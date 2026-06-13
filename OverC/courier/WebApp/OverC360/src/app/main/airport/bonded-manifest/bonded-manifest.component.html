@@ -1,0 +1,227 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Bonded Manifest </p>
+        <div class="d-flex justify-content-between align-items-center">
+            <img type="button" (click)="openCrud('Edit')" src="./assets/common/edit.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="downloadExcel()" src="./assets/common/download.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="deleteDialog()" src="./assets/common/deletetool.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="op.toggle($event)" src="./assets/common/settings.png" alt="" srcset=""
+                style="margin-left: 19px; margin-right: 28px; height: 1.5rem;">
+            <p-overlayPanel [style]="{ width: '180' }" #op>
+                <div class="d-flex flex-column">
+                    <button style="width: 8rem;" mat-menu-item class="w-100" (click)="updateBulk()"><img
+                            src="./assets/common2x/update.png" style="padding-right: 10px;width: 2rem;" srcset="">Bulk
+                        Update</button>
+                </div>
+            </p-overlayPanel>
+            <button type="button" class="btn ml-2 addNewbuttom bgBlack text-white" (click)="openCrud('New')"><i
+                    class="bi bi-plus-square pr-2"></i> Add New</button>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-start align-items-center"
+        style="margin-bottom: 1.1rem !important;margin-top: 0.8rem;">
+        <p-iconField iconPosition="right" class="mr-2">
+            <p-inputIcon type="button" (click)="bondedmanifest.toggle($event)" styleClass="pi pi-filter" />
+            <input type="text" id="toolInput1"  pInputText appTrim  placeholder="Advance filter"
+                (input)="bondedManifestTag.filterGlobal($any($event.target).value, 'contains')" />
+        </p-iconField>
+
+        <p-overlayPanel [dismissable]="false" appendTo="body" [style]="{ width: '80vw'}"
+            [styleClass]="'custom-overlay-panel'" #bondedmanifest>
+            <form [formGroup]="searchform" style="padding: 2rem;">
+                <div class="row">
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Bonded ID</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="bondedIdDropdown"
+                            formControlName="bondedId" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">MAWB</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="masterAirwayBillDropdown"
+                            formControlName="masterAirwayBill" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">HAWB</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="houseAirwayBillDropdown"
+                            formControlName="houseAirwayBill" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="partnerDropdown"
+                            formControlName="partnerId" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">HS Code</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="hsCodeDropdown"
+                            formControlName="hsCode" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <!-- <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Status</p>
+                        <p-multiSelect [showClear]="true"  placeholder="Select" filter="true" [options]="statusDropdown" formControlName="statusId" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" />
+                      </div> -->
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <img type="button" (click)="reset()" src="./assets/common/reset.png" alt="" srcset="">
+                    </div>
+                    <div>
+                        <button class="buttom1 textBlack mx-1" (click)="closeOverLay()">Cancel</button>
+                        <button class="buttom1 bgBlack text-white mx-1" (click)="search()">Apply</button>
+                    </div>
+                </div>
+            </form>
+        </p-overlayPanel>
+
+        <p-chips (onRemove)="chipClear($event)" [(ngModel)]="fieldsWithValue" class="inputborderLess" />
+    </div>
+
+
+    <div class="tableProperties">
+        <p-table #bondedManifestTag [columns]="cols" [value]="bondedManifestTable" class="custom-table"
+            [scrollable]="true" selectionMode="multiple" [(selection)]="selectedBondedManifest" sortField="createdOn"
+            [sortOrder]="-1" scrollHeight="calc(100vh - 20.8rem)" [paginator]="true" [rows]="100"
+            [showCurrentPageReport]="true" sortField="createdOn" [sortOrder]="-1" [tableStyle]="{'width': '110rem'}"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" styleClass="p-datatable-sm"
+            (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)" dataKey="pieceItemId"
+            rowExpandMode="single">
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th style="width: 5rem;">
+                        <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                    </th>
+                    <th style="width: 5rem;">
+                        Actions
+                    </th>
+                    <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                        {{ col.header }} <p-sortIcon [field]="col.field" />
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 5rem;">
+                        <p-tableHeaderCheckbox class="pl-3" [disabled]="true"></p-tableHeaderCheckbox>
+                    </th>
+                    <th *ngFor="let col of columns">
+                        <input  pInputText appTrim  type="text"
+                            (input)="bondedManifestTag.filter($any($event.target)?.value, col.field, 'contains')"
+                            [value]="$any(bondedManifestTag.filters[col.field])?.value" placeholder="Search"
+                            class="p-column-filter">
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns" let-expanded="expanded">
+                <tr [ngClass]="{'selectedRow': isSelected(rowData)}">
+                    <td style="width: 5rem; justify-content: center;">
+                        <p-tableCheckbox class="pl-3" [value]="rowData" />
+                    </td>
+                    <td style="width: 5rem; justify-content: center;">
+                        <i style="font-size: 14px;" [pRowToggler]="rowData"
+                            [ngClass]="expanded ?  'bi-chevron-up' : 'bi-chevron-right'"></i>
+                    </td>
+                    <td *ngFor="let col of columns">
+                        <ng-container *ngIf="col.format !== 'date'; else dateTemplate">
+                            {{ rowData[col.field] }}
+                        </ng-container>
+                        <ng-template #dateTemplate>
+                            {{ rowData.createdOn | date: 'dd-MM-yyyy HH:mm' }}
+                        </ng-template>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-rowData let-expanded="expanded">
+                <td [attr.colspan]="getColspan()" class="px-4">
+                    <div class="d-flex justify-content animate__animated animate__fadeIn">
+                        <div class="lineBorder"></div>
+                        <div class="contentBox ">
+                            <div class="row">
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">MAWB</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.masterAirwayBill}}</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Partner HAWB</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.partnerHouseAirwayBill}}</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Origin</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip"
+                                        [ngClass]="rowData.countryOfOrigin ? 'bgOrange text-dark w-75 textCenter' : ''">
+                                        {{rowData.countryOfOrigin}}</p>
+                                </div>
+
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Bonded ID</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.bondedId}}</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Bill of Lading No</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.houseAirwayBill}}</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Bill of Lading For</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.billOfLadingFor}}</p>
+                                </div>
+
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Payment Type</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.paymentType}}</p>
+                                </div>
+
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">No of Pcs</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.quantity}}</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 headerText">Weight</p>
+                                </div>
+                                <div class="col-2 spacingBottom">
+                                    <p class="mb-0 valueText chip">{{rowData.grossWeight}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="4">
+                        <p class="my-2 w-100 pl-3">No records found</p>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+
+<mat-menu #menu="matMenu" class="customClass">
+    <ng-template matMenuContent let-aliasMenuItems="delivery">
+        <button mat-menu-item>Edit</button>
+        <button mat-menu-item>Confirm</button>
+    </ng-template>
+</mat-menu>

@@ -1,0 +1,72 @@
+<div class="bgWhite text-black w-93 h-100 mx-4 my-2 mt-4">
+  <div class="d-flex justify-content-between align-items-center">
+      <p class="componentHeader f600 mb-0">List Items</p>
+      <button (click)="addItem()" type="button" class="btn ml-2 addNewbuttom bgBlack text-white"><i
+          class="bi bi-plus-square pr-2"></i> Add New</button>
+  </div>
+  <div class="mt-4 pt-2">
+    <form [formGroup]="itemForm" class="mt-1 mx-3">
+      <p-table [scrollable]="true" class="paddingZero" scrollHeight="calc(100vh - 24.8rem)"
+        [value]="itemDetails.controls" >
+        <ng-template pTemplate="header">
+          <tr>
+            <th >HS Code</th>
+            <th >Description</th>
+            <th >Qty</th>
+            <th >Unit Value</th>
+            <th >Total Value</th>
+            <th >Currency</th>
+            <th >Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-i="rowIndex"  let-rowData>
+          <tr [formGroup]="item">
+            <td>
+              <p-dropdown [showClear]="true"  *ngIf="!showInput" (dblclick)="toggleInput()" [options]="hsCodeList" #hscode placeholder="Select" filter="true"
+              formControlName="hsCode" appendTo="body" (onChange)="hsCodeChange(hscode, rowData)"
+              [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+              <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                placeholder="Search" /></ng-template></p-dropdown>
+              <input  (dblclick)="toggleInput()" *ngIf="showInput" class="inputborderLess pl-3" placeholder="Enter" formControlName="hsCode">
+            </td>
+            <td><input   class="inputborderLess pl-3" placeholder="Enter" formControlName="description"></td>
+            <td ><input class="inputborderLess pl-3" placeholder="Enter" (change)="calculateTotalValue(rowData)" formControlName="quantity"></td>
+            <td><input class="inputborderLess pl-3" placeholder="Enter" (change)="calculateTotalValue(rowData)" formControlName="unitValue"></td>
+            <td><input class="inputborderLess pl-3" placeholder="Enter" formControlName="declaredValue"></td>
+            <td>
+              <p-dropdown [showClear]="true"  [options]="currencyDropdown" placeholder="Select" filter="true"
+              formControlName="currency" appendTo="body"
+              [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+              <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                placeholder="Search" /></ng-template></p-dropdown>
+            </td>
+            <td style="padding-left: 1.5rem !important;">
+              <img type="button" src="./assets/common/actions.png" (click)="op.toggle($event)"
+                  alt="" srcset="" style="height: 1.4rem;">
+              <p-overlayPanel [style]="{ width: '180' }" #op>
+                  <div class="d-flex flex-column">
+                      <button style="width: 8rem;" mat-menu-item class="w-100"
+                          (click)="op.hide(); dimension(this.data.pageflow, 'item', i)"><img
+                              src="./assets/common/dimension.png" style="padding-right: 10px;width: 2rem;"
+                              srcset="">Dimension</button>
+                      <button style="width: 8rem;" mat-menu-item class="w-100"
+                          (click)="op.hide(); removeItem(i, rowData)"><img
+                              src="./assets/common/delete1x.png" style="padding-right: 10px;width: 2rem;"
+                              srcset="">Delete</button>
+                      <button style="width: 8rem;" mat-menu-item class="w-100" (click)="op.hide(); imageupload(this.data.pageflow, i)"><img
+                              src="./assets/common/image.png" style="padding-right: 10px;width: 2rem;"
+                              srcset="">Image</button>
+                  </div>
+              </p-overlayPanel>
+          </td>
+
+          </tr>
+        </ng-template>
+      </p-table>
+    </form>
+  </div>
+  <div class="d-flex my-3 justify-content-end">
+      <button class="buttom1 textBlack mx-1" mat-dialog-close >Back</button>
+      <button class="buttom1 bgBlack text-white mx-1" (click)="save()">Save</button>
+  </div>
+</div>

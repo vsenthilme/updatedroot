@@ -1,0 +1,119 @@
+<div class="bgWhite text-black w-93 h-100 m-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">{{this.data.title }} - Bulk Update</p>
+    </div>
+    <div class="mt-4 pt-2">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row scrollNew">
+                    <!-- <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner MAWB</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="partnerMasterAirwayBill" class="w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div> -->
+                    <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Origin Code</p>
+                        <p-dropdown [showClear]="true"  [options]="countryIdList" formControlName="countryOfOrigin" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}"
+                            placeholder="Select" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                        
+                    </div>
+
+                    <!-- <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Status</p>
+                        <p-dropdown [showClear]="true"  [options]="statusList" placeholder="Select" filter="true" formControlName="statusId" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div  class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Event</p>
+                        <p-dropdown [showClear]="true"  [options]="eventList" placeholder="Select" filter="true" formControlName="eventCode" appendTo="body"  (onChange)="eventChange()"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+
+                    </div> -->
+                    <div *ngIf="this.showHub == true" class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">HUB</p>
+                        <p-dropdown [showClear]="true"  [options]="hubList" placeholder="Select" filter="true" formControlName="hubCode"
+                            appendTo="body" [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Flight No </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="flightNo" class="w-100"  pInputText appTrim 
+                            placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Customer/Consignor</p>
+                        <p-dropdown [showClear]="true"  [options]="consignorIdList" formControlName="shipperId" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}"
+                            placeholder="Select" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <!-- <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Inco Terms</p>
+                        <p-dropdown [showClear]="true"  [options]="incoTerms" placeholder="Select" filter="true" formControlName="incoTerms"
+                            appendTo="body" [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+
+                    </div> -->
+                    <!-- <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">HS Code</p>
+                        <p-dropdown [showClear]="true"  [options]="hsCodeList" placeholder="Select" filter="true" formControlName="hsCode"
+                            appendTo="body" [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                    </div> -->
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Bayan HV</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="bayanHv" class="w-100"  pInputText appTrim 
+                            placeholder="Enter" />
+                    </div>
+                    <!-- <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Currency</p>
+                        <p-dropdown [showClear]="true"  [options]="currencyIdList" placeholder="Select" filter="true" formControlName="currency"
+                            appendTo="body" [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                    </div> -->
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Flight Name</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="flightName" class="w-100"  pInputText appTrim 
+                            placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Origin</p>
+                        <p-dropdown [showClear]="true"  [options]="airportOriginList" placeholder="Select" filter="true"
+                            formControlName="origin" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Flight Arrival</p>
+                        <p-calendar dateFormat="dd/mm/yy" formControlName="estimatedTimeOfArrival" appendTo="body"
+                            class=" w-100 small-calendar" placeholder="Select Date" [iconDisplay]="'input'"
+                            [showIcon]="true" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Flight Departure</p>
+                        <p-calendar  dateFormat="dd/mm/yy" formControlName="estimatedTimeOfDeparture" appendTo="body"
+                            class=" w-100 small-calendar" placeholder="Select Date" [iconDisplay]="'input'"
+                            [showIcon]="true" />
+                    </div>
+                </div>
+                <div class="d-flex float-right py-2">
+                    <button mat-dialog-close class="buttom1 textBlack mx-1" (click)="cancel()">Cancel</button>
+                    <button type="button" class="buttom1 bgBlack text-white mx-1" (click)="save()">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,128 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Rate Parameter - {{this.pageToken.pageflow}}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="invisible buttom1 bgBlack text-white ml-2">Transfer</button>
+        </div>
+    </div>
+    <div class="w-75 mt-4 mx-auto">
+        <form [formGroup]="form">
+            <p-stepper [(activeStep)]="active">
+                <p-stepperPanel>
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class=" d-flex justify-content-center align-items-center">
+                                <p *ngIf="active == 0;" class="circle borderCircle mb-0">1</p>
+                                <img *ngIf="active != 0;" src="./assets/dashboard/tick.png" alt="" srcset="">
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600 textBlack">General</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-nextCallback="nextCallback">
+                        <div class="row">
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Language</p>
+                                <p-dropdown [showClear]="true"  [options]="languageIdList" formControlName="languageId" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('languageId')"
+                                    class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                                <p-dropdown [showClear]="true"  [options]="companyIdList" formControlName="companyId" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('companyId')"
+                                    class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Rate Parameter ID</p>
+                                <input maxlength="50"  pInputText appTrim  pKeyFilter="alphanum" formControlName="rateParameterId"
+                                    [ngClass]="form.get('rateParameterId')?.invalid && form.get('rateParameterId')?.dirty ? 'invalid' : ''"
+                                    class="w-100"  pInputText appTrim  placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0 required">Rate Parameter Name</p>
+                                <input maxlength="100"  pInputText appTrim  pKeyFilter="alphanum"
+                                    formControlName="rateParameterDescription"
+                                    [ngClass]="form.get('rateParameterDescription')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                    class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                                <mat-error *ngIf="errorHandling('rateParameterDescription')"
+                                    class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Status</p>
+                                <p-dropdown [showClear]="true"  [options]="status" [style]="{'width': '100%'}" appendTo="body"
+                                    formControlName="statusId" placeholder="Select " >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Remarks</p>
+                                <input maxlength="2000" formControlName="remark" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                        </div>
+                        <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1"
+                                routerLink="/main/idMaster/rateParameter">Cancel</button>
+                            <button
+                                class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow !=
+                                'New' ? 'Update': 'Save'}}</button>
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+                <p-stepperPanel *ngIf="this.pageToken.pageflow != 'New'">
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <p class="circle mb-0" [ngClass]="active == 2 ? 'borderCircle' : 'disabled text-muted'">
+                                    2</p>
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600" [ngClass]="active == 2 ? 'textBlack f600' : 'text-muted'">
+                                    Admin</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-prevCallback="prevCallback">
+                        <div class="row">
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Created By</p>
+                                <input type="text" formControlName="createdBy" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Created On</p>
+                                <input type="text" formControlName="createdOn" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Updated By</p>
+                                <input type="text" formControlName="updatedBy" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Updated On</p>
+                                <input type="text" formControlName="updatedOn" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                        </div>
+                        <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1" (click)="prevCallback.emit()">Back</button>
+                            <button
+                                class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow !=
+                                'New' ? 'Update': 'Save'}}</button>
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+            </p-stepper>
+        </form>
+    </div>
+</div>

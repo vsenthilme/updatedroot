@@ -1,0 +1,116 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Customs Invoice - {{this.pageToken.pageflow}}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <button [disabled]="this.pageToken.pageflow != 'New'" type="button" class="btn ml-2 addNewbuttom bgBlack text-white" (click)="execute()"><i
+                    class="bi bi-check2 pr-2"></i>Execute</button>
+        </div>
+    </div>
+
+    <div class="mx-auto mt-4 md-4">
+        <form [formGroup]="searchForm" *ngIf="this.pageToken.pageflow == 'New'">
+            <div class="row">
+                <div class="col-3 marginFieldNew borderRadius12">
+                    <p class="formControlLabel f600 textBlack mb-0">Date</p>
+                    <p-calendar [yearNavigator]="true" [showButtonBar]="true" #myStartCalendar [monthNavigator]="true"
+                        yearRange="2000:2099" (onSelect)="filter('date')" dateFormat="dd/mm/yy"
+                        [hideOnDateTimeSelect]="true" formControlName="fullDate" placeholder="Choose Date"
+                        selectionMode="range" [readonlyInput]="true" inputId="range" />
+                </div>
+                <div class="col-3 marginFieldNew borderRadius12">
+                    <p class="formControlLabel f600 textBlack mb-0 required">Customer</p>
+                    <p-dropdown [showClear]="true"  [filter]="true" placeholder="Select" [options]="customerList"  (onChange)="customerChange()"
+                        formControlName="partnerId" appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                        [panelStyle]="{'width':'100%'}" >
+                        <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                </div>
+                <div class="col-3 marginFieldNew borderRadius12">
+                    <p class="formControlLabel f600 textBlack mb-0">MAWB</p>
+                    <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="mawbList"
+                        formControlName="partnerMasterAirwayBill" appendTo="body" [style]="{'width': '100%'}"
+                        [panelStyle]="{'width':'100%'}" />
+                </div>
+            </div>
+        </form>
+        <div class="d-flex-row">
+            <form [formGroup]="form" *ngIf="submitted || this.pageToken.pageflow != 'New'">
+                <div class="row scrollNew">
+                    <div class="col-3 marginFieldNew borderRadius12" *ngIf="this.pageToken.pageflow != 'New'">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Invoice Number</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="invoiceNo"class="w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div> 
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Invoice Date</p>
+                        <p-calendar dateFormat="dd/mm/yy" formControlName="invoiceDateFE" appendTo="body" class=" w-100 small-calendar"
+                            placeholder="Select Date" [iconDisplay]="'input'" [showIcon]="true" />
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Customer</p>
+                        <p-dropdown [showClear]="true"  [filter]="true" placeholder="Select" [options]="customerList"
+                            formControlName="partnerId" appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                            [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Invoice Description</p>
+                        <input  pInputText appTrim  formControlName="description"class="w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div> 
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Status</p>
+                        <p-dropdown [showClear]="true"  [filter]="true" placeholder="Select" [options]="status" 
+                            formControlName="statusId" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                </div>
+            </form>
+            <div class="tableProperties">
+                <p-table  [scrollable]="true" [columns]="cols" scrollHeight="calc(100vh - 24.8rem)" [tableStyle]="{'width': '120rem'}"
+                [value]="invoiceLines.controls" selectionMode="multiple" [(selection)]="selectedInvoice">
+                    <ng-template pTemplate="header"  let-columns>
+                        <tr>
+                            <th style="width: 5rem;">
+                                <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                              </th>
+                              <th *ngFor="let col of columns">{{ col.header }}</th>
+                        </tr>
+                      </ng-template>
+                    
+                      <ng-template pTemplate="body" let-columns="columns" let-item let-i="rowIndex" let-rowData>
+                        <tr [formGroup]="item">
+                            <td style="width: 5rem; justify-content: center;">
+                                <p-tableCheckbox class="pl-4" [value]="rowData" />
+                            </td>
+                            <td *ngFor="let col of columns">
+                                <ng-container *ngIf="col.format !== 'Input'; else others">
+                                    <p-inputNumber [minFractionDigits]="3"  class="inputborderLess1 pl-3" [formControlName]="col.field" (change)="calculcateTotal(rowData)" />
+                                </ng-container>
+                                <ng-template #others>
+                                    <input class="inputborderLess pl-3" [formControlName]="col.field" />
+                                </ng-template>
+                              </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="4">
+                                <p class="my-2 w-100 pl-3">No records found</p>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+        <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 43%; bottom: 7%;">
+            <button class="buttom1 textBlack mx-1" routerLink="/main/finance/invoice">Cancel</button>
+            <button class="buttom1 bgBlack text-white mx-1" *ngIf="submitted || this.pageToken.pageflow != 'New'" (click)="save()">{{this.pageToken.pageflow
+                != 'New' ? 'Update': 'Create Invoice'}}</button>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,27 @@
+.circle {
+    width: 44px;
+    height: 44px;
+    flex-grow: 0;
+    margin: 0 6px 12px;
+    border-radius: 100%;
+    padding: 12px 17px 11px;
+    background-color: var(--white);
+  }
+  
+  .borderCircle {
+    border: solid 1.5px var(--black);
+  }
+  
+  .marginFieldNew {
+    margin-bottom: 1.5rem;
+  }
+  
+  .img-icon {
+    gap: 2rem;
+  }
+  .scrollHorizontal{width: 115rem !important;overflow-x: scroll !important;}
+.scroll2 {
+  overflow-y: scroll !important;
+  height: calc(100vh - 27.2px) !important;
+}
+  

@@ -1,0 +1,136 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Customer - {{this.pageToken.pageflow}}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="invisible buttom1 bgBlack text-white ml-2">Transfer</button>
+        </div>
+    </div>
+    <div class="mx-auto mt-4">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row">
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Language</p>
+                        <p-dropdown [showClear]="true"  [options]="languageIdList" formControlName="languageId" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                        <mat-error *ngIf="errorHandling('languageId')"
+                            class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                        <p-dropdown [showClear]="true"  [options]="companyIdList" formControlName="companyId" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                        <mat-error *ngIf="errorHandling('companyId')"
+                            class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Customer ID</p>
+                        <input maxlength="50"  pInputText appTrim  pKeyFilter="alphanum" formControlName="customerId"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Customer Name</p>
+                        <input maxlength="100"  pInputText appTrim  formControlName="customerName"
+                            [ngClass]="form.get('customerName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                        <mat-error *ngIf="errorHandling('customerName')"
+                            class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Aging Count</p>
+                        <input maxlength="100"  pInputText appTrim  formControlName="agingCount"
+                            [ngClass]="form.get('agingCount')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                        <mat-error *ngIf="errorHandling('agingCount')"
+                            class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Status</p>
+                        <p-dropdown [showClear]="true"  [options]="status" [style]="{'width': '100%'}" appendTo="body"
+                            formControlName="statusId" placeholder="Select " />
+
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Remark</p>
+                        <input maxlength="2000" formControlName="remark" class=" w-100"  pInputText appTrim 
+                            placeholder="Enter" />
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mb-3">
+                    <button (click)="add()" type="button" class="btn ml-2 addNewbuttom bgBlack text-white"><i
+                            class="bi bi-plus-square pr-2"></i>Add Values</button>
+                </div>
+
+                <div class="d-flex-row">
+                    <p-table [scrollable]="true" scrollHeight="calc(100vh - 37.8rem)" [value]="customerArray">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Sub Product</th>
+                                <th>Sub Product Name</th>
+                                <th>Sub Product Value</th>
+                                <th>Sub Product Value Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-item let-i="rowIndex" let-rowData>
+                            <tr>
+                                <td>
+                                    <p class="w-100 pl-2 ml-2">{{ item.productName }}
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="w-100 pl-2 ml-2">{{ item.subProductId }}
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="w-100 pl-2 ml-2">{{ item.subProductName }}
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="w-100 pl-2 ml-2">{{ item.subProductValue }}
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="w-100 pl-2 ml-2">{{ item.referenceField1 }}
+                                    </p>
+                                </td>
+                                <!-- <td>
+                                    <div class="d-flex img-icon px-3">
+                                        <img type="button" src="./assets/common/edit.png" (click)="editItem('Edit',i)" alt="" width="24px" height="24px">
+                                        <img type="button" (click)="removeItem(i)" src="./assets/common/deletetool.png"
+                                            alt="" srcset="" width="24px" height="24px">
+                                    </div>
+                                </td> -->
+                                <td style="padding-left: 1.5rem !important;" pFrozenColumn alignFrozen="right">
+                                    <img type="button" src="./assets/common/actions.png" (click)="op.toggle($event)"
+                                        alt="" srcset="" style="height: 1.4rem;">
+                                    <p-overlayPanel [style]="{ width: '180' }" #op>
+                                        <div class="d-flex flex-column">
+                                            <button style="width: 8rem;" mat-menu-item class="w-100"
+                                                (click)="editItem('Edit',i); op.hide()"><img
+                                                    src="./assets/common/edit.png"
+                                                    style="padding-right: 10px;width: 2rem;" srcset="">Edit</button>
+                                            <button style="width: 8rem;" mat-menu-item class="w-100"
+                                                (click)="removeItem(i)"><img src="./assets/common/deletetool.png"
+                                                    style="padding-right: 10px;width: 2rem;" srcset="">Delete</button>
+                                        </div>
+                                    </p-overlayPanel>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%;">
+                <button class="buttom1 textBlack mx-1" routerLink="/main/master/customer">Cancel</button>
+                <button class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow
+                    != 'New' ? 'Update': 'Save'}}</button>
+            </div>
+        </form>
+    </div>
+</div>

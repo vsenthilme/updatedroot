@@ -1,0 +1,26 @@
+pipeline {
+    agent {
+        docker {
+            image 'node:14' // Docker image to use
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'npm install' // Example build step
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'npm test' // Example test step
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'docker build -t wrapper .' // Build Docker image
+                sh 'docker run -d -p 8586:8586 wrapper' // Run Docker container
+            }
+        }
+    }
+}

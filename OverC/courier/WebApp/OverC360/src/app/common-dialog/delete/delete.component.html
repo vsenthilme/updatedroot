@@ -1,0 +1,11 @@
+<div class="bgBlack w-100  text-white deleteDialog">
+    <div class="d-flex justify-content-center">
+        <img src="./assets/common/delete.png" style="width: 3rem;" class="text-center" alt="" srcset="">
+    </div>
+    <h1 class="deleteHeader mb-0 text-center mt-3">Are you sure, Delete {{this.data.module}}?</h1>
+    <p class="deleteBody px-3 mb-0 text-center">{{this.data.body}}</p>
+    <div class="d-flex justify-content-center align-items-center py-2">
+        <button mat-dialog-close type="button" class="btn mr-2 cancelButton">Cancel</button>
+        <button type="button" class="btn ml-2 saveButton" (click)="delete()">Yes</button>
+    </div>
+</div>

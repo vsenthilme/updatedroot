@@ -1,0 +1,34 @@
+.circle {
+    width: 44px;
+    height: 44px;
+    flex-grow: 0;
+    margin: 0 6px 12px;
+    border-radius: 100%;
+    padding: 12px 17px 11px;
+    background-color: var(--white);
+  }
+  .borderCircle{border: solid 1.5px var(--black);}
+  .marginFieldNew{margin-bottom: 2.5rem;}
+  .scrollNew{height: calc(100vh - 24rem); overflow-y: scroll;}
+
+
+  .mat-mdc-tab-group, .mat-mdc-tab-nav-bar {
+    --mdc-tab-indicator-active-indicator-color: #fb4;
+    --mat-tab-header-disabled-ripple-color: black;
+    --mat-tab-header-pagination-icon-color: #000;
+    --mat-tab-header-inactive-label-text-color: black;
+    --mat-tab-header-active-label-text-color: #fb4;
+    --mat-tab-header-active-ripple-color: #fb4;
+    --mat-tab-header-inactive-ripple-color: #fb4;
+    --mat-tab-header-inactive-focus-label-text-color: black;
+    --mat-tab-header-inactive-hover-label-text-color: black;
+    --mat-tab-header-active-focus-label-text-color: #fb4;
+    --mat-tab-header-active-hover-label-text-color: #fb4;
+    --mat-tab-header-active-focus-indicator-color: #fb4;
+    --mat-tab-header-active-hover-indicator-color: #fb4;
+}
+
+
+
+
+  

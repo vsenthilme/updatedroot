@@ -1,0 +1,344 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Delivery - {{this.pageToken.pageflow}}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="invisible buttom1 bgBlack text-white ml-2">Transfer</button>
+        </div>
+    </div>
+    <div class="w-75 mt-4 mx-auto">
+        <form [formGroup]="form">
+            <p-stepper [(activeStep)]="active">
+                <p-stepperPanel>
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class=" d-flex justify-content-center align-items-center">
+                                <p *ngIf="active == 0;" class="circle borderCircle mb-0">1</p>
+                                <img *ngIf="active != 0;" src="./assets/dashboard/tick.png" alt="" srcset="">
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600 textBlack">General</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-nextCallback="nextCallback">
+                        <div class="row scrollNew">
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                                <p-dropdown [showClear]="true" [options]="companyIdList" formControlName="companyId"
+                                    appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                                    [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('companyId')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Partner ID</p>
+                                <p-dropdown [showClear]="true" [options]="partnerIdList" placeholder="Select"
+                                    filter="true" formControlName="partnerId" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">HAWB</p>
+                                <p-dropdown [showClear]="true" [options]="houseAirwayBillList" placeholder="Select"
+                                    filter="true" formControlName="houseAirwayBill" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Service Type ID</p>
+                                <p-dropdown [showClear]="true" [options]="serviceTypeIdList" placeholder="Select"
+                                    filter="true" formControlName="serviceTypeId" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Piece Count</p>
+                                <input maxlength="50" formControlName="pieceCount" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Pickup Type</p>
+                                <p-dropdown [showClear]="true" [options]="pickupTypeList" placeholder="Select"
+                                    filter="true" formControlName="pickupType" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0 required">Pickup ID</p>
+                                <input pInputText appTrim formControlName="pickUpId" maxlength="50" class=" w-100"
+                                    [ngClass]="form.get('pickUpId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                    placeholder="Enter" />
+                                <mat-error *ngIf="errorHandling('pickUpId')"
+                                    class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Piece ID</p>
+                                <input pInputText appTrim formControlName="pieceId" maxlength="50" class=" w-100"
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Payment Type</p>
+                                <p-dropdown [showClear]="true" [options]="paymentTypeList" placeholder="Select"
+                                    filter="true" formControlName="paymentType" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Total Shipment Weight</p>
+                                <input maxlength="50" formControlName="totalShipmentWeight" class=" w-100" pInputText
+                                    appTrim placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">COD Amount</p>
+                                <input maxlength="50" formControlName="codAmount" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">COD Collection Mode</p>
+                                <p-dropdown [showClear]="true" [options]="codCollectionModeList" placeholder="Select"
+                                    filter="true" formControlName="codCollectionMode" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Priority</p>
+                                <p-dropdown [showClear]="true" [options]="priorityList" placeholder="Select"
+                                    filter="true" formControlName="priority" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Courier Type</p>
+                                <p-dropdown [showClear]="true" [options]="courierTypeList" placeholder="Select"
+                                    filter="true" formControlName="courierType"
+                                    [ngClass]="form.get('courierType')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                    appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                                    [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Courier ID</p>
+                                <p-dropdown [showClear]="true" [options]="courierIdList" placeholder="Select"
+                                    filter="true" formControlName="courierId"
+                                    [ngClass]="form.get('courierId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                    appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                                    [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Zone Type Text</p>
+                                <input maxlength="50" formControlName="zoneTypeText" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Zone Type Text</p>
+                                <input maxlength="50" formControlName="zoneTypeText" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Remark</p>
+                                <input maxlength="2000" formControlName="remarks" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Status</p>
+                                <p-dropdown [showClear]="true" [options]="status" [style]="{'width': '100%'}"
+                                    appendTo="body" formControlName="statusId" placeholder="Select" filter="true">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                        </div>
+                        <div class="d-flex mt-1 justify-content-end"
+                            style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1" routerLink="/main/lastMile/pickup">Cancel</button>
+                            <button class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow
+                                != 'New' ? 'Update': 'Save'}}</button>
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+                <p-stepperPanel>
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class=" d-flex justify-content-center align-items-center">
+                                <p *ngIf="active == 0;" class="circle borderCircle mb-0">2</p>
+                                <img *ngIf="active != 0;" src="./assets/dashboard/tick.png" alt="" srcset="">
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600 textBlack">Pickup Details</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-nextCallback="nextCallback">
+                        <div class="row scrollNew">
+                            <div class="col-6 marginFieldNew borderRadius12" id="name" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0"> Name</p>
+                                <input maxlength="50" formControlName="name" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="addressLine1" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Address Line 1</p>
+                                <input maxlength="50" formControlName="addressLine1" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="addressLine2" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Address Line 2</p>
+                                <input maxlength="50" formControlName="addressLine2" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="city" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">City</p>
+                                <p-dropdown [showClear]="true" [options]="cityIdList" placeholder="Select" filter="true"
+                                    formControlName="city" appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                                    [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="district" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">District</p>
+                                <p-dropdown [showClear]="true" [options]="districtIdList" placeholder="Select"
+                                    filter="true" formControlName="district" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="districtChanged()">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="state" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">State</p>
+                                <p-dropdown [showClear]="true" [options]="provinceIdList" placeholder="Select"
+                                    filter="true" formControlName="state" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="provinceChanged()">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="district" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Country</p>
+                                <p-dropdown [showClear]="true" [options]="countryIdList" placeholder="Select"
+                                    filter="true" formControlName="Country" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="countryChanged()">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="pincode" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Pincode</p>
+                                <input maxlength="50" formControlName="pincode" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="phone" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Phone</p>
+                                <input maxlength="50" formControlName="phone" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="phone" formGroupName="pickupDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Alternate Phone</p>
+                                <input maxlength="50" formControlName="alternatePhone" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                        </div>
+                        <div class="d-flex mt-1 justify-content-end"
+                            style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1" routerLink="/main/lastMile/pickup">Cancel</button>
+                            <button class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow
+                                != 'New' ? 'Update': 'Save'}}</button>
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+                <p-stepperPanel>
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class=" d-flex justify-content-center align-items-center">
+                                <p *ngIf="active == 0;" class="circle borderCircle mb-0">3</p>
+                                <img *ngIf="active != 0;" src="./assets/dashboard/tick.png" alt="" srcset="">
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600 textBlack">Destination Details</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-nextCallback="nextCallback">
+                        <div class="row scrollNew">
+                
+                            <div class="col-6 marginFieldNew borderRadius12" id="name" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0"> Name</p>
+                                <input maxlength="50" formControlName="name" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="addressLine1" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Address Line 1</p>
+                                <input maxlength="50" formControlName="addressLine1" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="addressLine2" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Address Line 2</p>
+                                <input maxlength="50" formControlName="addressLine2" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="city" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">City</p>
+                                <p-dropdown [showClear]="true" [options]="cityIdList" placeholder="Select" filter="true"
+                                    formControlName="city" appendTo="body" [style]="{'width': '100%'}" [disabled]="true"
+                                    [panelStyle]="{'width':'100%'}">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="district" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">District</p>
+                                <p-dropdown [showClear]="true" [options]="districtIdList" placeholder="Select"
+                                    filter="true" formControlName="district" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="districtChanged()">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="state" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">State</p>
+                                <p-dropdown [showClear]="true" [options]="provinceIdList" placeholder="Select"
+                                    filter="true" formControlName="state" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="provinceChanged()">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="district" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Country</p>
+                                <p-dropdown [showClear]="true" [options]="countryIdList" placeholder="Select"
+                                    filter="true" formControlName="Country" appendTo="body" [style]="{'width': '100%'}"
+                                    [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="countryChanged()">
+                                    <ng-template pTemplate="filter"><input type="text" pInputText appTrim appTrim
+                                            placeholder="Search" /></ng-template></p-dropdown>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="pincode" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Pincode</p>
+                                <input maxlength="50" formControlName="pincode" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="phone" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Phone</p>
+                                <input maxlength="50" formControlName="phone" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="phone" formGroupName="destinationDetails">
+                                <p class="formControlLabel f600 textBlack mb-0">Alternate Phone</p>
+                                <input maxlength="50" formControlName="alternatePhone" class=" w-100" pInputText appTrim
+                                    placeholder="Enter" />
+                            </div>
+                        </div>
+                        <div class="d-flex mt-1 justify-content-end"
+                            style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1" routerLink="/main/lastMile/pickup">Cancel</button>
+                            <button class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow
+                                != 'New' ? 'Update': 'Save'}}</button>
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+            </p-stepper>
+        </form>
+    </div>
+</div>

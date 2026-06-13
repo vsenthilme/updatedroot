@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/main/last-mile/last-mile-routing.module.ts", "src/app/main/last-mile/last-mile.module.ts"],
+  "sourcesContent": ["import { NgModule } from '@angular/core';\r\nimport { RouterModule, Routes } from '@angular/router';\r\n\r\nconst routes: Routes = [];\r\n\r\n@NgModule({\r\n  imports: [RouterModule.forChild(routes)],\r\n  exports: [RouterModule]\r\n})\r\nexport class LastMileRoutingModule { }\r\n", "import { NgModule } from '@angular/core';\r\nimport { CommonModule } from '@angular/common';\r\n\r\nimport { LastMileRoutingModule } from './last-mile-routing.module';\r\n\r\n\r\n@NgModule({\r\n  declarations: [],\r\n  imports: [\r\n    CommonModule,\r\n    LastMileRoutingModule\r\n  ]\r\n})\r\nexport class LastMileModule { }\r\n"],
+  "mappings": ";;;;;;;;AAGA,IAAM,SAAiB,CAAA;AAMjB,IAAO,yBAAP,MAAO,uBAAqB;;;mBAArB,wBAAqB;AAAA;sFAArB,uBAAqB,CAAA;0FAHtB,aAAa,SAAS,MAAM,GAC5B,YAAY,EAAA,CAAA;AAElB,IAAO,wBAAP;;;ACIA,IAAO,kBAAP,MAAO,gBAAc;;;mBAAd,iBAAc;AAAA;+EAAd,gBAAc,CAAA;;EAJvB;EACA;AAAqB,EAAA,CAAA;AAGnB,IAAO,iBAAP;",
+  "names": []
+}

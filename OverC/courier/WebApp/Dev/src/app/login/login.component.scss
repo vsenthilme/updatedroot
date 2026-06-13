@@ -1,0 +1,75 @@
+.loginBg{
+    background-image: url(../../assets/login/loginPage.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.cardLogin{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem;
+    border-radius: 30px;
+    box-shadow: 0 0 200px 0 rgba(0, 0, 0, 0.25);
+    background-color: var(--white);
+}
+.Welcome {
+    flex-grow: 0;
+    font-family: Nunito;
+    font-size: 24px;
+    font-weight: bold;
+    font-stretch: normal;
+    padding-top: 3rem;
+    font-style: normal;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-align: center;
+    color: #000;
+  }
+  .subText {
+    flex-grow: 0;
+    font-family: Nunito;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-align: center;
+    color: #767676;
+  }
+  .Forgot {
+    flex-grow: 0;
+    font-family: Nunito;
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-align: left;
+    color: var(--black);
+  }
+
+  .signIn {
+    flex-grow: 0;
+    font-family: Nunito;
+    font-size: 16px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-align: center;
+    color: var(--white);
+
+    margin-top: 2.7rem !important;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background-color: var(--black);
+  }

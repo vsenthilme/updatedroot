@@ -1,0 +1,73 @@
+<div class="bgWhite text-black w-93 h-100 m-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Dimension</p>
+    </div>
+    <div class="mt-4 pt-2">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row">
+                    <div class="col-6 marginFieldNew borderRadius12" id="length">
+                        <p class="formControlLabel f600 textBlack mb-0">Length</p>
+                        <input maxlength="50" pKeyFilter="num"
+                            (change)="calculateVolume(this.form)" formControlName="length"
+                            class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="width">
+                        <p class="formControlLabel f600 textBlack mb-0">Width</p>
+                        <input maxlength="50" pKeyFilter="num"
+                            (change)="calculateVolume(this.form)" formControlName="width"
+                            class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="height">
+                        <p class="formControlLabel f600 textBlack mb-0">Height</p>
+                        <input maxlength="50" pKeyFilter="num"
+                            (change)="calculateVolume(this.form)" formControlName="height"
+                            class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12" id="dimensionUnit">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Dimension Unit</p>
+                        <p-dropdown [showClear]="true"  [options]="dimensionList" placeholder="Select" filter="true" formControlName="dimensionUnit" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <!-- <div class="col-6 marginFieldNew borderRadius12" id="dimensionUnit">
+                        <p class="formControlLabel f600 textBlack mb-0">Dimension Unit</p>
+                        <input maxlength="50" formControlName="dimensionUnit" class=" w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div> -->
+                    <div class="col-6 marginFieldNew borderRadius12" id="volume">
+                        <p class="formControlLabel f600 textBlack mb-0">Volume</p>
+                        <input maxlength="50" formControlName="volume" class=" w-100"  pInputText appTrim 
+                            placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="volumeUnit">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Volume Unit</p>
+                        <p-dropdown [showClear]="true"  [options]="volumeList" placeholder="Select" filter="true" formControlName="volumeUnit" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="weight">
+                        <p class="formControlLabel f600 textBlack mb-0">Weight</p>
+                        <input maxlength="50" formControlName="weight" class=" w-100"  pInputText appTrim 
+                            placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="weightUnit">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Weight Unit</p>
+                        <p-dropdown [showClear]="true"  [options]="weightList" placeholder="Select" filter="true" formControlName="weightUnit" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                </div>
+                <div class="d-flex float-right py-2" >
+                    <button mat-dialog-close class="buttom1 textBlack mx-1"
+                    >Cancel</button>
+                    <button type="button" class="buttom1 bgBlack text-white mx-1" (click)="save()">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

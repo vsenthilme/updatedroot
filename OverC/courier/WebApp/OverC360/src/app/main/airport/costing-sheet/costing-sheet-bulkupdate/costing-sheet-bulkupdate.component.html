@@ -1,0 +1,42 @@
+<div class="bgWhite text-black w-93 h-100 m-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <p  *ngIf="this.data.title=='Custom Calculations'"class="componentHeader f600 mb-0">{{this.data.title }} - Bulk Update</p>
+        <p  *ngIf="this.data.title!='Custom Calculations'"class="componentHeader f600 mb-0">{{this.data.title }}</p>
+    </div>
+    <div class="mt-4 pt-2">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row scrollNew">
+                    <div *ngIf="this.data.title=='Custom Calculations'" class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Cost Description</p>
+                        <p-dropdown [showClear]="true"  [options]="incoTerms" formControlName="costDescription" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}"
+                            placeholder="Select" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div *ngIf="this.data.title=='Custom Calculation'" class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Cost Description</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="costDescription"class="w-100"
+                         pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                     <div  *ngIf="this.data.title=='Custom Calculation' || this.data.title == 'Custom Calculations'"class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Cost Amount</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="costAmount"class="w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div> 
+                    <div  *ngIf="this.data.title=='Send To Operation' "class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Remarks</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="remark"class="w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div> 
+                </div>
+                <div class="d-flex float-right py-2">
+                    <button mat-dialog-close class="buttom1 textBlack mx-1">Cancel</button>
+                    <button type="button" class="buttom1 bgBlack text-white mx-1" (click)="save()">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

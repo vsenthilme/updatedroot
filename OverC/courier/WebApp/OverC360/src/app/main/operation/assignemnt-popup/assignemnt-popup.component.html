@@ -1,0 +1,62 @@
+<div class="componentBody">
+  <!-- Header Section -->
+  <div class="d-flex justify-content-between align-items-center">
+    <p class="header">Rider List</p>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="w-100 mt-0">
+    <!-- List of riders in tiles -->
+    <div *ngIf="raiders.length > 0">
+      <div class="raider-tiles-container">
+        <div class="raider-tile" *ngFor="let raider of raiders">
+          <div class="raider-header">
+            <!-- Material person icon -->
+            <div class="LocationName">
+              <span class="material-icons">person</span>
+            </div>
+            <div class="raider-info">
+              <div class="raider-name-container">
+                <h5 class="raider-name">{{ raider.name }}</h5>
+                <!-- Material location icon -->
+              </div>
+
+              <!-- Phone number section -->
+              <p class="raider-phone">{{ raider.phone }}</p>
+            </div>
+            <div class="Location">
+              <img src="../../../../assets/location.png" class="LocationPng" />
+            </div>
+          </div>
+          <!-- Data sections -->
+          <div class="raider-data">
+            <div class="data-item1">
+              <div class="data-value1">{{ raider.assigned }}</div>
+              <div class="data-label1">Assigned</div>
+            </div>
+            <div class="data-item2">
+              <div class="data-value2">{{ raider.delivered }}</div>
+              <div class="data-label2">Delivered</div>
+            </div>
+            <div class="data-item3">
+              <div class="data-value3">{{ raider.eta }}</div>
+              <div class="data-label3">ETA</div>
+            </div>
+            <div class="data-item4">
+              <div class="data-value4">{{ raider.currentLocation }}</div>
+              <div class="data-label4">Current Locations</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p *ngIf="raiders.length === 0" class="text-center">No riders available.</p>
+
+    <!-- Button Section -->
+    <div class="d-flex justify-content-end py-2 popup-container" >
+      <button mat-dialog-close class="button textBlack mx-1">Cancel</button>
+      <button type="button"  class="button bgBlack text-white mx-1">Save</button>
+    </div>
+  </div>
+</div>

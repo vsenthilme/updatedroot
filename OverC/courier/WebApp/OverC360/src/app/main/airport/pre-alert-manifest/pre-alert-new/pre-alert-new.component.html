@@ -1,0 +1,219 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Pre Alert Manifest - {{this.pageToken.pageflow}}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="invisible buttom1 bgBlack text-white ml-2">Transfer</button>
+        </div>
+    </div>
+    <div class="w-75 mt-4 mx-auto">
+        <form [formGroup]="form">
+            <p-stepper [(activeStep)]="active">
+                <p-stepperPanel>
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class=" d-flex justify-content-center align-items-center">
+                                <p *ngIf="active == 0;" class="circle borderCircle mb-0">1</p>
+                                <img *ngIf="active != 0;" src="./assets/dashboard/tick.png" alt="" srcset="">
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600 textBlack">General</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-nextCallback="nextCallback">
+
+                        <div class="row scrollNew">
+
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                                <p-dropdown [showClear]="true"  [options]="companyIdList" formControlName="companyId" appendTo="body"
+                                    [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('companyId')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0 required">Partner Type</p>
+                                <p-dropdown [showClear]="true"  [options]="partnerType" placeholder="Select" filter="true" formControlName="partnerType"
+                                    appendTo="body" [style]="{'width': '100%'}"  (onChange)="partnerTypeChanged()"
+                                    [panelStyle]="{'width':'100%'}" >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('partnerType')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="partnerId">
+                                <p class="formControlLabel f600 textBlack mb-0 required">Partner ID</p>
+                                <p-dropdown [showClear]="true"  [options]="customerIdList" placeholder="Select" filter="true"
+                                    formControlName="partnerId" appendTo="body"
+                                    [ngClass]="form.get('partnerId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                    [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('partnerId')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <!-- <div class="col-6 marginFieldNew borderRadius12"  id="partnerName">
+                                <p class="formControlLabel f600 textBlack mb-0">Partner Name</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="partnerName" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('partnerName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('partnerName')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div> -->
+                            <div class="col-6 marginFieldNew borderRadius12"  id="partnerMasterAirwayBill">
+                                <p class="formControlLabel f600 textBlack mb-0">Partner MAWB</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="partnerMasterAirwayBill" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('partnerMasterAirwayBill')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('partnerMasterAirwayBill')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="flightNo">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Flight No</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="flightNo" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('flightNo')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('flightNo')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12" id="flightName">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Flight Name</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="flightName" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('flightName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('flightName')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+                            <!-- <div class="col-6 marginFieldNew borderRadius12"  id="partnerHouseAirwayBill">
+                                <p class="formControlLabel f600 textBlack mb-0">Partner HAWB</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="partnerHouseAirwayBill" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('partnerHouseAirwayBill')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('partnerHouseAirwayBill')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div> -->
+
+                            <!-- <div class="col-6 marginFieldNew borderRadius12" id="shipperName">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Shipper Name</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="shipperName" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('shipperName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('shipperName')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div> -->
+ 
+                            <!-- <div class="col-6 marginFieldNew borderRadius12" id="consigneeName">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Consignee Name</p>
+                                <input maxlength="100"  pInputText appTrim  formControlName="consigneeName" class=" w-100"  pInputText appTrim 
+                                placeholder="Enter"
+                                [ngClass]="form.get('consigneeName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                                <mat-error *ngIf="errorHandling('consigneeName')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div> -->
+
+                            <!-- <div class="col-6 marginFieldNew borderRadius12" id="hsCode">
+                                <p class="formControlLabel f600 textBlack mb-0">HS Code</p>
+                                <p-dropdown [showClear]="true"  [options]="hsCodeList" placeholder="Select" filter="true"
+                                    formControlName="hsCode" appendTo="body"
+                                    [ngClass]="form.get('hsCode')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                    [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                                    <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                                <mat-error *ngIf="errorHandling('hsCode')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div> -->
+
+                            <div class="col-6 marginFieldNew borderRadius12" id="estimatedDepartureTimeFE">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Estimated Time Of Departure</p>
+                                <p-calendar dateFormat="dd/mm/yy" formControlName="estimatedDepartureTimeFE" appendTo="body"
+                                [ngClass]="form.get('estimatedDepartureTimeFE')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                class=" w-100 small-calendar" placeholder="Select Date" [iconDisplay]="'input'"
+                                [showIcon]="true" />
+
+                                <mat-error *ngIf="errorHandling('estimatedDepartureTimeFE')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+
+                            <div class="col-6 marginFieldNew borderRadius12" id="estimatedTimeOfArrivalFE">
+                                <p class="formControlLabel f600 textBlack mb-0 ">Estimated Time Of Arrival</p>
+                                <p-calendar  dateFormat="dd/mm/yy" formControlName="estimatedTimeOfArrivalFE" appendTo="body"
+                                [ngClass]="form.get('estimatedTimeOfArrivalFE')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                                class=" w-100 small-calendar" placeholder="Select Date" [iconDisplay]="'input'"
+                                [showIcon]="true" />
+
+                                <mat-error *ngIf="errorHandling('estimatedTimeOfArrivalFE')" class="text-danger"><small>{{
+                                        getErrorMessage()}}</small></mat-error>
+                            </div>
+
+                            <div class="col-4 marginFieldNew borderRadius12" id="upload">
+                                <p class="formControlLabel f600 textBlack mb-0">Upload File</p>
+                                <p-inputGroup>
+                                    <input maxlength="50"
+                                        pKeyFilter="num" formControlName="upload"  pInputText appTrim  placeholder="Enter" />
+                                    <button type="button" pButton (click)="fileInput.click()" class="bgBlack border-0"><i
+                                            class="bi bi-upload"></i></button>
+                                </p-inputGroup>
+                                <!-- <mat-error *ngIf="errorHandlingShipment('upload')"
+                                    class="text-danger"><small>{{getErrorMessage()}}</small></mat-error> -->
+                            </div>
+                            <input type="file" #fileInput style="display:none" (change)="onFileSelected($event)" />
+
+                        </div>
+
+                        <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1" routerLink="/main/airport/preAlertManifest">Cancel</button>
+                          <!--   <button class="buttom1 bgBlack text-white mx-1" (click)="onFileSelected($event)">{{this.pageToken.pageflow
+                                != 'New' ? 'Update': 'Save'}}</button> -->
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+                <p-stepperPanel *ngIf="this.pageToken.pageflow != 'New'">
+                    <!--*ngIf="this.pageToken.pageflow != 'New'"-->
+                    <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+                        <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <p class="circle mb-0" [ngClass]="active == 2 ? 'borderCircle' : 'disabled text-muted'">
+                                    2</p>
+                            </div>
+                            <div>
+                                <p class="mb-0 mt-2 f600" [ngClass]="active == 2 ? 'textBlack f600' : 'text-muted'">
+                                    Admin</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="content" let-prevCallback="prevCallback">
+                        <div class="row">
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Created By</p>
+                                <input type="text" formControlName="createdBy" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Created On</p>
+                                <input type="text" formControlName="createdOn" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Updated By</p>
+                                <input type="text" formControlName="updatedBy" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                            <div class="col-6 marginFieldNew borderRadius12">
+                                <p class="formControlLabel f600 textBlack mb-0">Updated On</p>
+                                <input type="text" formControlName="updatedOn" class=" w-100"  pInputText appTrim 
+                                    placeholder="Enter" />
+                            </div>
+                        </div>
+                        <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%;">
+                            <button class="buttom1 textBlack mx-1" (click)="prevCallback.emit()">Back</button>
+                            <!-- <button class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.pageToken.pageflow
+                                != 'New' ? 'Update': 'Save'}}</button> -->
+                        </div>
+                    </ng-template>
+                </p-stepperPanel>
+            </p-stepper>
+        </form>
+    </div>
+</div>

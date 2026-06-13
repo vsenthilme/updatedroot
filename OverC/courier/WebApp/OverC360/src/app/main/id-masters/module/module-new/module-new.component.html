@@ -1,0 +1,198 @@
+<div class="componentBody">
+  <div class="d-flex justify-content-between align-items-center">
+    <p class="componentHeader f600 mb-0">
+      Module- {{ this.pageToken.pageflow }}
+    </p>
+    <div class="d-flex justify-content-between align-items-center">
+        <button type="button" class="invisible buttom1 bgBlack text-white ml-2">Transfer</button>
+    </div>
+  </div>
+  <div class="w-75 mt-4 mx-auto">
+    <form [formGroup]="form">
+      <p-stepper #stepper [(activeStep)]="active">
+        <p-stepperPanel>
+          <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+            <div class="d-flex flex-column align-items-center"> <!-- (click)="onClick.emit()"-->
+              <div class="d-flex justify-content-center align-items-center">
+                <p *ngIf="active == 0" class="circle borderCircle mb-0">1</p>
+                <img *ngIf="active != 0" src="./assets/dashboard/tick.png" alt="" srcset="" />
+              </div>
+              <div>
+                <p class="mb-0 mt-2 f600 textBlack">General</p>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content" let-nextCallback="nextCallback">
+            <div class="row">
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Language</p>
+                <p-dropdown [showClear]="true"  [options]="languageIdList" formControlName="languageId" appendTo="body"
+                  [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                  <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                    placeholder="Search" /></ng-template></p-dropdown>
+                <mat-error *ngIf="errorHandling('languageId')" class="text-danger"><small>{{
+                    getErrorMessage()}}</small></mat-error>
+              </div>
+
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                <p-dropdown [showClear]="true"  [options]="companyIdList" formControlName="companyId" appendTo="body"
+                  [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                  <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                    placeholder="Search" /></ng-template></p-dropdown>
+              </div>
+
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0 required">Menu ID</p>
+                  <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="menuIdList"
+                  formControlName="menuId" appendTo="body" [style]="{'width': '100%'}"  (onChange)="menuIdChanged($event)"
+                  [ngClass]="form.get('menuId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" [panelStyle]="{'width':'100%'}" />
+
+                <mat-error *ngIf="errorHandling('menuId')"
+                  class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+              </div>
+
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0 required">Module ID</p>
+                <input maxlength="50"  pInputText appTrim  pKeyFilter="alphanum" formControlName="moduleId" placeholder="Enter"
+                  [ngClass]="form.get('moduleId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                <mat-error *ngIf="errorHandling('moduleId')"
+                  class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+              </div>
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0 required">Module Description</p>
+                <input maxlength="100"  pInputText appTrim  (keydown)="space($event)" formControlName="moduleDescription"
+                  class="w-100" placeholder="Enter"
+                  [ngClass]="form.get('moduleDescription')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''" />
+                <mat-error *ngIf="errorHandling('moduleDescription')"
+                  class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+              </div>
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Status</p>
+                <p-dropdown [showClear]="true"  [options]="status" [style]="{'width': '100%'}" appendTo="body" formControlName="statusId"
+                  placeholder="Select" filter="true" >
+                  <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                    placeholder="Search" /></ng-template></p-dropdown>
+              </div>
+            </div>
+            <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%">
+              <button class="buttom1 textBlack mx-1" routerLink="/main/idMaster/module">
+                Cancel
+              </button>
+              <button class="buttom1 bgBlack text-white mx-1" (click)="nextToSecond()">
+                Next
+              </button>
+            </div>
+          </ng-template>
+        </p-stepperPanel>
+
+        <p-stepperPanel>
+          <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+            <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+              <div class="d-flex justify-content-center align-items-center">
+                <p *ngIf="active == 0" class="circle borderCircle mb-0">2</p>
+                <img *ngIf="active != 0" src="./assets/dashboard/tick.png" alt="" srcset="" />
+              </div>
+              <div>
+                <p class="mb-0 mt-2 f600 textBlack">Lines</p>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content" let-nextCallback="nextCallback">
+            <p-table #moduleTag [columns]="cols" [value]="moduleTable" class="custom-table" [scrollable]="true"
+              selectionMode="multiple" [(selection)]="selectedModule" scrollHeight="calc(100vh - 27.8rem)"
+              styleClass="p-datatable-sm">
+              <ng-template pTemplate="header" let-columns>
+                <tr>
+                  <th style="width: 5rem;">
+                    <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                  </th>
+                  <th *ngFor="let col of columns">
+                    {{ col.header }}
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData let-columns="columns">
+                <tr [class.selectedRow]="selectedModule[0] === rowData">
+                  <td style="width: 5rem; justify-content: center;">
+                    <p-tableCheckbox class="pl-3" [value]="rowData" />
+                  </td>
+                  <td *ngFor="let col of columns">
+                    <ng-container *ngIf="col.format !== 'date'; else dateTemplate">
+                      {{ rowData[col.field] }}
+                    </ng-container>
+                    <ng-template #dateTemplate>
+                      {{ rowData.createdOn | date: 'dd-MM-yyyy HH:mm' }}
+                    </ng-template>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td [attr.colspan]="4">
+                    <p class="my-2 w-100 pl-3">No records found</p>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+            <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%">
+              <button class="buttom1 textBlack mx-1" routerLink="/main/idMaster/module">
+                Cancel
+              </button>
+              <button class="buttom1 bgBlack text-white mx-1" (click)="save()">
+                {{ this.pageToken.pageflow != "New" ? "Update" : "Save" }}
+              </button>
+            </div>
+          </ng-template>
+        </p-stepperPanel>
+
+        <p-stepperPanel *ngIf="this.pageToken.pageflow != 'New'">
+          <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+            <div class="d-flex flex-column align-items-center" (click)="onClick.emit()">
+              <div class="d-flex justify-content-center align-items-center">
+                <p class="circle mb-0" [ngClass]="
+                      active == 2 ? 'borderCircle' : 'disabled text-muted'
+                    ">
+                  2
+                </p>
+              </div>
+              <div>
+                <p class="mb-0 mt-2 f600" [ngClass]="active == 2 ? 'textBlack f600' : 'text-muted'">
+                  Admin
+                </p>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content" let-prevCallback="prevCallback">
+            <div class="row">
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Created By</p>
+                <input type="text" formControlName="createdBy" class="w-100"  pInputText appTrim  placeholder="Enter" />
+              </div>
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Created On</p>
+                <input type="text" formControlName="createdOn" class="w-100"  pInputText appTrim  placeholder="Enter" />
+              </div>
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Updated By</p>
+                <input type="text" formControlName="updatedBy" class="w-100"  pInputText appTrim  placeholder="Enter" />
+              </div>
+              <div class="col-6 marginFieldNew borderRadius12">
+                <p class="formControlLabel f600 textBlack mb-0">Updated On</p>
+                <input type="text" formControlName="updatedOn" class="w-100"  pInputText appTrim  placeholder="Enter" />
+              </div>
+            </div>
+            <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 3.5%; bottom: 7%">
+              <button class="buttom1 textBlack mx-1" (click)="prevCallback.emit()">
+                Back
+              </button>
+              <button class="buttom1 bgBlack text-white mx-1" (click)="save()">
+                {{ this.pageToken.pageflow != "New" ? "Update" : "Save" }}
+              </button>
+            </div>
+          </ng-template>
+        </p-stepperPanel>
+      </p-stepper>
+    </form>
+  </div>
+</div>

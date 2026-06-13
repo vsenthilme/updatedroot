@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/common-dialog/custom-table/custom-table.component.scss"],
+  "sourcesContent": [".p-picklist .p-picklist-list-wrapper{background-color: var(--black) !important; color: white;}\r\n\r\n.header{font-family: Nunito;font-size: 16px;font-weight: 400;line-height: 20.8px;text-align: center;}\r\n.cancelButton{padding: 7px 25px 7px 25px; gap: 10px;border-radius: 6px;border: 1px 0px 0px 0px;opacity: 0px;background-color: var(--white);color: var(--black);}\r\n.saveButton{padding: 7px 35px 7px 35px;gap: 10px;border-radius: 6px;opacity: 0px;background-color: var(--overcOrange);color: var(--black);}\r\n\r\n\r\n::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface{border-radius: 12px !important;}"],
+  "mappings": ";AAAA,CAAA,WAAA,CAAA;AAAqC,oBAAA,IAAA;AAA2C,SAAA;;AAEhF,CAAA;AAAQ,eAAA;AAAoB,aAAA;AAAgB,eAAA;AAAiB,eAAA;AAAoB,cAAA;;AACjF,CAAA;AAAc,WAAA,IAAA,KAAA,IAAA;AAA4B,OAAA;AAAU,iBAAA;AAAmB,UAAA,IAAA,IAAA,IAAA;AAAwB,WAAA;AAAa,oBAAA,IAAA;AAA+B,SAAA,IAAA;;AAC3I,CAAA;AAAY,WAAA,IAAA,KAAA,IAAA;AAA2B,OAAA;AAAU,iBAAA;AAAmB,WAAA;AAAa,oBAAA,IAAA;AAAqC,SAAA,IAAA;;AAGtH,UAAA,CAAA,yBAAA,CAAA;AAAyD,iBAAA;;",
+  "names": []
+}

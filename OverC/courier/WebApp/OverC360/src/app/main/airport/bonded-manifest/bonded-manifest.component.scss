@@ -1,0 +1,51 @@
+::ng-deep .customClass { border-radius: 12px !important; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important}
+
+.custom-height{height: calc(100vh - 19.3rem) !important; overflow-y: scroll !important;}
+.contentBox {
+    flex-grow: 0;
+    margin: 10px 10px 10px 0px;  
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    padding: 1rem 2rem 0px 2rem;
+    border-radius: 16px;
+    border: solid 1px var(--black);
+    background-color: var(--white);
+    color: var(--black);
+    transition: background-color 0.3s ease;
+  }
+  .contentBox:hover{
+    background-color: var(--black);
+    color: var(--white);
+  }
+  .lineBorder {width: 8px;flex-grow: 0;margin: 10px 7px 10px 0;border-radius: 20px;background-color: var(--overcOrange);}
+.chip{padding: 3px 1rem 3px 0px; border-radius: 6px; }
+  .headerText {
+    flex-grow: 1;
+    font-family: Nunito;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-align: left;
+    padding-bottom: 3px;
+  }
+  .valueText{
+    flex-grow: 0;
+    font-family: Nunito;
+    font-size: 14px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-align: left;
+  }
+  .spacingBottom{padding-bottom: 0.8rem;}
+
+  .hoverButton{border: 1px solid var(--black) !important;color: var(--black);}
+  .hoverButton:hover{background-color: var(--black); border: none; color: var(--white);}

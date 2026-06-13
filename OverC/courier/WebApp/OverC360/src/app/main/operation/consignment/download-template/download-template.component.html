@@ -1,0 +1,62 @@
+<div class="bgWhite text-black w-93 h-100 m-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Create Consignment</p>
+    </div>
+    <div class="mt-4 pt-2">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row">
+                    <div class="col-6 marginFieldNew borderRadius12" id="creationType">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Creation Type</p>
+                        <p-dropdown [showClear]="true"  formControlName="creationType" [options]="creationType" appendTo="body"
+                            [ngClass]="form.get('creationType')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" placeholder="Select" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="partnerType" *ngIf="this.form.controls.creationType.value == 'Bulk'">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Partner Type</p>
+                        <p-dropdown [showClear]="true"  formControlName="partnerType" [options]="partnerType" appendTo="body"
+                            [ngClass]="form.get('partnerType')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" placeholder="Select"
+                            (onChange)="partnerTypeChanged()" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12" id="partnerId" *ngIf="this.form.controls.creationType.value == 'Bulk'">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Partner</p>
+                        <p-dropdown [showClear]="true"  [options]="partnerNameList" placeholder="Select" filter="true" #partnerChange
+                            formControlName="partnerId" (onChange)="partnerChanged()"
+                            [ngClass]="form.get('partnerId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            appendTo="body" [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12" id="productId" *ngIf="this.form.controls.creationType.value == 'Bulk'">
+                        <p class="formControlLabel f600 textBlack mb-0 ">Product</p>
+                        <p-dropdown [showClear]="true"  [options]="productNameList" placeholder="Select" filter="true" #productChange
+                            formControlName="productId" (onChange)="productChanged()"
+                            [ngClass]="form.get('productName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            appendTo="body" [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+
+                    <!-- <div class="col-6 marginFieldNew borderRadius12" id="productName" *ngIf="this.form.controls.creationType.value == 'Bulk'">
+                        <p class="formControlLabel f600 textBlack mb-0">Product</p>
+                        <input maxlength="50" formControlName="productName"
+                            [ngClass]="form.get('productName')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                            class=" w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div> -->
+                </div>
+                <div class="d-flex float-right py-2">
+                    <button mat-dialog-close class="buttom1 textBlack mx-1">Cancel</button>
+                    <button type="button" class="buttom1 bgBlack text-white mx-1" (click)="save()">{{this.form.controls.creationType.value == 'Single' ? 'Create' : 'Download'}}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

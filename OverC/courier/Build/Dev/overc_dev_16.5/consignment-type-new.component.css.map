@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/main/id-masters/consignment-type/consignment-type-new/consignment-type-new.component.scss"],
+  "sourcesContent": [".circle {\r\n    width: 44px;\r\n    height: 44px;\r\n    flex-grow: 0;\r\n    margin: 0 6px 12px;\r\n    border-radius: 100%;\r\n    padding: 12px 17px 11px;\r\n    background-color: var(--white);\r\n  }\r\n  .borderCircle{border: solid 1.5px var(--black);}\r\n  .marginFieldNew{margin-bottom: 2.5rem;}"],
+  "mappings": ";AAAA,CAAA;AACI,SAAA;AACA,UAAA;AACA,aAAA;AACA,UAAA,EAAA,IAAA;AACA,iBAAA;AACA,WAAA,KAAA,KAAA;AACA,oBAAA,IAAA;;AAEF,CAAA;AAAc,UAAA,MAAA,MAAA,IAAA;;AACd,CAAA;AAAgB,iBAAA;;",
+  "names": []
+}

@@ -1,0 +1,223 @@
+<div class="bgWhite text-black w-93 h-100 m-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0"> CCR - Edit</p>
+    </div>
+    <div class="mt-4 pt-2">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row scrollNew">
+                    <div class="col-6 marginFieldNew borderRadius12"> 
+                        <p class="formControlLabel f600 textBlack mb-0">Consignment No</p>
+                        <input maxlength="50"  formControlName="houseAirwayBill"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">MWAB</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="masterAirwayBill"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner HWAB</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="partnerHouseAirwayBill"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner MWAB</p>
+                        <input maxlength="50"   pInputText appTrim  formControlName="partnerMasterAirwayBill"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Customs CCR No</p>
+                        <input maxlength="50"   pInputText appTrim  formControlName="customsCcrNo"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    
+                    <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 required">Airport Origin Code</p>
+                        <input maxlength="50"   pInputText appTrim  formControlName="airportOriginCode"
+                        class="w-100"  pInputText appTrim  placeholder="Enter" />
+                        
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 ">Origin</p>
+                        <p-dropdown [showClear]="true"  [options]="countryIdList" formControlName="countryOfOrigin" appendTo="body"
+                        [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" placeholder="Select" >
+                        <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                        
+                    </div>
+                   
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">HS Code </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="hsCode"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Commodity </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="goodsDescription"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Invoice No</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="invoiceNumber"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Invoice Type</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="invoiceType"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Invoice Date </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="invoiceDate"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Invoice Supplier Name</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="invoiceSupplierName"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Is Exempted</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="isExempted"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Exempted For</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="exemptionFor"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Exempted Beneficiary</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="exemptionBeneficiary"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Exempted Reference</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="exemptionReference"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Consignee Name </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="consigneeName"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Consignment Value </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="consignmentValue"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 required">Consignment Currency</p>
+                        <p-dropdown [showClear]="true"  [options]="currencyIdList" placeholder="Select" filter="true" formControlName="consignmentCurrency" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" ><ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Exchange Rate </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="exchangeRate"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Customs Insurance </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="customsInsurance"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Duty </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="duty"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Consignment Value Local </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="consignmentValueLocal"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Add IATA </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="addIATA"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Add Insurance </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="addInsurance"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Custom </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="customsValue"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Calculated Total Duty </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="calculatedTotalDuty"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">DDU Charge </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="dduCharge"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Spl Approval Charge </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="specialApprovalCharge"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Duty From Bayan </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="totalDuty"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12" >
+                        <p class="formControlLabel f600 textBlack mb-0 required">Customs KD</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="customsKd" [ngClass]="form.get('customsKd')?.invalid && form.get('customsKd')?.dirty ? 'invalid' : ''" class="w-100" placeholder="Enter" />
+                       
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0 required">IATA</p>
+                        <p-dropdown [showClear]="true"  [options]="iataList" placeholder="Select" filter="true" formControlName="iata" appendTo="body"
+                          [style]="{'width': '100%'}" [panelStyle]="{'width':'100%'}" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                        
+                    </div>
+
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Created On </p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="createdOn"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                  
+                </div>
+                <div class="d-flex float-right py-2">
+                    <button mat-dialog-close class="buttom1 textBlack mx-1"
+                    >Cancel</button>
+                    <button type="button" class="buttom1 bgBlack text-white mx-1" (click)="save()">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

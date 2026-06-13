@@ -1,0 +1,18 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ConsignmentLabelComponent } from './consignment-label/consignment-label.component';
+import { InvoicepdfComponent } from './invoice/invoicepdf/invoicepdf.component';
+
+//  private apiKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMmE5MzU2M2M5MjE4MDQyOGM1ZDBkMzRkYTViMGU0NTFkMDNhOGZlOTExOWJjOTU0ZDRkNTFlOWE3ZWI1MWIzOTZiNWVjZGY4Zjc4NWJhYjMiLCJpYXQiOjE3MjM1MzMwMDcuMTkzODE0LCJuYmYiOjE3MjM1MzMwMDcuMTkzODE1LCJleHAiOjQ4NzkyMDY2MDcuMTkwNTA5LCJzdWIiOiI2OTI2NzU1OCIsInNjb3BlcyI6WyJ1c2VyLnJlYWQiLCJ1c2VyLndyaXRlIiwidGFzay5yZWFkIiwidGFzay53cml0ZSIsIndlYmhvb2sucmVhZCIsIndlYmhvb2sud3JpdGUiLCJwcmVzZXQucmVhZCIsInByZXNldC53cml0ZSJdfQ.Sui5uokzgbBuBNkk3o8G4EoHge68cJe5_jdOmoFtYQWQ82SZOMw6noeUDLmD9F7vDXZMSodB04y9VLUsILaILQNcalYScGOYP8fYdFv-WkeNrGVQObHVI6daBzRaHDKutudcKfCeOytdJB8H16GIts3mkKb_f3MssJ9zBZ-QX4HqRWA8jem71Liro7gNFAgIwZrbm9IuERw3uZzpU6304kwzOsF_HD0vjbBtDdR6VSoTJtbPgRP1yzDut4qIEQee2bfZ1OoJjS2yxPysJsDbo1M6r1Fgb9paf-SQ1llfKU1cU3F1oKIWEHRufsCn7bhyt24s8t2RWQMy0fgKkRkizgmXz3tL6dMRviir0M0FB87-r5Aj-2EnlxaMLS2q0hk7S4AKDJLPDDUXUibCASsKocF3ufa3I1afAKlwUtAOOGlQD4rr5iwjcFk-tRj2e9cnn_gUKUz471xXmDULX6WHXWePmlLWo8Cvb_lZ3y9InDn0sYfQINCBTULdPNMTnEoxUi0cbOeETfhpsWLBPnkcYcM2Fj5TsPs-PeaoL_MUolg1dZgjUCerF0rmmcseg4oTInrfeEJLjfGv-xgljHnxNjpUyQXDg2SIFOs98K34YFycBlMJpu2QQg4o7RjVaFY20wGRVVOhj-LLvVPat4x6YGT3kZgTVBsVWSxo8NLeIBg'; 
+
+
+@NgModule({
+  declarations: [
+    ConsignmentLabelComponent,
+    InvoicepdfComponent
+  ],
+  imports: [
+    CommonModule
+  ]
+})
+export class PdfModule { }

@@ -1,0 +1,176 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Customs Costing </p>
+        <div class="d-flex justify-content-between align-items-center">
+            <img type="button" (click)="openCrud('Edit')" src="./assets/common/edit.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="downloadExcel()" src="./assets/common/download.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="deleteDialog()" src="./assets/common/deletetool.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="op.toggle($event)" src="./assets/common/settings.png" alt="" srcset=""
+                style="margin-left: 19px; margin-right: 28px; height: 1.5rem;">
+            <p-overlayPanel [style]="{ width: '180' }" #op>
+                <div class="d-flex flex-column">
+                    <button *ngIf="this.activeLink == 'airport'" style="width: 8rem;" mat-menu-item class="w-100" (click)="sendToFinance(); op.hide()"><img
+                            src="./assets/common2x/tick.png" style="padding-right: 10px;width: 2rem;" srcset="">
+                        Send to Finance</button>
+                    <button *ngIf="this.activeLink == 'finance'" style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="updateBulk(); op.hide()"><img src="./assets/common/upload.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Bulk
+                        Update</button>
+                        <button *ngIf="this.activeLink == 'finance'" style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="sendToOperations(); op.hide()"><img src="./assets/common2x/tick.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Send to Operations</button>
+                            
+                        <button *ngIf="this.activeLink == 'finance'" style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="approve('null', 'Bulk'); op.hide()"><img src="./assets/common2x/tick.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Approve</button>
+                </div>
+            </p-overlayPanel>
+            <button type="button" class="btn ml-2 addNewbuttom bgBlack text-white" (click)="openCrud('New')"><i
+                    class="bi bi-plus-square pr-2"></i> Add New</button>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-start align-items-center"
+        style="margin-bottom: 1.1rem !important;margin-top: 0.8rem;">
+        <p-iconField iconPosition="right" class="mr-2">
+            <p-inputIcon type="button" (click)="costingSheet.toggle($event)" styleClass="pi pi-filter" />
+            <input type="text" id="toolInput1"  pInputText appTrim  placeholder="Advance filter"
+                (input)="expenseTag.filterGlobal($any($event.target).value, 'contains')" />
+        </p-iconField>
+
+        <p-overlayPanel [dismissable]="false" appendTo="body" [style]="{ width: '80vw'}"
+            [styleClass]="'custom-overlay-panel'" #costingSheet>
+            <form [formGroup]="searchform" style="padding: 2rem;">
+                <div class="row">
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Cash Number</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="cashNumberDropdown"
+                            formControlName="cashNumber" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Cost Center</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="costCenterDropdown"
+                            formControlName="costCenter" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                    <!-- <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Line Number</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="lineNumberDropdown"
+                            formControlName="lineNumber" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div> -->
+                    <div class="col-3 mb-3 borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner ID</p>
+                        <p-multiSelect [showClear]="true" placeholder="Select" filter="true" [options]="partnerIdDropdown"
+                            formControlName="partnerId" appendTo="body" [style]="{'width': '100%'}"
+                            [panelStyle]="{'width':'100%'}" />
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <img type="button" (click)="reset()" src="./assets/common/reset.png" alt="" srcset="">
+                    </div>
+                    <div>
+                        <button class="buttom1 textBlack mx-1" (click)="closeOverLay()">Cancel</button>
+                        <button class="buttom1 bgBlack text-white mx-1" (click)="search()">Apply</button>
+                    </div>
+                </div>
+            </form>
+        </p-overlayPanel>
+
+        <p-chips (onRemove)="chipClear($event)" [(ngModel)]="fieldsWithValue" class="inputborderLess" />
+    </div>
+
+    <div class="tableProperties">
+        <p-table #expenseTag [columns]="columns" [value]="expenseTable" class="custom-table" [scrollable]="true"
+            selectionMode="multiple" [(selection)]="selectedCostingSheet" sortField="cashNumber" [sortOrder]="-1" [tableStyle]="{'width': '120rem'}"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th style="width: 5rem;">
+                        <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                    </th>
+                    <th *ngFor="let column of columns" [pSortableColumn]="column">
+                        {{ column }} <p-sortIcon [field]="column" />
+                    </th>
+                    <th pFrozenColumn alignFrozen="right">Actions</th>
+                </tr>
+                <tr>
+                    <th style="width: 5rem;">
+                        <p-tableHeaderCheckbox class="pl-3" [disabled]="true"></p-tableHeaderCheckbox>
+                    </th>
+                    <th *ngFor="let column of columns">
+                        <input  pInputText appTrim  type="text"
+                            (input)="expenseTag.filter($any($event.target)?.value, column, 'contains')"
+                            [value]="$any(expenseTag.filters[column])?.value" placeholder="Search"
+                            class="p-column-filter">
+                    </th>
+                    <th pFrozenColumn alignFrozen="right">
+                        <input  pInputText appTrim  type="text" placeholder="Search" class="p-column-filter">
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                <tr [class.selectedRow]="selectedCostingSheet[0] === rowData">
+                    <td style="width: 5rem; justify-content: center;">
+                        <p-tableCheckbox class="pl-3" [value]="rowData" />
+                    </td>
+                    <td *ngFor="let column of columns">
+                        <ng-container *ngIf="column != 'Created On' && column != 'Manifest';">
+                            {{ rowData[column] }}
+                        </ng-container>
+                        <ng-container *ngIf="column === 'Created On'">
+                            {{ rowData[column] | date:'dd-MM-yyyy' }}
+                        </ng-container>
+                        <ng-container *ngIf="column === 'Manifest'">
+                            <span (click)="openCrud('Edit', rowData)" style="cursor:pointer"
+                                class="textOrange font-weight-bold hvr-underline-from-center">{{ rowData[column]
+                                }}</span>
+                        </ng-container>
+                    </td>
+                    <td style="padding-left: 1.5rem !important;" pFrozenColumn alignFrozen="right">
+                        <img type="button" src="./assets/common/actions.png" (click)="op.toggle($event)" alt=""
+                            srcset="" style="height: 1.4rem;">
+                        <p-overlayPanel [style]="{ width: '180' }" #op>
+                            <div class="d-flex flex-column">
+                                <input type="file" #fileInput style="display:none"
+                                    (change)="onFileSelected($event, rowData)" />
+                                <button style="width: 8rem;" mat-menu-item class="w-100"
+                                    (click)="fileInput.click(); op.hide()"><img src="./assets/common/upload.png"
+                                        style="padding-right: 10px;width: 2rem;" srcset="">Upload</button>
+                                <button style="width: 8rem;" mat-menu-item class="w-100"
+                                    (click)="downloadMerge(rowData); op.hide()"><img src="./assets/common/download.png"
+                                        style="padding-right: 10px;width: 2rem;" srcset="">Download</button>
+
+                                        <button *ngIf="this.activeLink == 'finance'"  style="width: 8rem;" mat-menu-item class="w-100"
+                                        (click)="approve(rowData, 'single'); op.hide()"><img src="./assets/common2x/tick.png"
+                                            style="padding-right: 10px;width: 2rem;" srcset="">Approve</button>
+
+                            </div>
+                        </p-overlayPanel>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="4">
+                        <p class="my-2 w-100 pl-3">No records found</p>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+
+<mat-menu #menu="matMenu" class="customClass">
+    <ng-template matMenuContent let-aliasMenuItems="delivery">
+        <button mat-menu-item>Edit</button>
+        <button mat-menu-item>Confirm</button>
+    </ng-template>
+</mat-menu>

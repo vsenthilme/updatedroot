@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/common-service/path-name.service.ts"],
+  "sourcesContent": ["import { Injectable } from '@angular/core';\r\nimport { BehaviorSubject } from 'rxjs';\r\n\r\n@Injectable({\r\n  providedIn: 'root'\r\n})\r\nexport class PathNameService {\r\n\r\n  private dataArraySubject = new BehaviorSubject<any[]>([]);\r\n  dataArray$ = this.dataArraySubject.asObservable();\r\n\r\n  constructor() {}\r\n\r\n  setData(data: any[]): void {\r\n    this.dataArraySubject.next(data);\r\n  }\r\n}"],
+  "mappings": ";;;;;;AAMM,IAAO,mBAAP,MAAO,iBAAe;EAK1B,cAAA;AAHQ,SAAA,mBAAmB,IAAI,gBAAuB,CAAA,CAAE;AACxD,SAAA,aAAa,KAAK,iBAAiB,aAAY;EAEhC;EAEf,QAAQ,MAAW;AACjB,SAAK,iBAAiB,KAAK,IAAI;EACjC;;;mBATW,kBAAe;AAAA;oFAAf,kBAAe,SAAf,iBAAe,WAAA,YAFd,OAAM,CAAA;AAEd,IAAO,kBAAP;",
+  "names": []
+}

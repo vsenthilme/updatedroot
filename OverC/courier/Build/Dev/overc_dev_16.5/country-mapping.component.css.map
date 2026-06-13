@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/main/master/country-mapping/country-mapping.component.scss"],
+  "sourcesContent": ["::ng-deep .customClass { border-radius: 12px !important; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important}\r\n\r\n.custom-height{height: calc(100vh - 19.3rem) !important; overflow-y: scroll !important;}"],
+  "mappings": ";AAAA,UAAA,CAAA;AAAyB,iBAAA;AAAgC,cAAA,EAAA,OAAA,KAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;AAEzD,CAAA;AAAe,UAAA,KAAA,MAAA,EAAA;AAA0C,cAAA;;",
+  "names": []
+}

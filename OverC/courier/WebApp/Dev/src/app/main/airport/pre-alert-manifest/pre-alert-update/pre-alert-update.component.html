@@ -1,0 +1,98 @@
+
+ <div class="componentBody">
+        <div class="d-flex justify-content-between align-items-center">
+            <p class="componentHeader f600 mb-0">{{pageFlow}}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <img type="button" (click)="bulkUpdate.toggle($event)" src="./assets/common/settings.png" alt="" srcset=""
+                    style="margin-left: 19px; margin-right: 28px; height: 1.5rem;">
+                <p-overlayPanel [style]="{ width: '180' }" #bulkUpdate>
+                    <div class="d-flex flex-column">
+                        <button style="width: 8rem;" mat-menu-item class="w-100" (click)="updateBulk()"><img
+                                src="./assets/common/upload.png" style="padding-right: 10px;width: 2rem;" srcset="">Bulk
+                            Update</button>
+                    </div>
+                </p-overlayPanel>
+                <button type="button" *ngIf="this.pageToken.pageflow=='Edit'" class="buttom1 bgBlack text-white ml-2"
+                (click)="downloadExcel()">Download</button>
+            </div>
+        </div>
+
+    <div class="mx-auto mt-4">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row ">
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                        <input maxlength="50"  pInputText appTrim   formControlName="companyId"
+                        class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner MAWB</p>
+                        <input maxlength="50"  pInputText appTrim   formControlName="partnerMasterAirwayBill"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                </div>
+
+                <div class="tableProperties">
+                    <p-table #preAlertEditTag [columns]="cols" [value]="preAlertManifestTableArray"  class="custom-table" [scrollable]="true"
+                        selectionMode="multiple" sortField="createdOn" [sortOrder]="-1" [(selection)]="selectedPreAlertManifest"
+                        scrollHeight="calc(100vh - 25rem)" sortField="createdOn" [sortOrder]="-1" [tableStyle]="{'width': '250rem'}"
+                        styleClass="p-datatable-sm" [paginator]="true" [rows]="100" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+                        <ng-template pTemplate="header" let-columns>
+                            <tr>
+                                <th style="width: 5rem;" pFrozenColumn>
+                                    <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                                </th>
+                                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                                    {{ col.header }} <p-sortIcon [field]="col.field" />
+                                </th>
+                                <th style="width: 5rem;" pFrozenColumn alignFrozen="right">
+                                    Actions
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-rowData let-columns="columns" let-expanded="expanded">
+                            <tr  [class.selectedRow]="selectedPreAlertManifest[0] === rowData">
+                                <td style="width: 5rem; justify-content: center;" pFrozenColumn>
+                                    <p-tableCheckbox class="pl-3" [value]="rowData" />
+                                </td>
+                                <td *ngFor="let col of columns">
+                                    <ng-container *ngIf="col.format !== 'date' && col.format !== 'date1'; else dateTemplate">
+                                        {{ rowData[col.field] }}
+                                    </ng-container>
+                                    <ng-template #dateTemplate>
+                                        <span *ngIf="col.format === 'date'">{{rowData[col.field] | date: 'dd-MM-yyyy HH:mm'}}</span>
+                                        <span *ngIf="col.format === 'date1'">{{rowData[col.field] | date: 'dd-MM-yyyy' }}</span>
+                                    </ng-template>
+                                </td>
+                                <td style="padding-left: 1.5rem !important;" pFrozenColumn alignFrozen="right">
+                                    <img type="button" src="./assets/common/actions.png" (click)="op.toggle($event)"
+                                        alt="" srcset="" style="height: 1.4rem;">
+                                    <p-overlayPanel [style]="{ width: '180' }" #op>
+                                        <div class="d-flex flex-column">
+                                            <button style="width: 8rem;" mat-menu-item class="w-100"
+                                            (click)="editItem('Edit',rowData); op.hide()"><img
+                                                    src="./assets/common/edit.png"
+                                                    style="padding-right: 10px;width: 2rem;" srcset="">Edit</button>
+                                        </div>
+                                    </p-overlayPanel>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td [attr.colspan]="4">
+                                    <p class="my-2 w-100 pl-3">No records found</p>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 55%; bottom: 7%;">
+                <button class="buttom1 textBlack mx-1" (click)="back()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+

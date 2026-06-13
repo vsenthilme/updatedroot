@@ -1,0 +1,74 @@
+package com.courier.overc360.api.model.transaction;
+
+import lombok.Data;
+
+import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Data
+public class AddCustomsCosting {
+
+    private String partnerId;
+
+    private String costCenter;
+
+    private Long lineNumber;
+
+    private String companyId;
+
+    private String languageId;
+
+    private String partnerName;
+
+    private String department;
+
+    private Date date;
+
+    private String cashHolder;
+
+    private Long noOfShipments;
+
+    private String invoiceNumber;
+
+    private String statusId;
+
+    private Date invoiceDate;
+
+    private String supplierName;
+
+    private String costDescription;
+
+    private BigDecimal checkField;
+
+    private Double costAmount;
+
+    private String remark;
+
+    private Long cashNumber;
+
+    private Boolean finance;
+
+    private String referenceField1;
+
+    private String referenceField2;
+
+    private String referenceField3;
+
+    private String referenceField4;
+
+    private String referenceField5;
+
+    private String referenceField6;
+
+    private String referenceField7;
+
+    private String referenceField8;
+
+    private String referenceField9;
+
+    private String referenceField10;
+
+
+}

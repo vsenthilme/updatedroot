@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/main/master/airport-code/airport-code-new/airport-code-new.component.scss"],
+  "sourcesContent": [".circle {\r\n    width: 44px;\r\n    height: 44px;\r\n    flex-grow: 0;\r\n    margin: 0 6px 12px;\r\n    border-radius: 100%;\r\n    padding: 12px 17px 11px;\r\n    background-color: var(--white);\r\n  }\r\n  .borderCircle {\r\n    border: solid 1.5px var(--black);\r\n  }\r\n  .marginFieldNew {\r\n    margin-bottom: 2.5rem;\r\n  }\r\n  .scrollNew {\r\n    height: calc(100vh - 24rem);\r\n    overflow-y: scroll;\r\n  }\r\n  "],
+  "mappings": ";AAAA,CAAA;AACI,SAAA;AACA,UAAA;AACA,aAAA;AACA,UAAA,EAAA,IAAA;AACA,iBAAA;AACA,WAAA,KAAA,KAAA;AACA,oBAAA,IAAA;;AAEF,CAAA;AACE,UAAA,MAAA,MAAA,IAAA;;AAEF,CAAA;AACE,iBAAA;;AAEF,CAAA;AACE,UAAA,KAAA,MAAA,EAAA;AACA,cAAA;;",
+  "names": []
+}

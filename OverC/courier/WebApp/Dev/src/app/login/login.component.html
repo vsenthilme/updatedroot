@@ -1,0 +1,22 @@
+<div class="d-flex vh-100 justify-content-center align-items-center loginBg">
+<div class="cardLogin">
+  <img src="./assets/login/logo.png" style="width: 15rem;" class="img-fluid" alt="" srcset="">
+  <p class="Welcome">Welcome</p>
+  <p class="subText">Enter your user id and password to log in.</p>
+
+  <form class="d-flex justify-content-center align-items-center mt-4" [formGroup]="lgForm" (ngSubmit)="login()">
+    <div class="mx-auto">
+      <div class="form-group mb-0 mt-3">
+        <input type="text" placeholder="User ID" class="w-100"  pInputText appTrim  formControlName="userName" />
+      </div>
+      <div class="form-group mb-0 mt-3">
+        <p-password placeholder="Password" formControlName="password" [feedback]="false" [toggleMask]="true"  />
+        <div class="Forgot mt-1 d-flex float-right">Forgot Password?</div>
+      </div>
+      
+      <button mat-button style="color: white;width:21rem;"
+        class="signIn" type="Submit">Sign In</button>
+    </div>
+  </form> 
+</div>
+</div>

@@ -1,0 +1,63 @@
+<div class="bgWhite text-black w-93 h-100 m-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">Add Consignor</p>
+    </div>
+    <div class="mt-4 pt-2">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row">
+                    <div class="col-6 marginFieldNew borderRadius12" id="customerId">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Customer</p>
+                        <p-dropdown [showClear]="true"  [options]="customerIdList" placeholder="Select" filter="true" formControlName="customerId" appendTo="body"
+                        [ngClass]="form.get('customerId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                          [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="customerChanged()">
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <!-- <div class="col-6 marginFieldNew borderRadius12" id="subProductId">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Sub Product</p>    
+                        <p-dropdown [showClear]="true"  [options]="subProductIdList" placeholder="Select" filter="true" formControlName="subProductId" appendTo="body"
+                        [ngClass]="form.get('subProductId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                          [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="subProductChanged()" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                        placeholder="Search" /></ng-template></p-dropdown>
+                    </div> -->
+                    <div class="col-6 marginFieldNew borderRadius12" id="productId">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Product</p>
+                        <p-dropdown [showClear]="true"  [options]="productIdList" placeholder="Select" filter="true" formControlName="productId" appendTo="body"
+                        [ngClass]="form.get('productId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                          [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="subProductChanged()">
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="subProductId">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Sub Product</p>    
+                        <p-dropdown [showClear]="true"  [options]="subProductIdList" placeholder="Select" filter="true" formControlName="subProductId" appendTo="body"
+                        [ngClass]="form.get('subProductId')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                          [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="subProductChanged()" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12" id="subProductValue">
+                        <p class="formControlLabel f600 textBlack mb-0 required">Sub Product Value</p>
+                        <p-dropdown [showClear]="true"  [options]="subProductValueList" placeholder="Select" filter="true" formControlName="subProductValue" appendTo="body"
+                        [ngClass]="form.get('subProductValue')?.invalid && submitted ? 'ng-invalid ng-dirty' : ''"
+                          [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" (onChange)="subProductValueChanged()" >
+                          <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                            placeholder="Search" /></ng-template></p-dropdown>
+                    </div>
+                    <div class="col-6 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Value Description</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="referenceField1"
+                            class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div>
+                </div>
+                <div class="d-flex float-right py-2" style="position: absolute; right: 3.5%; bottom: 7%;">
+                    <button mat-dialog-close class="buttom1 textBlack mx-1"
+                    >Cancel</button>
+                    <button type="button" class="buttom1 bgBlack text-white mx-1" (click)="save()">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

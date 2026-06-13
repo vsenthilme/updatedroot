@@ -1,0 +1,87 @@
+<mat-sidenav-container>
+  <mat-sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="isMobile ? 'false' : 'true'" class="bgBlack ">
+    <div class="sidenav d-flex-column" [ngClass]="collapsed ? 'sidenav-collapsed' :''">
+      <div class="logo-container">
+        <img src="./assets/dashboard/Circle Icon.svg" *ngIf="!collapsed"
+          style="width: 3.3rem !important; height: 3.3rem !important;" alt="">
+        <img src="./assets/dashboard/Circle Icon.svg" *ngIf="collapsed"
+          style="width: 3.3rem !important; height: 3.3rem !important; " alt="">
+        <h1 id="overc-container">
+          <span id="overc" [@fadeLater]="!collapsed ? 'fade-out' : 'fade-in'"><img
+              src="./assets/dashboard/Later.svg"
+              style="width: 4.3rem !important; height: 3.3rem !important; margin-left: -25px;" alt=""></span>
+          <span id="span360" [@move360]="!collapsed ? 'move-center' : 'move-left'"><img
+              src="./assets/dashboard/360.svg" alt=""
+              style="width: 3.3rem !important; height: 1rem !important; margin-top: -4px;"></span>
+        </h1>
+      </div>
+      <div class="hrline"></div>
+      <div class="toggle-btn">
+        <mat-icon class="btn" *ngIf="collapsed" (click)="closeSidenav()">chevron_left</mat-icon>
+        <mat-icon class="btn" *ngIf="!collapsed" (click)="toggleCollapse()">chevron_right</mat-icon>
+      </div>
+      <div class="Menu" style="padding: 5px;">
+        <mat-nav-list>
+          <ul class="sidenav-nav" [ngStyle]="{ 'width': isAnySubnavActive() ? '160%' : '100%' }"
+          style="overflow-y: scroll; height: calc(100vh - 9rem);">
+            <li class="sidenav-nav-item" *ngFor="let data of navData; let i = index">
+              <a class="sidenav-nav-link" (click)="handleClick(data, i)" (click)="setActiveLink(i)"
+                [ngClass]="{'active': activeLinkIndex === i}" *ngIf="data.items && data.items.length > 0">
+                <img [src]="isActive(i) ? data.srcDark : data.src" alt="" class="sidenav-nav-icon">
+                <span class="sidenav-link-text" [@fadeText]="!collapsed ? 'fade-out' : 'fade-in'" *ngIf="collapsed">{{data.label}}</span>
+                <img [src]="isActive(i) ? './assets/sidebar/Alt Arrow Down Dark.png' : './assets/sidebar/Alt Arrow Down.png'" *ngIf="data.items && collapsed" class="menu-collapse-icon" alt="">
+              </a>
+              <a class="sidenav-nav-link" [routerLink]="[data.routerLink]" (click)="handleClick(data, i)"
+                (click)="setActiveLink(i)" [ngClass]="{'active': activeLinkIndex === i}"
+                *ngIf="!data.items || (data.items && data.items.length === 0)">
+                <img [src]="isActive(i) ? data.srcDark : data.src" alt="" class="sidenav-nav-icon">
+                <span class="sidenav-link-text" [@fadeText]="!collapsed ? 'fade-out' : 'fade-in'" *ngIf="collapsed">{{data.label}}</span>
+            </a>
+              <div *ngIf="collapsed && data.items && data.items.length > 0">
+                <app-sublevel-menu [data]="data" [collapsed]="collapsed" [multiple]="multiple"
+                  [expanded]="data.expanded"></app-sublevel-menu>
+              </div>
+            </li>
+          </ul>
+        </mat-nav-list>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="bodyBackGround" style="margin-left: 120px;" (click)="closeAllMenus()" [ngStyle]="{ 'margin-left': collapsed ? '300px' : '105px' }">
+    <div class="d-flex justify-content-between">
+      <div id="breadcrumbs">
+        <p class="headerPageName">{{dataArray[0]}}</p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb" >
+            <li *ngFor="let element of dataArray; let j = index" class="breadcrumb-item" [ngClass]="j == dataArray.length -1 ? 'active' : ''">{{element}}</li>
+          </ol>
+        </nav>
+      </div>
+      <div id="logout">
+        <div class="d-flex justify-content-between align-items-center">
+          <img src="./assets/dashboard/notifications.png" class="img-fluid mr-5" alt="" srcset="">
+
+          <div class="d-flex flex-column mr-2">
+            <p class="mb-1 headerPageName text-right">{{this.auth.userName}}</p>
+            <p class="mb-0 breadcrumb-item  text-right">{{this.auth.companyName}}</p>
+
+          </div>
+          <img src="./assets/dashboard/User.png" [matMenuTriggerFor]="menu" class="img-fluid" alt="" srcset="">
+        </div>
+      </div>
+    </div>
+    <div class="componentBackground">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container> 
+
+
+
+
+<mat-menu #menu="matMenu" class="customClass">
+  <ng-template matMenuContent let-aliasMenuItems="delivery">
+      <button mat-menu-item class="listItems" (click)="logout()"><img src="./assets/login/Logout.png"  style="padding-right: 10px;" srcset="">Logout</button>
+  </ng-template>
+</mat-menu>

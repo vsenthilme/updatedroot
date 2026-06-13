@@ -1,0 +1,191 @@
+<div class="componentBody">
+    <div class="d-flex justify-content-between align-items-center">
+        <p class="componentHeader f600 mb-0">{{pageFlow}}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <img type="button" (click)="deleteDialog()" src="./assets/common/deletetool.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <img type="button" (click)="status.toggle($event)" src="./assets/common/edit.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <p-overlayPanel [style]="{ width: '180' }" #status>
+                <div class="d-flex flex-column">
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="updateConsole('cleared'); status.hide()"><img src="./assets/common/document.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Customs Cleared</button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="updateConsole('self'); status.hide()"><img src="./assets/common/document.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Self Clearance </button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100" (click)="callHubCode(); status.hide()"><img
+                            src="./assets/common/document.png" style="padding-right: 10px;width: 2rem;"
+                            srcset="">Outscan </button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="updateGateway(this.selectedConsole); status.hide()"><img
+                            src="./assets/common/document.png" style="padding-right: 10px;width: 2rem;"
+                            srcset="">Gateway Scan </button>
+                </div>
+            </p-overlayPanel>
+
+            <img type="button" (click)="download.toggle($event)" src="./assets/common/download.png" alt="" srcset=""
+                style="margin: 0 17px; height: 1.5rem;">
+            <p-overlayPanel [style]="{ width: '180' }" #download>
+                <div class="d-flex flex-column">
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="downloadConsole(); download.hide()"><img src="./assets/common/document.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Console</button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="generateLabel(); download.hide()"><img src="./assets/common/document.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Label
+                    </button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="generateInvoice(); download.hide()"><img src="./assets/common2x/invoice.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Invoice </button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100"
+                        (click)="generateMerge(); download.hide()"><img src="./assets/common2x/merge.png"
+                            style="padding-right: 10px;width: 2rem;" srcset="">Invoice
+                        & Label </button>
+                </div>
+            </p-overlayPanel>
+
+            <img type="button" (click)="op.toggle($event)" src="./assets/common/settings.png" alt="" srcset=""
+                style="margin-left: 19px; margin-right: 28px; height: 1.5rem;">
+            <p-overlayPanel [style]="{ width: '180' }" #op>
+                <input type="file" #fileInput1 style="display:none" (change)="onFileSelectedBayan($event)" />
+                <div class="d-flex flex-column">
+                    <button style="width: 8rem;" mat-menu-item class="w-100" (click)="createConsole(); op.hide()"><img
+                        src="./assets/common/add.png" style="padding-right: 10px;width: 2rem;" srcset="">Create Console
+                </button>
+                    <!-- <button style="width: 8rem;" mat-menu-item class="w-100" (click)="saveCCR(); op.hide()"><img
+                            src="./assets/common/add.png" style="padding-right: 10px;width: 2rem;" srcset="">Create CCR
+                    </button> -->
+                    <!-- <button style="width: 8rem;" mat-menu-item class="w-100" (click)="createLocation(); op.hide()"><img
+                            src="./assets/common/add.png" style="padding-right: 10px;width: 2rem;" srcset="">Location
+                    </button> -->
+                    <button style="width: 8rem;" mat-menu-item class="w-100" (click)="uploadBayan()"><img
+                            src="./assets/common/upload.png" style="padding-right: 10px;width: 2rem;" srcset="">Upload
+                        Bayan</button>
+                    <button style="width: 8rem;" mat-menu-item class="w-100" (click)="updateBulk()"><img
+                            src="./assets/common2x/update.png" style="padding-right: 10px;width: 2rem;" srcset="">Bulk
+                        Update</button>
+                </div>
+            </p-overlayPanel>
+            <button type="button" class="btn ml-2 addNewbuttom bgBlack text-white"
+                (click)="transfer()">Transfer</button>
+        </div>
+    </div>
+
+    <div class="mx-auto mt-4">
+        <form [formGroup]="form">
+            <div class="d-flex-row">
+                <div class="row scrollNew">
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Language</p>
+                        <p-dropdown [showClear]="true"  [options]="languageIdList" formControlName="languageId" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                        <mat-error *ngIf="errorHandling('languageId')"
+                            class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Company</p>
+                        <p-dropdown [showClear]="true"  [options]="companyIdList" formControlName="companyId" appendTo="body"
+                            [style]="{'width': '100%'}" [disabled]="true" [panelStyle]="{'width':'100%'}" >
+                            <ng-template pTemplate="filter"><input type="text"  pInputText appTrim  appTrim
+                                placeholder="Search" /></ng-template></p-dropdown>
+                        <mat-error *ngIf="errorHandling('companyId')"
+                            class="text-danger"><small>{{getErrorMessage()}}</small></mat-error>
+                    </div>
+                    <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Partner MAWB</p>
+                        <input maxlength="50"  pInputText appTrim  formControlName="partnerMasterAirwayBill" class="w-100"
+                             pInputText appTrim  placeholder="Enter" />
+                    </div>
+                    <!-- <div class="col-3 marginFieldNew borderRadius12">
+                        <p class="formControlLabel f600 textBlack mb-0">Status</p>
+                        <input maxlength="50"  pInputText appTrim  pKeyFilter="alphanum" formControlName="statusText"
+                        class="w-100"  pInputText appTrim  placeholder="Enter" />
+                    </div> -->
+                </div>
+                <!-- <div class="d-flex justify-content-end mb-3">
+                    <button (click)="add()" type="button" class="btn ml-2 addNewbuttom bgBlack text-white"><i
+                            class="bi bi-plus-square pr-2"></i>Add Values</button>
+                </div> -->
+                <div class="tableProperties">
+                    <p-table #ccrTag [columns]="cols" [value]="subProductArray" class="custom-table" [scrollable]="true"
+                        selectionMode="multiple" sortField="createdOn" [sortOrder]="-1" [(selection)]="selectedConsole"
+                        scrollHeight="calc(100vh - 23rem)" sortField="createdOn" [sortOrder]="-1" [paginator]="true"
+                        [rows]="100" [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        [tableStyle]="tableStyle" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header" let-columns>
+                            <tr>
+                                <th style="width: 5rem;" pFrozenColumn>
+                                    <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                                </th>
+                                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                                    {{ col.header }} <p-sortIcon [field]="col.field" />
+                                </th>
+                                <th style="width: 5rem;" pFrozenColumn alignFrozen="right">
+                                    Actions
+                                </th>
+                            </tr>
+                            <tr>
+                                <th style="width: 5rem;" pFrozenColumn>
+                                    <p-tableHeaderCheckbox [disabled]="true" class="pl-3"></p-tableHeaderCheckbox>
+                                </th>
+                                <th *ngFor="let col of columns">
+                                    <input  pInputText appTrim  type="text"
+                                        (input)="ccrTag.filter($any($event.target)?.value, col.field, 'contains')"
+                                        [value]="$any(ccrTag.filters[col.field])?.value" placeholder="Search"
+                                        class="p-column-filter">
+                                </th>
+                                <th style="width: 5rem;" pFrozenColumn alignFrozen="right">
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-rowData let-columns="columns" let-expanded="expanded">
+                            <tr [class.selectedRow]="selectedConsole[0] === rowData">
+                                <td style="width: 5rem;" pFrozenColumn>
+                                    <p-tableCheckbox class="pl-3" [value]="rowData" />
+                                </td>
+                                <td *ngFor="let col of columns">
+                                    <ng-container *ngIf="col.format !== 'date'; else dateTemplate">
+                                        {{ rowData[col.field] }}
+                                    </ng-container>
+                                    <ng-template #dateTemplate>
+                                        {{ rowData.createdOn | date: 'dd-MM-yyyy HH:mm' }}
+                                    </ng-template>
+                                </td>
+                                <td style="padding-left: 1.5rem !important;" pFrozenColumn alignFrozen="right">
+                                    <img type="button" src="./assets/common/actions.png" (click)="op.toggle($event)"
+                                        alt="" srcset="" style="height: 1.4rem;">
+                                    <p-overlayPanel [style]="{ width: '180' }" #op>
+                                        <div class="d-flex flex-column">
+                                            <button style="width: 8rem;" mat-menu-item class="w-100"
+                                                (click)="editItem('Edit',rowData); op.hide()"><img
+                                                    src="./assets/common/edit.png"
+                                                    style="padding-right: 10px;width: 2rem;" srcset="">Edit</button>
+                                            <button style="width: 8rem;" mat-menu-item class="w-100"
+                                                (click)="removeItem(rowData)"><img src="./assets/common/deletetool.png"
+                                                    style="padding-right: 10px;width: 2rem;" srcset="">Delete</button>
+                                        </div>
+                                    </p-overlayPanel>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td [attr.colspan]="4">
+                                    <p class="my-2 w-100 pl-3">No records found</p>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="d-flex mt-1 justify-content-end" style="position: absolute; right: 50%; bottom: 7%;">
+                <button class="buttom1 textBlack mx-1" (click)="back()">Cancel</button>
+                <!-- <button class="buttom1 bgBlack text-white mx-1" (click)="saveCCR()">CCR</button> -->
+            </div>
+        </form>
+    </div>
+</div>

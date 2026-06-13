@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/main/id-masters/company/company.component.scss"],
+  "sourcesContent": ["::ng-deep .customClass { border-radius: 12px !important; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important}\r\n\r\n.custom-height{height: calc(100vh - 19.3rem) !important; overflow-y: scroll !important;}\r\n\r\n.search{ box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.2) !important;}"],
+  "mappings": ";AAAA,UAAA,CAAA;AAAyB,iBAAA;AAAgC,cAAA,EAAA,OAAA,KAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;AAEzD,CAAA;AAAe,UAAA,KAAA,MAAA,EAAA;AAA0C,cAAA;;AAEzD,CAAA;AAAS,cAAA,EAAA,IAAA,KAAA,EAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;",
+  "names": []
+}

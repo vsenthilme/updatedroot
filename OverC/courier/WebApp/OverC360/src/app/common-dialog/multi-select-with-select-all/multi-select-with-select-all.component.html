@@ -1,0 +1,29 @@
+<!-- multi-select-with-select-all.component.html -->
+<p-multiSelect
+  [showClear]="true"
+  placeholder="Select"
+  filter="true"
+  [options]="options"
+  [formControl]="control"
+  appendTo="body"
+  [style]="{'width': '100%'}"
+  [panelStyle]="{'width':'100%'}"
+  (onChange)="selectionChange.emit($event.value)"
+>
+  <ng-template pTemplate="header">
+    <div class="select-all-container">
+      <p-checkbox 
+        [binary]="true" 
+        inputId="selectAll" 
+        (onChange)="selectAll($event)"
+        [checked]="isAllSelected()" />
+      <label for="selectAll">Select All</label>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="filter">
+    <input 
+      type="text" 
+      pInputText 
+      placeholder="Search" />
+  </ng-template>
+</p-multiSelect>

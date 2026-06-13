@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/main/master/vehicle/vehicle.component.scss"],
+  "sourcesContent": ["::ng-deep .customClass {\r\n    border-radius: 12px !important;\r\n    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;\r\n  }\r\n  \r\n  .custom-height {\r\n    height: calc(100vh - 19.3rem) !important;\r\n    overflow-y: scroll !important;\r\n  }\r\n  "],
+  "mappings": ";AAAA,UAAA,CAAA;AACI,iBAAA;AACA,cAAA,EAAA,OAAA,KAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;AAGF,CAAA;AACE,UAAA,KAAA,MAAA,EAAA;AACA,cAAA;;",
+  "names": []
+}

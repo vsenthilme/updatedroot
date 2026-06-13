@@ -1,0 +1,66 @@
+<p-tabView>
+<p-tabPanel *ngFor="let line of groupByPieceId" [header]="line.pieceId">
+    <div class="scrollNew31">
+        <table class="table p-2">
+            <thead class="sticky-top  table-style ">
+                <tr>
+                    <th scope="col">Piece ID</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">User</th>
+                </tr>
+            </thead>
+            <tbody class="table-style-body">
+                <tr style="height: 20px !important;"
+                    *ngFor="let item of line.lines; let i = index">
+                    <td scope="row">{{item.pieceId}}</td>
+                    <td scope="row">{{item.pieceType}}</td>
+                    <!-- <td>{{item.bagId}}</td> -->
+                    <td scope="row">{{item.pieceTypeDescription}}</td>
+                    <td scope="row">{{item.pieceTimeStamp | date: 'dd-MM-yyyy HH:mm' }}</td>
+                    <td scope="row">{{item.updatedBy}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</p-tabPanel>
+</p-tabView>
+
+
+
+
+<p-accordion class="customTabPanel1 d-none">
+    <p-accordionTab *ngFor="let line of groupByPieceId" class="mx-4" >
+        <ng-template pTemplate="header">
+            <div class="accordion-header">
+                <span class="header-left">Piece ID: {{line.pieceId}}</span>
+            </div>
+        </ng-template>
+        <div class="scrollNew31">
+            <table class="table p-2">
+                <thead class="sticky-top  table-style ">
+                    <tr>
+                        <th scope="col">Piece ID</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">User</th>
+                    </tr>
+                </thead>
+                <tbody class="table-style-body">
+                    <tr style="height: 20px !important;"
+                        *ngFor="let item of line.lines; let i = index">
+                        <td scope="row">{{item.pieceId}}</td>
+                        <td scope="row">{{item.pieceType}}</td>
+                        <!-- <td>{{item.bagId}}</td> -->
+                        <td scope="row">{{item.pieceTypeDescription}}</td>
+                        <td scope="row">{{item.pieceTimeStamp | date: 'dd-MM-yyyy HH:mm' }}
+                        </td>
+                        <td scope="row">{{item.updatedBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </p-accordionTab>
+</p-accordion>

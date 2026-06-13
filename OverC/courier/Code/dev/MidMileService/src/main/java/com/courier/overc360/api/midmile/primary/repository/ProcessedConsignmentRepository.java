@@ -1,0 +1,16 @@
+package com.courier.overc360.api.midmile.primary.repository;
+
+import com.courier.overc360.api.midmile.primary.model.consignment.ProcessConsignment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+@Transactional
+public interface ProcessedConsignmentRepository extends JpaRepository<ProcessConsignment, Long>, JpaSpecificationExecutor<ProcessConsignment> {
+
+
+
+
+}
