@@ -1,0 +1,38 @@
+package com.mnrclara.spark.core.model.wmscorev2;
+
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class FindInventoryV2 {
+
+    private List<String> warehouseId;
+    private List<String> packBarcodes;
+    private List<String> itemCode;
+    private List<String> storageBin;
+    private List<String> storageSectionId;
+    private List<Long> stockTypeId;
+    private List<Long> specialStockIndicatorId;
+    private List<Long> binClassId;
+    private List<String> description;
+<<<<<<< HEAD
+    private List<String> partnerCode;
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+
+    // V2 fields
+    private List<String> languageId;
+    private List<String> companyCodeId;
+    private List<String> plantId;
+    private List<String> barcodeId;
+    private List<String> manufacturerCode;
+    private List<String> manufacturerName;
+    private List<String> referenceDocumentNo;
+<<<<<<< HEAD
+    private List<String> levelId;
+    private List<String> altUom;
+    private List<Long> itemTypeId;
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+}
