@@ -1,0 +1,137 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { Table } from 'primeng/table';
+import { Subscription } from 'rxjs';
+import { CommonService } from 'src/app/common-service/common-service.service';
+import { AuthService } from 'src/app/core/core';
+import { MiddlewareService } from '../middleware.service';
+
+@Component({
+  selector: 'app-stockreceiptheader',
+  templateUrl: './stockreceiptheader.component.html',
+  styleUrls: ['./stockreceiptheader.component.scss']
+})
+export class StockreceiptheaderComponent implements OnInit {
+  screenid = 3051;
+  salesInvoice: any[] = [];
+  selectedSalesInvoice: any[] = [];
+  @ViewChild('salesInvoiceTag') salesInvoiceTag: Table | any;
+
+  selectedStatusIdList: any[] = [];
+  constructor(
+    private service: MiddlewareService,
+    public toastr: ToastrService,
+    public dialog: MatDialog,
+    private spin: NgxSpinnerService,
+    private router: Router,
+    public auth: AuthService,
+    private fb: FormBuilder,
+    public cs: CommonService
+  ) { }
+  sub = new Subscription();
+  RA: any = {};
+  ngOnInit(): void {
+    this.RA = this.auth.getRoleAccess(this.screenid);
+    let currentDate = new Date();
+    let currentMonthStartDate = new Date();
+    currentMonthStartDate.setDate(currentDate.getDate() - 31);
+    this.form.controls.toOrderReceivedOnFE.patchValue(new Date());
+    this.form.controls.fromOrderReceivedOnFE.patchValue(currentMonthStartDate);
+    this.search(true);
+    this.getDropdown();
+  }
+
+  isShowDiv = false;
+  public icon = 'expand_more';
+  showFloatingButtons: any;
+  toggle = true;
+  toggleFloat() {
+    this.isShowDiv = !this.isShowDiv;
+    this.toggle = !this.toggle;
+
+    if (this.icon === 'expand_more') {
+      this.icon = 'chevron_left';
+    } else {
+      this.icon = 'expand_more';
+    }
+    this.showFloatingButtons = !this.showFloatingButtons;
+    console.log('show:' + this.showFloatingButtons);
+  }
+
+  form = this.fb.group({
+    branchCode: [[this.auth.plantId]],
+  companyCode: [[this.auth.companyId]],
+  fromOrderProcessedOn: [],
+  fromOrderReceivedOn: [],
+  processedStatusId: [],
+  fromOrderReceivedOnFE: [],
+  receiptNo: [],
+  stockReceiptHeaderId: [],
+  toOrderProcessedOn: [],
+  toOrderReceivedOn: [],
+  toOrderReceivedOnFE: [],
+  });
+
+  search(ispageload = false) {
+    this.spin.show();
+    //  this.form.controls.startCreatedOn.patchValue(this.cs.dateNewFormat1(this.form.controls.startCreatedOn.value));
+    //  this.form.controls.endCreatedOn.patchValue(this.cs.dateNewFormat1(this.form.controls.endCreatedOn.value));
+    this.form.controls.fromOrderReceivedOn.patchValue(this.cs.day_callapi(this.form.controls.fromOrderReceivedOnFE.value));
+     this.form.controls.toOrderReceivedOn.patchValue(this.cs.day_callapi(this.form.controls.toOrderReceivedOnFE.value));
+    this.service.stockreceipt(this.form.value).subscribe(
+      (res) => {
+        this.spin.hide();
+        this.salesInvoice = res;
+      },
+      (err) => {
+        this.cs.commonerrorNew(err);
+        this.spin.hide();
+      }
+      
+    );
+  }
+ 
+ 
+  reload() {
+    this.form.reset();
+    this.form.controls.branchCode.patchValue([this.auth.plantId]);
+    this.form.controls.companyCode.patchValue([this.auth.companyId]);
+    this.sub.add(this.service.stockreceipt({ companyCode:[this.auth.companyId],branchCode:[this.auth.plantId], }).subscribe(res => {
+      res.forEach((x: any) => this.multisalesOrderNo.push({ value: x.returnOrderNo, label: x.returnOrderNo }));
+    }))
+  }
+  multisalesOrderNo:any[]=[];
+  multisalesInvoiceNo:any[]=[];
+  multipickuplistNo:any[]=[];
+  multicustomer:any[]=[];
+  multipicklistNo:any[]=[];
+  getDropdown() {
+    this.sub.add(this.service.stockreceipt({ companyCode:[this.auth.companyId],branchCode:[this.auth.plantId]}).subscribe(res => {
+      res.forEach((x: any) => this.multisalesOrderNo.push({ value: x.returnOrderNo, label: x.returnOrderNo }));
+    }))
+  }
+  downloadexcel() {
+    var res: any = [];
+    this.salesInvoice.forEach((x) => {
+      res.push({
+        'Branch': x.branchCode,
+        'Company': x.companyCode,
+        "Receipt No":x.receiptNo,
+        'Status ': x.processedStatusId,
+        "Order Received On": this.cs.dateapiwithTime(x.orderReceivedOn),
+        "Order Processed On": this.cs.dateapiwithTime(x.orderProcessedOn),
+      });
+    });
+    this.cs.exportAsExcel(res, 'DIRECT RECEIPT ');
+  }
+   openConfirm(data: any) {
+    let paramdata = this.cs.encrypt({ code: data, pageflow: 'Edit' });
+    this.router.navigate(['/main/middleware/stockreceiptlines/' + paramdata]);
+   }
+}
+
+

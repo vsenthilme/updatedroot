@@ -1,0 +1,159 @@
+
+<div class="card  border-0 bg-white " style="overflow: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center header_colour text-white p-2">
+      <h6 class="my-auto">Inbound Lines</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+   
+    <div class="col-12 mainsection mt-1  border-top px-0 uatwhite" style="height: calc(100vh - 12rem);  ">
+      <div class="example-sidenav-content">
+        <div class="row " style="padding-right: 15px !important;">
+            <p-table #inboundTag [value]="inbound" styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"
+          selectionMode="single"
+          [globalFilterFields]="['companyDescription', 'plantDescription', 'warehouseDescription', 'refDocNumber',  'lineNo','itemCode','manufacturerName','description','orderQty','acceptedQty','damageQty','varianceQty','confirmedOn','createdOn','statusId']"
+          scrollHeight="calc(100vh - 29.2rem)" sortField="createdOn"[sortOrder]="-1" [paginator]="true" [rows]="500"
+          [showCurrentPageReport]="true" [scrollable]="true" selectionMode="single" scrollDirection="both"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [resizableColumns]="true"
+          style="width: 100%;margin-left: 16px;background-color:white">
+          <ng-template pTemplate="header">
+            <tr>
+                  <th style="width: 7rem;" st pSortableColumn="sourceBranchCode" pResizableColumn>Source Branch<p-sortIcon
+                    field="sourceBranchCode"></p-sortIcon></th>
+              <th style="width: 7rem;" st pSortableColumn="refDocNumber" pResizableColumn>Order No<p-sortIcon
+                  field="refDocNumber"></p-sortIcon></th>
+              <th style="width: 7rem;" pSortableColumn="lineNo" pResizableColumn>Line No<p-sortIcon
+                  field="lineNo"></p-sortIcon></th>
+                  <th style="width: 7rem;" pSortableColumn="referenceDocumentType" pResizableColumn>Order Type<p-sortIcon
+                      field="referenceDocumentType"></p-sortIcon></th>
+              <th style="width: 7rem;" pSortableColumn="manufacturerName" pResizableColumn>Mfr Name<p-sortIcon
+                  field="manufacturerName"></p-sortIcon></th>
+              <th style="width: 7rem;" pSortableColumn="itemCode" pResizableColumn>Part No<p-sortIcon
+                  field="itemCode"></p-sortIcon></th>
+              <th style="width: 7rem;" pSortableColumn="description" pResizableColumn>Description<p-sortIcon
+                  field="description"></p-sortIcon></th>
+              <th style="width: 7rem;" pSortableColumn="orderQty" pResizableColumn>Order Qty<p-sortIcon
+                  field="orderQty"></p-sortIcon></th>
+              <th style="width: 7rem;" pResizableColumn="createdOn">Created Date<p-sortIcon
+                  field="createdOn"></p-sortIcon></th>
+              <th style="width: 7rem;" pSortableColumn="confirmedOn" pResizableColumn>Confirmed Date <p-sortIcon
+                  field="confirmedOn"></p-sortIcon></th>
+              <th style="width: 10rem;" pSortableColumn="statusDescription" pResizableColumn>Status<p-sortIcon
+                  field="statusDescription"></p-sortIcon></th>
+              <!--<th style="width: 7rem;"  pSortableColumn="pickupConfirmedOn" pResizableColumn>Confirmed On<p-sortIcon field="pickupConfirmedOn"></p-sortIcon></th>-->
+
+            </tr>
+
+            <tr>
+           
+              <th style="width: 7rem;">
+                <input pInputText type="text" #sourcebranch
+                  (input)="inboundTag.filter($any($event.target)?.value, 'sourceBranchCode', 'contains')" (keyup)="handleSearch1(sourcebranch.value)"
+                  [value]="$any(inboundTag.filters['sourceBranchCode'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #refDocNumber
+                  (input)="inboundTag.filter($any($event.target)?.value, 'refDocNumber', 'contains')" (keyup)="handleSearch1(refDocNumber.value)"
+                  [value]="$any(inboundTag.filters['refDocNumber'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #lineNo
+                  (input)="inboundTag.filter($any($event.target)?.value, 'lineNo', 'contains')" (keyup)="handleSearch1(lineNo.value)"
+                  [value]="$any(inboundTag.filters['lineNo'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #orderType
+                  (input)="inboundTag.filter($any($event.target)?.value, 'referenceDocumentType', 'contains')" (keyup)="handleSearch1(orderType.value)"
+                  [value]="$any(inboundTag.filters['referenceDocumentType'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #mfrname 
+                  (input)="inboundTag.filter($any($event.target)?.value, 'manufacturerName', 'contains')" (keyup)="handleSearch1(mfrname.value)"
+                  [value]="$any(inboundTag.filters['manufacturerName'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #itemcode
+                  (input)="inboundTag.filter($any($event.target)?.value, 'itemCode', 'contains')" (keyup)="handleSearch1(itemcode.value)"
+                  [value]="$any(inboundTag.filters['itemCode'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+
+              <th style="width: 7rem;">
+                <input pInputText type="text" #des
+                  (input)="inboundTag.filter($any($event.target)?.value, 'description', 'contains')" (keyup)="handleSearch1(des.value)"
+                  [value]="$any(inboundTag.filters['description'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #orderqty
+                  (input)="inboundTag.filter($any($event.target)?.value, 'orderQty', 'contains')" (keyup)="handleSearch1(orderqty.value)"
+                  [value]="$any(inboundTag.filters['orderQty'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #createdon
+                  (input)="inboundTag.filter($any($event.target)?.value, 'createdOn', 'contains')" (keyup)="handleSearch1(createdon.value)"
+                  [value]="$any(inboundTag.filters['createdOn'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 7rem;">
+                <input pInputText type="text" #confirmedon
+                  (input)="inboundTag.filter($any($event.target)?.value, 'confirmedOn', 'contains')" (keyup)="handleSearch1(confirmedon.value)"
+                  [value]="$any(inboundTag.filters['confirmedOn'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 10rem;">
+                <input pInputText type="text" #status
+                  (input)="inboundTag.filter($any($event.target)?.value, 'statusDescription', 'contains')" (keyup)="handleSearch1(status.value)"
+                  [value]="$any(inboundTag.filters['statusDescription'])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </th>
+
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-picker let-rowIndex="rowIndex">
+            <tr [pSelectableRow]="picker" [pSelectableRowIndex]="rowIndex">
+              <td style="width: 7rem;">{{picker.sourceBranchCode}}</td>
+              <td style="width: 7rem;">{{picker.refDocNumber}}</td>
+              <td style="width: 7rem;"> {{picker.lineNo}}</td>
+              <td style="width: 7rem;">{{picker.referenceDocumentType}}</td>
+              <td style="width: 7rem;">{{picker.manufacturerName}}</td>
+              <td style="width: 7rem;">{{picker.itemCode}}</td>
+              <td style="width: 7rem;">{{picker.description}}</td>
+              <td style="width: 7rem;">{{picker.orderQty }}</td>
+              <td style="width: 7rem;">{{picker.createdOn| date : 'dd-MM-yyyy HH:mm' :'GMT +3'}}</td>
+              <td style="width: 7rem;">{{picker.confirmedOn| date : 'dd-MM-yyyy HH:mm' :'GMT +3'}}</td>
+              <td style="width: 10rem;">{{picker.statusDescription}}</td>
+              <!--<td style="width: 7rem;" >{{picker.pickupConfirmedOn| date : 'dd-MM-yyyy HH:mm' :'GMT +3' }}</td>-->
+
+            </tr>
+
+          </ng-template>
+
+          <ng-template pTemplate="footer">
+            <tr>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"> </td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;">{{totalInventoryQuantity}}</td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 10rem;"></td>
+            </tr>
+        </ng-template>
+
+        </p-table>
+      </div>
+    </div>
+    </div>
+  
+  </div>

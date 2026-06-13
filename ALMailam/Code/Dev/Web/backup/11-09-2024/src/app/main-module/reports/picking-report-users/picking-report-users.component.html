@@ -1,0 +1,408 @@
+
+
+<div class="row mx-1 pl-2">
+  <div class="col-12">
+    <div class="row  text-secondary pr-0 mt-1">
+      <div class="col bg-white d-flex align-items-center mt-1 px-1 py-1 pathname">
+
+
+        <nav aria-label="breadcrumb" class="d-flex align-items-center">
+          <ol class="breadcrumb mb-0 bg-white">
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto"><a routerLink="/main/dashboard">Home</a>
+            </li>
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto"><a
+                routerLink="/main/reports/report-list">Reports</a></li>
+            <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto">Picking Report</li>
+          </ol>
+        </nav>
+
+
+        <div class="d-flex ml-auto my-auto">
+          <div [hidden]="isShowDiv"> <input matInput (input)="inboundTag.filterGlobal($any($event.target).value, 'contains')"
+              class="form-control filter_button mt-2 mt-2 mx-2 border-bottom" placeholder="Search" style="width:90%">
+          </div>
+          <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+            class="button-row d-flex align-items-center">
+            <!--
+                        <button mat-mini-fab *ngIf="showFloatingButtons == true" class="floating-buttons  d-flex align-items-center justify-content-center bg-pink text-white mx-2"
+                        matTooltip="Add">
+                        <mat-icon class="action-icon d-flex align-items-center justify-content-center">add_circle_outline</mat-icon>
+                      </button>
+                      -->
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center text-white   yellowaction"
+              matTooltip="Display">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">search</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  blueaction "
+              matTooltip="Edit">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">edit</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center redaction text-white  align-middle"
+              matTooltip="Delete">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">delete</mat-icon>
+            </button>
+            <!-- 
+                        <button  mat-mini-fab *ngIf="showFloatingButtons == true"
+                      class="floating-buttons  d-flex align-items-center justify-content-center text-white  bg-success  " matTooltip="Info">
+                      <mat-icon class="action-icon d-flex align-items-center justify-content-center">info_outline</mat-icon>
+                    </button>
+                      -->
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  darkblueaction "
+              matTooltip="Download" (click)="downloadexcel();">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">download</mat-icon>
+            </button>
+            <button mat-mini-fab (click)="toggleFloat()" class="mx-2 text-white action-button"
+              [ngClass]="{'bg-orange' : toggle, 'purple': !toggle}">
+              <mat-icon>{{icon}}</mat-icon>Options
+            </button>
+            <button mat-mini-fab
+              class=" floating-buttons1  d-flex align-items-center justify-content-center darkaction text-white mx-2 mr-3 align-middle"
+              matTooltip="New">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">add</mat-icon>
+            </button>
+            <button mat-mini-fab
+              class=" floating-buttons1  d-flex align-items-center justify-content-center greyaction text-white mx-2 mr-3 align-middle"
+              matTooltip="Save">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">save</mat-icon>
+            </button>
+            <button mat-mini-fab class="text-white mx-2 action-button  bg-red " type="button" mat-button>
+              <mat-icon class="">tune</mat-icon> Filter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mainsection mt-1  border-top px-0 bg-white" style="height: calc(100vh - 12rem);  ">
+    <div class="d-flex align-items-center justify-content-between pb-2"
+      style="height: 3rem !important;background-color: #f5f5f5 !important;">
+      <div>
+        <h6 class="my-auto mb-0 mx-3 font-weight-bold whs-text-grey">Picking Report</h6>
+      </div>
+      <div *ngIf="fullscreen">
+        <button mat-mini-fab (click)="togglesearch()"
+          class=" floating-buttons1  d-flex align-items-center justify-content-center roundedhover text-white mx-2 mr-3 align-middle"
+          matTooltip="Fullscreen">
+          <mat-icon class="action-icon whs-text-grey d-flex align-items-center justify-content-center my-auto">launch
+          </mat-icon>
+        </button>
+      </div>
+      <div *ngIf="back">
+        <button mat-mini-fab (click)="backsearch()"
+          class=" floating-buttons1  d-flex align-items-center justify-content-center roundedhover text-white mx-2 mr-3 align-middle"
+          matTooltip="Back">
+          <mat-icon class="action-icon whs-text-grey d-flex align-items-center justify-content-center my-auto">
+            arrow_back</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="mt-3 mb-0 " *ngIf="search">
+      <form [formGroup]="searhform">
+      <div class="row  px-3">
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group mb-0">
+            <label for="status" class="mb-0 required">Company</label>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" [disabled]="true" [value]="this.auth.companyIdAndDescription">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group mb-0">
+            <label for="status" class="mb-0 required">Branch</label>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" [disabled]="true" [value]="this.auth.plantIdAndDescription">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group mb-0">
+            <label for="status" class="mb-0 required">Warehouse</label>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" [disabled]="true" [value]="this.auth.warehouseIdAndDescription">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mt-2">
+          <p class="mb-0 py-0 ">Order No</p>
+          <p-multiSelect  placeholder="Select" class="w-100" [filter]="true" [options]="multiOrderNo" (onChange)="orderNoChange($event)" formControlName="refDocNumber"
+          [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}" 
+          [panelStyle]="{'width':'20%'}" appendTo="body"> </p-multiSelect >
+        </div>
+        <div class="col-lg-3 col-md-6 mt-2">
+          <p class="mb-0 py-0 ">Order Type</p>
+          <p-multiSelect  placeholder="Select" class="w-100"  [filter]="true" [options]="orderTypDropdown" formControlName="outboundOrderTypeId"
+          [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}" 
+          [panelStyle]="{'width':'20%'}" appendTo="body"> </p-multiSelect >
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <p class="mb-0 py-0 ">Level</p>
+          <p-multiSelect  placeholder="Select" class="w-100" [filter]="true" [options]="levelIdOption" formControlName="levelId"
+          [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}" 
+          [panelStyle]="{'width':'20%'}" appendTo="body"> </p-multiSelect >
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-1">Part No</label>
+            <!-- <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" [(ngModel)]="itemCode" [ngModelOptions]="{standalone: true}">
+            </mat-form-field> -->
+            <p-dropdown placeholder="Select"   [filter]="true" class="w-100" [options]="multiselectItemCodeList"
+            [resetFilterOnHide]="true"  #itemcode (onChange)="itemCodeChanged(itemcode.selectedOption)"
+             formControlName="itemCodeFE" name="product" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}"
+                (onFilter)="onItemType($event)"  >
+          </p-dropdown>
+          </div>
+        </div>
+      
+      
+
+        <div class="col-lg-3 col-md-6">
+          <div class="form-group mb-0">
+            <label for="receipno" class="mb-1">Status</label>
+            <p-multiSelect placeholder="Select" class="w-100" [options]="StatusList" formControlName="statusId"
+              [style]="{'width': '100%'}">
+            </p-multiSelect>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-4">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 ">Pickup Date</p>
+            <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+              <mat-date-range-input [rangePicker]="picker2">
+                <input matStartDate placeholder="Start date" formControlName="fromPickConfirmedOnFE">
+                <input matEndDate placeholder="End date" formControlName="toPickConfirmedOnFE">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker2></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- <div class="col-lg-3 col-md-6">
+              <div class="form-group mb-0">
+                <label for="suplier" class="mb-0">Supplier</label>
+                <p-multiSelect placeholder="Select" class="w-100 mt-2" [options]="partnerCodeList"
+                formControlName="partnerCode" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}">
+              </p-multiSelect>
+              </div>
+            </div> -->
+
+
+        <!-- <div class="col-lg-3 col-md-6">
+              <div class="form-group mb-0">
+                <label for="status" class="mb-0">Status</label>
+                <p-multiSelect placeholder="Select" class="w-100 mt-2" [options]="statusIdList"
+                formControlName="statusId" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}">
+              </p-multiSelect>
+              </div>
+            </div> -->
+
+        <!--   
+            <div class="col-lg-3 col-md-6">
+              <p class="mb-0 py-0">Created Date</p>
+              <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+               
+                <mat-date-range-input [rangePicker]="pickerss">
+                  <input matStartDate placeholder="Start date" formControlName="startContainerReceivedDate">
+                  <input matEndDate placeholder="End date" formControlName="endContainerReceivedDate">
+                </mat-date-range-input>
+                <mat-datepicker-toggle matSuffix [for]="pickerss"></mat-datepicker-toggle>
+                <mat-date-range-picker #pickerss></mat-date-range-picker>
+              </mat-form-field>
+  
+            </div> -->
+      </div>
+    </form>
+      <div class="d-flex justify-content-end align-items-center pr-3">
+        <button mat-raised-button color="warn" class="text-white mb-2 mr-2 px-4" (click)="reset();">
+          <mat-icon class="">restart_alt</mat-icon> Reset
+        </button>
+        <button mat-raised-button class=" bg-darkblue text-white mb-2" (click)="filtersearch()"> <i
+            class="bi bi-gear-fill me-1 font-size-1_5rem pr-2"></i>Execute</button>
+      </div>
+    </div>
+    <div class="example-sidenav-content">
+      <div class="row " style="padding-right: 15px !important;">
+        <p-table #inboundTag  [value]="inbound" 
+        styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true" selectionMode="single"   [globalFilterFields]="['c_text', 'plant_text', 'wh_text', 'status_text',  'ref_doc_no','ref_doc_type','pu_no','ob_line_no','mfr_name','itm_code','item_text','partner_item_barcode','pick_st_bin','level_id','pickupConfirmedBy','partner_code','alloc_qty','pick_cnf_qty','var_qty','pick_ctd_on','pick_utd_on']"
+        scrollHeight="calc(100vh - 14.8rem)" sortField="stagingNo" [sortOrder]="-1" [paginator]="true" [rows]="500" [showCurrentPageReport]="true" [scrollable]="true" selectionMode="single"  scrollDirection="both"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+           [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white" >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 11.5rem;" pSortableColumn="c_text" pResizableColumn>Company<p-sortIcon field="c_text"></p-sortIcon></th> 
+            <th style="width: 11.5rem;" pSortableColumn="plant_text" pResizableColumn>Branch<p-sortIcon field="plant_text"></p-sortIcon></th> 
+            <th style="width: 11.5rem;" pSortableColumn="wh_text" pResizableColumn>Warehouse<p-sortIcon field="wh_text"></p-sortIcon></th> 
+            <th style="width: 6rem;" st pSortableColumn="status_text" pResizableColumn>Status<p-sortIcon field="status_text"></p-sortIcon></th> 
+            <th style="width: 9rem;" pSortableColumn="ref_doc_no" pResizableColumn>Order No<p-sortIcon field="ref_doc_no"></p-sortIcon></th> 
+            <th style="width: 9rem;" pSortableColumn="ref_doc_type" pResizableColumn>Order Type<p-sortIcon field="ref_doc_type"></p-sortIcon></th> 
+            <th style="width: 9rem;" pSortableColumn="pu_no"   pResizableColumn>Pickup No<p-sortIcon field="pu_no"></p-sortIcon></th>
+            <th style="width: 6rem;" pSortableColumn="ob_line_no" pResizableColumn>Line No<p-sortIcon field="ob_line_no"></p-sortIcon></th> 
+            <th style="width: 7rem;" pSortableColumn="mfr_name" pResizableColumn>Mfr Name<p-sortIcon field="mfr_name"></p-sortIcon></th> 
+            <th style="width: 7rem;" pSortableColumn="itm_code" pResizableColumn>Part No<p-sortIcon field="itm_code"></p-sortIcon></th> 
+            <th style="width: 9rem;" pSortableColumn="item_text" pResizableColumn> Description<p-sortIcon field="item_text"></p-sortIcon></th> 
+            <th style="width: 6rem;" pSortableColumn="partner_item_barcode" pResizableColumn>Barcode Id<p-sortIcon field="partner_item_barcode"></p-sortIcon></th> 
+          <th style="width: 9rem;" pSortableColumn="pick_st_bin" pResizableColumn>Bin Location <p-sortIcon field="pick_st_bin"></p-sortIcon></th>
+          <th style="width: 6rem;" pSortableColumn="level_id" pResizableColumn>Level Id <p-sortIcon field="level_id"></p-sortIcon></th>
+          <th style="width: 6rem;"  pSortableColumn="pickupConfirmedBy" >Picker<p-sortIcon field="pickupConfirmedBy"></p-sortIcon> </th>
+          <th style="width: 6rem;" pSortableColumn="partner_code" pResizableColumn>Store<p-sortIcon field="partner_code"></p-sortIcon></th>
+          <th style="width: 6rem;" pSortableColumn="alloc_qty" pResizableColumn>Order Qty<p-sortIcon field="alloc_qty"></p-sortIcon></th>
+          <th style="width: 9rem;"  pSortableColumn="pick_cnf_qty" pResizableColumn>Pick To Qty<p-sortIcon field="pick_cnf_qty"></p-sortIcon></th>
+          <th style="width: 9rem;" pSortableColumn="var_qty" pResizableColumn>Variance  <p-sortIcon field="var_qty"></p-sortIcon></th>
+          <th style="width: 9rem;"  pSortableColumn="pick_ctd_on" pResizableColumn>Assigned On<p-sortIcon field="pick_ctd_on"></p-sortIcon></th>
+          <th style="width: 9rem;"  pSortableColumn="pick_utd_on" pResizableColumn>Picked On<p-sortIcon field="pick_utd_on"></p-sortIcon></th>
+         
+          </tr>
+           
+          <tr >
+            <th  style="width: 11.5rem;">
+              <input pInputText  type="text"  #companyDes (input)="inboundTag.filter($any($event.target)?.value, 'c_text', 'contains')"  (keyup)="handleSearch1(companyDes.value)"
+              [value]="$any(inboundTag.filters['c_text'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th> 
+            <th  style="width: 11.5rem;">
+              <input pInputText  type="text" #plantDes (input)="inboundTag.filter($any($event.target)?.value, 'plant_text', 'contains')" (keyup)="handleSearch1(plantDes.value)"
+              [value]="$any(inboundTag.filters['plant_text'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th> 
+            <th  style="width: 11.5rem;">
+              <input pInputText  type="text" #warehouseDes (input)="inboundTag.filter($any($event.target)?.value, 'wh_text', 'contains')"  (keyup)="handleSearch1(warehouseDes.value)"
+              [value]="$any(inboundTag.filters['wh_text'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th> 
+          <th  style="width: 6rem;">
+              <input pInputText  type="text" #statusDes (input)="inboundTag.filter($any($event.target)?.value, 'status_text', 'contains')"  (keyup)="handleSearch1(statusDes.value)"
+              [value]="$any(inboundTag.filters['status_text'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th> 
+            <th style="width: 9rem;">
+              <input pInputText  type="text" #refdocnumber (input)="inboundTag.filter($any($event.target)?.value, 'ref_doc_no', 'contains')" (keyup)="handleSearch1(refdocnumber.value)"
+              [value]="$any(inboundTag.filters['ref_doc_no'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 9rem;">
+              <input pInputText  type="text" #referenceDocumentType (input)="inboundTag.filter($any($event.target)?.value, 'ref_doc_type', 'contains')" (keyup)="handleSearch1(referenceDocumentType.value)"
+              [value]="$any(inboundTag.filters['ref_doc_type'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+              <th style="width: 9rem;">
+                <input pInputText  type="text" #pickupNumber (input)="inboundTag.filter($any($event.target)?.value, 'pu_no', 'contains')"  (keyup)="handleSearch1(pickupNumber.value)"
+                [value]="$any(inboundTag.filters['pu_no'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+              </th>
+              <th style="width: 6rem;">
+              <input pInputText  type="text" #lineno (input)="inboundTag.filter($any($event.target)?.value, 'ob_line_no', 'contains')"  (keyup)="handleSearch1(lineno.value)"
+              [value]="$any(inboundTag.filters['ob_line_no'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th> 
+            <th style="width: 7rem;">
+              <input pInputText  type="text" #mfrname (input)="inboundTag.filter($any($event.target)?.value, 'mfr_name', 'contains')" (keyup)="handleSearch1(mfrname.value)"
+              [value]="$any(inboundTag.filters['mfr_name'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 7rem;">
+              <input pInputText  type="text" #itemcode (input)="inboundTag.filter($any($event.target)?.value, 'itm_code', 'contains')"  (keyup)="handleSearch1(itemcode.value)"
+              [value]="$any(inboundTag.filters['itm_code'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+          
+            <th style="width: 9rem;">
+              <input pInputText  type="text"  #description (input)="inboundTag.filter($any($event.target)?.value, 'item_text', 'contains')"  (keyup)="handleSearch1(description.value)"
+              [value]="$any(inboundTag.filters['item_text'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 6rem;">
+              <input pInputText  type="text" #partneritembarcode (input)="inboundTag.filter($any($event.target)?.value, 'partner_item_barcode', 'contains')" (keyup)="handleSearch1(partneritembarcode.value)"
+              [value]="$any(inboundTag.filters['partner_item_barcode'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 9rem;">
+              <input pInputText  type="text" #pickedStorageBin (input)="inboundTag.filter($any($event.target)?.value, 'pick_st_bin', 'contains')"  (keyup)="handleSearch1(pickedStorageBin.value)"
+              [value]="$any(inboundTag.filters['pick_st_bin'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 6rem;">
+              <input pInputText  type="text" #levelId (input)="inboundTag.filter($any($event.target)?.value, 'level_id', 'contains')"  (keyup)="handleSearch1(levelId.value)"
+              [value]="$any(inboundTag.filters['level_id'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 6rem;">
+              <input pInputText  type="text" #assignedPickerId (input)="inboundTag.filter($any($event.target)?.value, 'pickupConfirmedBy', 'contains')"  (keyup)="handleSearch1(assignedPickerId.value)"
+              [value]="$any(inboundTag.filters['pickupConfirmedBy'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 6rem;">
+              <input pInputText  type="text" #partnerCode (input)="inboundTag.filter($any($event.target)?.value, 'partner_code', 'contains')" (keyup)="handleSearch1(partnerCode.value)"
+              [value]="$any(inboundTag.filters['partner_code'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 6rem;">
+              <input pInputText  type="text" #allocatedQty (input)="inboundTag.filter($any($event.target)?.value, 'alloc_qty', 'contains')" (keyup)="handleSearch1(allocatedQty.value)"
+              [value]="$any(inboundTag.filters['alloc_qty'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 9rem;"  >
+              <input pInputText  type="text" #pickConfirmQty  (input)="inboundTag.filter($any($event.target)?.value, 'pick_cnf_qty', 'contains')" (keyup)="handleSearch1(pickConfirmQty.value)"
+              [value]="$any(inboundTag.filters['pick_cnf_qty'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 9rem;"  >
+              <input pInputText  type="text" #varianceQuantity (input)="inboundTag.filter($any($event.target)?.value, 'var_qty', 'contains')" (keyup)="handleSearch1(varianceQuantity.value)"
+              [value]="$any(inboundTag.filters['var_qty'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            <th style="width: 9rem;"  >
+              <input pInputText  type="text" #pickupCreatedOn (input)="inboundTag.filter($any($event.target)?.value, 'pick_ctd_on', 'contains')"  (keyup)="handleSearch1(pickupCreatedOn.value)"
+              [value]="$any(inboundTag.filters['pick_ctd_on'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+           <th style="width: 9rem;"  >
+              <input pInputText  type="text" #pickupUpdatedOn (input)="inboundTag.filter($any($event.target)?.value, 'pick_utd_on', 'contains')" (keyup)="handleSearch1(pickupUpdatedOn.value)"
+              [value]="$any(inboundTag.filters['pick_utd_on'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+            
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-picker let-rowIndex="rowIndex">
+          <tr [pSelectableRow]="picker" [pSelectableRowIndex]="rowIndex">
+            <td style="width: 11.5rem;">{{picker.c_text}}</td>
+            <td style="width: 11.5rem;">{{picker.plant_text}}</td>
+            <td style="width: 11.5rem;">{{picker.wh_text}}</td>
+              <td style="width: 6rem;"> {{picker.status_text}}</td>
+            <td style="width: 9rem;"> {{picker.ref_doc_no}}</td>
+            <td style="width: 9rem;"> {{picker.ref_doc_type}}</td>
+            <td style="width: 9rem;">{{picker.pu_no}}</td>
+            <td style="width: 6rem;">{{picker.ob_line_no}}</td>
+            <td style="width: 7rem;">{{picker.mfr_name }}</td>
+            <td style="width: 7rem;">{{picker.itm_code }}</td>
+            <td style="width: 9rem;">{{picker.item_text }}</td>
+            <td style="width: 6rem;">{{picker.partner_item_barcode }}</td>
+           <td style="width: 9rem;">{{picker.pick_st_bin }}</td>
+           <td style="width: 6rem;"> {{picker.level_id}}</td>
+            <td style="width: 6rem;"> {{picker.pickupConfirmedBy}}</td>
+            <td style="width: 6rem;">{{picker.partner_code }}</td>
+            <td style="width: 6rem;">{{picker.alloc_qty }}</td>
+            <td style="width: 9rem;" >{{picker.pick_cnf_qty}}</td>
+            <td style="width: 9rem;" >{{picker.var_qty}}</td>
+            <td style="width: 9rem;" >{{picker.pick_ctd_on| date : 'dd-MM-yyyy HH:mm' :'GMT +3' }}</td>
+            <td style="width: 9rem;" >{{picker.pick_utd_on| date : 'dd-MM-yyyy HH:mm' :'GMT +3' }}</td>
+          
+          </tr>
+       
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td style="width: 11.5rem;"></td>
+            <td style="width: 11.5rem;"></td>
+            <td style="width: 11.5rem;"></td>
+              <td style="width: 6rem;"></td>
+              <td style="width: 9rem;"></td>
+              <td style="width: 9rem;"></td>
+              <td style="width: 9rem;"></td>
+              <td style="width: 6rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 7rem;"></td>
+              <td style="width: 9rem;"></td>
+              <td style="width: 6rem;"></td>
+             <td style="width: 9rem;"></td>
+              <td style="width: 6rem;"> </td>
+              <td style="width: 6rem;"> </td>
+               <td style="width: 6rem;">Total</td>
+              <td style="width: 6rem;">{{totalInventoryQuantity}}</td>
+              <td style="width: 9rem;" >{{totalAllocatedQuantity}}</td>
+              <td style="width: 9rem;" >{{totalQty1}}</td>
+              <td style="width: 9rem;" ></td>
+              <td style="width: 9rem;" ></td>
+          </tr>
+      </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+</div>
