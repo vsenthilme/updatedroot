@@ -1,0 +1,33 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title class="d-flex justify-content-between bg-secondary align-items-center p-2">
+        <h6 class="my-auto text-white  text-left">Location Sensor - IoT AD-211</h6>
+        <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <div class="mt-2 px-4">
+        <div class="row p-1">
+            <table class="table table-striped table-sm" style="font-size: 0.7rem;">
+                <thead>
+                    <tr>
+                        <th scope="col">S No</th>
+                        <th scope="col">Date Time</th>
+                        <th scope="col">Aisle</th>
+                        <th scope="col">IoT Sensor ID</th>
+                        <th scope="col">Location Status</th>
+                        <th scope="col">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let element of dataArray; let i = index">
+                        <td [ngClass]="element.location == 'Blocked' ? 'text-danger pulsate' : ''">{{ i + 1 }}</td>
+                        <td [ngClass]="element.location == 'Blocked' ? 'text-danger pulsate' : ''">{{ element.date | date : 'dd-MM-yyyy'}}  {{element.time}}</td>
+                        <td [ngClass]="element.location == 'Blocked' ? 'text-danger pulsate' : ''">{{ element.aisle }}</td>
+                        <td [ngClass]="element.location == 'Blocked' ? 'text-danger pulsate' : ''">{{ element.id }}</td>
+                        <td [ngClass]="element.location == 'Blocked' ? 'text-danger pulsate' : 'text-success'">{{ element.location }}</td>
+                        <td [ngClass]="element.location == 'Blocked' ? 'text-danger pulsate' : ''">{{ element.remarks }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>

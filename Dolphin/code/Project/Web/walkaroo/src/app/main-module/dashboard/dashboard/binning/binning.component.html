@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="col-4">
+      <p-dropdown placeholder="Select User" class="w-100" [filter]="true" [(ngModel)]="userSelected" [options]="userList"
+          (onChange)="pickerChoosed($event)"
+          [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+          [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+  </div>
+</div>
+
+<highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions" class="size uatwhite">
+</highcharts-chart>

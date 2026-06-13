@@ -1,0 +1,977 @@
+
+<form [formGroup]="form"*ngIf="this.data.lines.phaseDescription == 'Sorting'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Sorting</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('soaking.itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch No</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Quantity Processed</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="processQty" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('processQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Output Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="outputQty" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('outputQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="startTime" [owlDateTime]="startTime"
+                  [owlDateTimeTrigger]="startTime" placeholder="Select Time">
+                <owl-date-time #startTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('startTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="endTime" [owlDateTime]="endTime"
+              [owlDateTimeTrigger]="endTime" placeholder="Select Time">
+            <owl-date-time #endTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('endTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">No of Workers Involved</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="noOfWorkers" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('noOfWorkers')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Impurities Identified</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="impurities" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('impurities')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Supervisor's Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="supervisorName" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('supervisorName')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="sortingdate" [owlDateTimeTrigger]="sortingdate" placeholder="Select Time">
+                <owl-date-time #sortingdate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('sortingdate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'Soaking'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Soaking</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Ingredient Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Kettle Batch Number </p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('kettleBatchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Soaking Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="soakingQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('soakingQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Water Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="waterQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('waterQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="startTime" [owlDateTime]="startTime"
+                  [owlDateTimeTrigger]="startTime" placeholder="Select Time">
+                <owl-date-time #startTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('startTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="endTime" [owlDateTime]="endTime"
+              [owlDateTimeTrigger]="endTime" placeholder="Select Time">
+            <owl-date-time #endTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('endTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Room Temperature</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="roomTemperature" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('roomTemperature')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Water Temperature</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="waterTemperature" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('waterTemperature')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Supervisor's Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="supervisorName" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('supervisorName')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="soakingdate" [owlDateTimeTrigger]="soakingdate" placeholder="Select Time">
+                <owl-date-time #soakingdate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('soakingdate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'Peeling'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Peeling</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Number</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Peeling Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="peelingStartTime" [owlDateTime]="peelingStartTime"
+                  [owlDateTimeTrigger]="peelingStartTime" placeholder="Select Time">
+                <owl-date-time #peelingStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('peelingStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Peeling End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="peelingEndTime" [owlDateTime]="peelingEndTime"
+              [owlDateTimeTrigger]="peelingEndTime" placeholder="Select Time">
+            <owl-date-time #peelingEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('peelingEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Washing Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="washingStartTime" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('washingStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Washing End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="washingEndTime" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('washingEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Post Boiling Weight</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="postBoilingWeight" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('postBoilingWeight')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Brix Of Boiled Dal</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="brixOfBoiledDal" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('brixOfBoiledDal')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="peelingdate" [owlDateTimeTrigger]="peelingdate" placeholder="Select Time">
+                <owl-date-time #peelingdate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('peelingdate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'Making paste with water'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Paste</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Code</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Issued Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="issuedQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('issuedQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Water Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="waterQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('waterQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Output Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="outputQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('outputQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Paste Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="pasteStartTime" [owlDateTime]="pasteStartTime"
+                  [owlDateTimeTrigger]="pasteStartTime" placeholder="Select Time">
+                <owl-date-time #pasteStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('pasteStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Paste End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="pasteEndTime" [owlDateTime]="pasteEndTime"
+              [owlDateTimeTrigger]="pasteEndTime" placeholder="Select Time">
+            <owl-date-time #pasteEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('pasteEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">No of Workers Involved</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="noOfWorkers" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('noOfWorkers')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Storage Location</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="storageLocation" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('storageLocation')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Supervisor's Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="supervisorName" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('supervisorName')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="pastedate" [owlDateTimeTrigger]="pastedate" placeholder="Select Time">
+                <owl-date-time #pastedate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('pastedate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'Powder' || this.data.lines.phaseDescription == 'Grinding into powder'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Powder</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Code</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Issued Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="issuedQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('issuedQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Output Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="outputQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('outputQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Roasting Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="roastingStartTime" [owlDateTime]="roastingStartTime"
+                  [owlDateTimeTrigger]="roastingStartTime" placeholder="Select Time">
+                <owl-date-time #roastingStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('roastingStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Roasting End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="roastingEndTime" [owlDateTime]="roastingEndTime"
+              [owlDateTimeTrigger]="roastingEndTime" placeholder="Select Time">
+            <owl-date-time #roastingEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('roastingEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Powder Preparation Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="powderPreparationStartTime" [owlDateTime]="powderPreparationStartTime"
+                  [owlDateTimeTrigger]="powderPreparationStartTime" placeholder="Select Time">
+                <owl-date-time #powderPreparationStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('powderPreparationStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Powder Preparation End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="powderPreparationEndTime" [owlDateTime]="powderPreparationEndTime"
+              [owlDateTimeTrigger]="powderPreparationEndTime" placeholder="Select Time">
+            <owl-date-time #powderPreparationEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('powderPreparationEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">No of Workers Involved</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="numberOfWorkers" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('noOfWorkers')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Storage Location</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="storageLocation" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('storageLocation')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Supervisor's Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="supervisorName" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('supervisorName')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="powderdate" [owlDateTimeTrigger]="powderdate" placeholder="Select Time">
+                <owl-date-time #powderdate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('powderdate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'Chopping'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Dice Slice Chop</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Code</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Issued Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="issuedQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('issuedQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Output Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="outputQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('outputQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="startTime" [owlDateTime]="chopStartTime"
+                  [owlDateTimeTrigger]="chopStartTime" placeholder="Select Time">
+                <owl-date-time #chopStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 "> End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="endTime" [owlDateTime]="chopEndTime"
+              [owlDateTimeTrigger]="chopEndTime" placeholder="Select Time">
+            <owl-date-time #chopEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">No of Workers Involved</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="numberOfWorkers" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('noOfWorkers')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Storage Location</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="storageLocation" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('storageLocation')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Supervisor's Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="supervisorName" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('supervisorName')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="dieceDate" [owlDateTimeTrigger]="dieceDate" placeholder="Select Time">
+                <owl-date-time #dieceDate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('dieceDate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'Cooking'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Cooking</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Code</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="cookingStartTime" [owlDateTime]="cookingStartTime"
+                  [owlDateTimeTrigger]="cookingStartTime" placeholder="Select Time">
+                <owl-date-time #cookingStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 "> End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="cookingEndTime" [owlDateTime]="cookingEndTime"
+              [owlDateTimeTrigger]="cookingEndTime" placeholder="Select Time">
+            <owl-date-time #cookingEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Packing Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="packingStartTime" [owlDateTime]="packingStartTime"
+                  [owlDateTimeTrigger]="packingStartTime" placeholder="Select Time">
+                <owl-date-time #packingStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">  Packing End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="packingEndTime" [owlDateTime]="packingEndTime"
+              [owlDateTimeTrigger]="packingEndTime" placeholder="Select Time">
+            <owl-date-time #packingEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Retort Start Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="retortStartTime" [owlDateTime]="retortStartTime"
+                  [owlDateTimeTrigger]="retortStartTime" placeholder="Select Time">
+                <owl-date-time #retortStartTime ></owl-date-time>
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopStartTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">  Retort End Time</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput formControlName="retortEndTime" [owlDateTime]="retortEndTime"
+              [owlDateTimeTrigger]="retortEndTime" placeholder="Select Time">
+            <owl-date-time #retortEndTime ></owl-date-time>      
+          </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('chopEndTime')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Temperature of First Packet During Retort Loading</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="firstPacketTemperatureDuringRetortLoading" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('issuedQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Output Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="outputQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('outputQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="cookingDate" [owlDateTimeTrigger]="cookingDate" placeholder="Select Time">
+                <owl-date-time #cookingDate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('cookingDate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'QC Packing'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">QC Packing</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Code</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Output Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="outputQty" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('outputQty')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Colour</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="color" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('color')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Temperature</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="temperature" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('temperature')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Bost Wick Value</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="bostwickValue" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('bostwickValue')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Total Soluble Solids</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="tss" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('tss')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+        
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Sugar Syrup Tss</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="sugarSyrupTss" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('sugarSyrupTss')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Acidity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="acidity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('acidity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Salt Content</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="salt" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('salt')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">PH Level</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="ph" formControlName="ph" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('salt')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Moisture Content</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="moisture" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('moisture')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Approval Status</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('approvalStatus')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Observation</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="observation" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('observation')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="qcPackingdate" [owlDateTimeTrigger]="qcPackingdate" placeholder="Select Time">
+                <owl-date-time #qcPackingdate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('qcPackingdate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+  </div>
+
+</form>
+<form [formGroup]="form" *ngIf="this.data.lines.phaseDescription == 'FG Delivery'">
+  <div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">FG Delivery</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <mat-accordion>
+      <mat-expansion-panel #panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+          <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+            General
+            <mat-icon class="text-secondary">{{panel.expanded? 'remove' : 'add'}}</mat-icon>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="row  scroll p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Product Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="itemDescription" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('itemDescription')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Batch Code</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="batchNumber" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('batchNo')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Order Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="orderQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('orderQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Dispatch Quantity</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="dispatchQuantity" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('dispatchQuantity')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Customer Name</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="customerName" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('customerName')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <p class="mb-0 py-0 ">Transport Details</p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="transportDetails" >
+            </mat-form-field>
+          <!--  <mat-error *ngIf="errorHandling('transportDetails')">{{getErrorMessage()}}</mat-error> -->
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Date</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput  [owlDateTime]="deliverydate" [owlDateTimeTrigger]="deliverydate" placeholder="Select Time">
+                <owl-date-time #deliverydate ></owl-date-time>
+              </mat-form-field>
+            <!--  <mat-error *ngIf="errorHandling('deliverydate')">{{getErrorMessage()}}</mat-error> -->
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+  </div>
+</form>
+
+
+

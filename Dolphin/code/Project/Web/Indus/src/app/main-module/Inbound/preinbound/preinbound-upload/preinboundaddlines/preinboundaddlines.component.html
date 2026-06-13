@@ -1,0 +1,116 @@
+<form [formGroup]="form">
+  <div class="card bg-white" style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+         class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Preinbound-Lines</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <div class="mt-2 px-4">
+      <div class="row scroll2 p-1">
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">Line Reference</p>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="lineReference">
+            </mat-form-field>
+            <mat-error *ngIf="errorHandling('lineReference')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">Part No</p>
+            <p-dropdown *ngIf=" this.data.pageflow != 'Edit' || this.showDropdown1==true" placeholder="Select" [filter]="true" appendTo="body" class="w-100"
+                        [options]="multiselectItemCodeList" [resetFilterOnHide]="true" #itemcode
+                        (onChange)="itemCodeChanged(itemcode.selectedOption)" formControlName="sku" name="product"
+                        [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}" (onFilter)="onItemType($event)">
+            </p-dropdown>
+                <mat-form-field *ngIf="!showDropdown1 && this.data.pageflow == 'Edit'" class="form-group input_field mb-0 w-100" appearance="outline">
+                              <input matInput placeholder="Enter" formControlName="sku" 
+                               >
+                               <button  matSuffix mat-icon-button (click)="showDropdown()">
+                                <mat-icon>edit</mat-icon>
+                              </button>
+                            </mat-form-field>
+            <mat-error *ngIf="errorHandling('sku')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">Description</p>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput formControlName="skuDescription">
+            </mat-form-field>
+            <mat-error *ngIf="errorHandling('skuDescription')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">Mfr Code</p>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput formControlName="manufacturerCode">
+            </mat-form-field>
+            <mat-error *ngIf="errorHandling('manufacturerCode')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">UOM</p>
+            <p-dropdown *ngIf="this.data.pageflow != 'Edit'" placeholder="Select" [filter]="true" appendTo="body" class="w-100"
+                        [options]="uomList" [resetFilterOnHide]="true" formControlName="uom"
+                        [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}">
+            </p-dropdown>
+            <mat-form-field *ngIf="this.data.pageflow == 'Edit'" class="form-group input_field mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="uom" 
+               >
+            </mat-form-field>
+            <mat-error *ngIf="errorHandling('uom')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">Date</p>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput [matDatepicker]="picker" placeholder="Choose Date" formControlName="expectedDate1"
+                     (dateChange)="inputChange($event)">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <mat-error *ngIf="errorHandling('expectedDate1')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black">Invoice Number</p>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="invoiceNumber">
+            </mat-form-field>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-4 mt-1">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black required">Order Qty</p>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="expectedQty">
+            </mat-form-field>
+            <mat-error *ngIf="errorHandling('expectedQty')">{{getErrorMessage()}}</mat-error>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+    
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button class="text-white mx-1 px-3" color="warn" (click)="cancel()">
+        <mat-icon class="">close</mat-icon>Cancel
+      </button>
+      <button mat-raised-button class="bg-darkblue text-white mx-1" (click)="submit()">
+        <mat-icon class="">done</mat-icon> Save
+      </button>
+    </div>
+  </div>
+</form>

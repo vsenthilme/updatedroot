@@ -1,0 +1,34 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title class="d-flex justify-content-between bg-secondary align-items-center p-2">
+        <h6 class="my-auto text-white  text-left">Bin Class Status</h6>
+        <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <div class="mt-2 px-4">
+        <h6>Current Stock : 0</h6>
+        <div class="row p-1 scroll">
+            <table class="table table-striped table-sm" style="font-size: 0.7rem;">
+                <thead>
+                    <tr>
+                        <th scope="col">S No</th>
+                        <th scope="col">Part No</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Del Qty</th>
+                        <th scope="col">Class</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let element of dataArray; let i = index">
+                        <td [ngClass]="element.class == 'A' ? 'text-success pulsate' : ''">{{ i + 1 }}</td>
+                        <td [ngClass]="element.class == 'A' ? 'text-success pulsate' : ''">{{ this.data.referenceField5 }}</td>
+                        <td [ngClass]="element.class == 'A' ? 'text-success pulsate' : ''">{{ this.data.referenceField8 }}</td>
+                        <td [ngClass]="element.class == 'A' ? 'text-success pulsate' : ''">{{ element.date | date : 'dd-MM-yyyy'}}</td>
+                        <td [ngClass]="element.class == 'A' ? 'text-success pulsate' : ''">{{ element.qty }}</td>
+                        <td [ngClass]="element.class == 'A' ? 'text-success pulsate' : ''">{{ element.class }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>

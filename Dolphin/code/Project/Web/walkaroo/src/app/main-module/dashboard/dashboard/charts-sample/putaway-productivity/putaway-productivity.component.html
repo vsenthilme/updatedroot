@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-6 mt-1">
+        <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+            <mat-date-range-input [rangePicker]="picker2">
+              <input matStartDate placeholder="Start date"
+                [(ngModel)]="fromCreatedOnFE">
+              <input matEndDate placeholder="End date" (dateChange)="dateChoosed($event)"
+                [(ngModel)]="toCreatedOnFE">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker2></mat-date-range-picker>
+          </mat-form-field>
+    </div>
+    <div class="col-6">
+        <p-dropdown placeholder="Select User" class="w-100" [filter]="true" [options]="typeOfFilter"
+            (onChange)="dateChoosed($event)" [(ngModel)]="filter"
+            [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+            [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+    </div>
+</div>
+
+<div id="container" style="width: 100%; height: 400px;"></div>

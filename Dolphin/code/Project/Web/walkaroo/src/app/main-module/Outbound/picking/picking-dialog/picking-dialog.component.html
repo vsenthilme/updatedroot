@@ -1,0 +1,206 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+  <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+    class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+    <h6 class="my-auto">Pick List Details</h6>
+    <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+  </div>
+  <div class="row">
+    <p-table #Setuppricelist [globalFilterFields]="['languageId','companyIdAndDescription','plantIdAndDescription','warehouseIdAndDescription','storageSectionId','levelId','aisleNumber','statusId','createdBy','createdOn']" [value]="pricelist"
+    styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"   selectionMode="single"  sortField="lineNumber" [sortOrder]="1" 
+    scrollHeight="calc(100vh - 29.2rem)"  [paginator]="false" [rows]="100" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[100, 150, 200, 250]" [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white" >
+    <ng-template pTemplate="header">
+      <tr>
+       
+    
+      
+        <th style="width: 8rem" pSortableColumn="lineNumber"   pResizableColumn>Line  No<p-sortIcon field="lineNumber"></p-sortIcon>
+ 
+        </th>
+        <th style="width: 8rem" pSortableColumn="refDocNumber"   pResizableColumn>Order No<p-sortIcon field="refDocNumber"></p-sortIcon>
+ 
+        </th>
+        <th style="width: 8rem" pSortableColumn="manufacturerName" pResizableColumn>Mfr Name<p-sortIcon field="manufacturerName"></p-sortIcon>
+
+        </th>
+        <th style="width: 8rem" pSortableColumn="itemCode" pResizableColumn>Part No<p-sortIcon field="itemCode"></p-sortIcon>
+
+        </th>
+    
+        <th style="width: 8rem" pSortableColumn="proposedStorageBin" pResizableColumn>Bin Location<p-sortIcon field="proposedStorageBin"></p-sortIcon>
+
+        </th>
+        <th style="width: 8rem" pSortableColumn="assignedPickerId" pResizableColumn>Picker<p-sortIcon field="assignedPickerId"></p-sortIcon>
+
+        </th>
+        <th style="width: 8rem" pSortableColumn="articleNo" pResizableColumn>Article <p-sortIcon
+          field="articleNo"></p-sortIcon></th>
+      <th style="width: 8rem"  pSortableColumn="gender" pResizableColumn>Gender <p-sortIcon
+            field="gender"></p-sortIcon></th>   
+      <th style="width: 8rem" pSortableColumn="priceSegment" pResizableColumn>Price Segment <p-sortIcon
+              field="priceSegment"></p-sortIcon></th>  
+       <th style="width: 8rem"pSortableColumn="color" pResizableColumn>Color <p-sortIcon
+                field="color"></p-sortIcon></th>  
+       <th style="width: 8rem" pSortableColumn="size" pResizableColumn>Size <p-sortIcon
+                  field="size"></p-sortIcon></th>  
+      <th style="width: 8rem" pSortableColumn="materialNo" pResizableColumn>Material No <p-sortIcon
+                    field="materialNo"></p-sortIcon></th>  
+      <th style="width: 8rem" pSortableColumn="noPairs" pResizableColumn>No of Pairs <p-sortIcon
+                      field="noPairs"></p-sortIcon></th>  
+      <th style="width: 8rem" pSortableColumn="barcodeId" pResizableColumn>HU SNo <p-sortIcon
+                       field="barcodeId"></p-sortIcon></th> 
+        <th style="width: 8rem" pSortableColumn="pickToQty" pResizableColumn>Order Qty<p-sortIcon field="pickToQty"></p-sortIcon>
+        </th>
+      </tr>
+       
+      <tr >
+        <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'lineNumber', 'contains')"
+              [value]="$any(Setuppricelist.filters['lineNumber'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'refDocNumber', 'contains')"
+              [value]="$any(Setuppricelist.filters['refDocNumber'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+          </th>
+        <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'manufacturerName', 'contains')"
+              [value]="$any(Setuppricelist.filters['manufacturerName'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'itemCode', 'contains')"
+              [value]="$any(Setuppricelist.filters['itemCode'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+          </th>
+    
+ 
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'proposedStorageBin', 'contains')"
+              [value]="$any(Setuppricelist.filters['proposedStorageBin'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'assignedPickerId', 'contains')"
+              [value]="$any(Setuppricelist.filters['assignedPickerId'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+           
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'articleNo', 'contains')"
+              [value]="$any(Setuppricelist.filters['articleNo'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'gender', 'contains')"
+              [value]="$any(Setuppricelist.filters['gender'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'priceSegment', 'contains')"
+              [value]="$any(Setuppricelist.filters['priceSegment'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'color', 'contains')"
+              [value]="$any(Setuppricelist.filters['color'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'size', 'contains')"
+              [value]="$any(Setuppricelist.filters['size'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'materialNo', 'contains')"
+              [value]="$any(Setuppricelist.filters['materialNo'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'noPairs', 'contains')"
+              [value]="$any(Setuppricelist.filters['noPairs'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+            <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'barcodeId', 'contains')"
+              [value]="$any(Setuppricelist.filters['noPairs'])?.value" placeholder="Search"
+              class=" w-100 p-column-filter">
+          </th>
+          <th style="width: 8rem">
+            <input pInputText type="text"
+              (input)="Setuppricelist.filter($any($event.target)?.value, 'pickToQty', 'contains')"
+              [value]="$any(Setuppricelist.filters['pickToQty'])?.value" placeholder="Search "
+              class=" w-100 p-column-filter">
+
+          </th>
+       
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-pricelist let-rowIndex="rowIndex">
+      <tr>
+       
+        <td style="width: 8rem">{{pricelist.lineNumber}}</td>
+        <td style="text-decoration-line: underline;cursor:pointer;width:8rem;"  class="text-primary" (click)="openConfirm(pricelist)">{{pricelist.refDocNumber}}</td>
+        <td style="width: 8rem">{{pricelist.manufacturerName}}</td>
+        <td style="width: 8rem">{{pricelist.itemCode}}</td>
+        <td style="width: 8rem">{{pricelist.proposedStorageBin}}</td>
+        <td style="width: 8rem">{{pricelist.assignedPickerId}}</td>
+        <td style="width: 8rem">{{pricelist.articleNo}}</td>
+        <td style="width: 8rem">{{pricelist.gender}}</td>
+        <td style="width: 8rem">{{pricelist.priceSegment}}</td>
+        <td style="width: 8rem">{{pricelist.color}}</td>
+        <td style="width: 8rem">{{pricelist.size}}</td>
+        <td style="width: 8rem">{{pricelist.materialNo}}</td>
+        <td style="width: 8rem">{{pricelist.noPairs}}</td>
+          <td style="width: 8rem">{{pricelist.barcodeId}}</td> 
+        <td style="width: 8rem">{{pricelist.pickToQty}}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <tr>
+
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+            <td style="width: 8rem"></td>
+              <td style="width: 8rem"></td> 
+              <td style="width: 8rem"></td> 
+            <td style="width: 8rem">{{getToQtyQty()}}</td>
+        </tr>
+          
+      </ng-template>
+  </p-table>
+  </div>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+    </div>
+
+
+</div>
+
+

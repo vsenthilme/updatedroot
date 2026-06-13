@@ -1,0 +1,180 @@
+<div class="card  border-0 bg-white " style="overflow: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center header_colour text-white p-2">
+      <h6 class="my-auto">Price List Details</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+   
+    <div class="col-12 mainsection mt-1  border-top px-0 uatwhite" style="height: calc(100vh - 12rem);  ">
+        <div class="scroll2">
+      <div class="example-sidenav-content">
+        <div class="row " style="padding-right: 15px !important;">
+            <p-table #Setuppricelist [globalFilterFields]="['languageId','companyIdAndDescription','plantIdAndDescription','warehouseIdAndDescription','storageSectionId','levelId','aisleNumber','statusId','createdBy','createdOn']" [value]="pricelist"
+            styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"   selectionMode="single"  
+            scrollHeight="calc(100vh - 15.2rem)" [paginator]="true" [rows]="100" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [rowsPerPageOptions]="[100, 150, 200, 250]" [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white" >
+            <ng-template pTemplate="header">
+              <tr>
+               
+            
+              
+              <th  style="width:5rem" pSortableColumn="moduleIdAndDescriptionAndDescription" pResizableColumn>Module  <p-sortIcon field="moduleIdAndDescription"></p-sortIcon>
+          
+          
+              </th>
+              <th style="width:5rem"  pSortableColumn="priceListId"  pResizableColumn>Price List <p-sortIcon field="priceListId"></p-sortIcon></th>
+              <th style="width:5rem"  pSortableColumn="description"  pResizableColumn>Description  <p-sortIcon field="description"></p-sortIcon></th>
+            
+              <th style="width:5rem" pSortableColumn="serviceTypeIdAndDescription"  pResizableColumn>Service Type <p-sortIcon field="serviceTypeIdAndDescription"></p-sortIcon>
+                </th>
+                   <th style="width:5rem" pSortableColumn="chargeRangeId"  pResizableColumn>Charge ID <p-sortIcon field="chargeRangeId"></p-sortIcon>
+                   </th>
+                   <th style="width:5rem" pSortableColumn="priceUnit"  pResizableColumn>Unit <p-sortIcon field="priceUnit"></p-sortIcon>
+                   </th>
+                   <th style="width:5rem" pSortableColumn="chargeRangeFrom"  pResizableColumn>From <p-sortIcon field="chargeRangeFrom"></p-sortIcon>
+                   </th>
+                   <th style="width:5rem" pSortableColumn="chargeRangeTo"  pResizableColumn>To <p-sortIcon field="chargeRangeTo"></p-sortIcon>
+                   </th>
+                   <th  style="width:5rem" pSortableColumn="pricePerChargeUnit"  pResizableColumn>Rate Per Unit <p-sortIcon field="pricePerChargeUnit"></p-sortIcon></th>
+                   <th  style="width:5rem" pSortableColumn="chargeUnit"  pResizableColumn>Rate Unit <p-sortIcon field="chargeUnit"></p-sortIcon></th>
+                   <th  style="width:5rem" pSortableColumn="minMonthlyPrice"  pResizableColumn>Minimum Monthly Cost <p-sortIcon field="minMonthlyPrice"></p-sortIcon></th>
+              <th style="width:5rem" pSortableColumn="statusId"   pResizableColumn>Status<p-sortIcon field="statusId"></p-sortIcon>
+                </th>
+             
+              <th style="width:5rem" pSortableColumn="createdBy"   pResizableColumn>Created By<p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th style="width:5rem" pSortableColumn="createdOn"   pResizableColumn>Created On<p-sortIcon field="createdOn"></p-sortIcon>
+              </th>
+              <th style="width:5rem" pResizableColumn>Delete</th>
+              </tr>
+               
+              <tr >
+           
+              <th style="width:5rem">
+                <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'moduleIdAndDescription', 'contains')" 
+                [value]="$any(Setuppricelist.filters['moduleIdAndDescription'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+               <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+              </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'priceListId', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['priceListId'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                    <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'description', 'contains')" 
+                    [value]="$any(Setuppricelist.filters['description'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                   <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                  </th>
+               
+                 
+                 
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'serviceTypeIdAndDescription', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['serviceTypeIdAndDescription'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'chargeRangeId', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['chargeRangeId'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'priceUnit', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['priceUnit'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'changeRangeFrom', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['changeRangeFrom'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'changeRangeTo', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['changeRangeTo'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'pricePerChargeUnit', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['pricePerChargeUnit'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'chargeUnit', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['chargeUnit'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'minMonthlyPrice', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['minMonthlyPrice'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'statusId', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['statusId'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'createdBy', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['createdBy'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'createdon', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['createdOn'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+                <th style="width:5rem">
+                  <input pInputText  type="text" (input)="Setuppricelist.filter($any($event.target)?.value, 'edit', 'contains')" 
+                  [value]="$any(Setuppricelist.filters['edit'])?.value" placeholder="Search " class=" w-100 p-column-filter">
+                 <!-- <p-columnFilter type="text" placeholder="Search" field="floorId"></p-columnFilter>-->
+                </th>
+               
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-pricelist let-rowIndex="rowIndex">
+              <tr>
+               
+          
+            <td style="width:5rem">{{pricelist.moduleIdAndDescription}}</td>
+            <td style="text-decoration-line: underline;width:8rem;cursor:pointer" class="text-primary" (click)="openDialog('Edit',pricelist)">
+              {{ pricelist.priceListId }}
+            </td>
+            <td style="width:5rem">
+                {{ pricelist.description }}
+              </td>
+          
+             
+             
+            <td style="width:5rem">{{pricelist.serviceTypeIdAndDescription}}</td>
+            <td style="width:5rem">{{pricelist.chargeRangeId}}</td>
+            <td style="width:5rem">{{pricelist.chargeUnit}}</td>
+            <td style="width:5rem">{{pricelist.chargeRangeFrom}}</td>
+            <td style="width:5rem">{{pricelist.chargeRangeTo}}</td>
+            <td style="width:5rem">
+              {{ pricelist.pricePerChargeUnit }}
+            </td>
+            <td style="width:5rem">
+              {{ pricelist.priceUnit +'-'+pricelist.referenceField4}}
+            </td>
+            <td style="width:5rem">
+              {{ pricelist.minMonthlyPrice }}
+            </td>
+            <td style="width:5rem">{{pricelist.statusId == 1? 'Active':'Inactive'}}</td>
+            <td style="width:5rem">{{pricelist.createdBy}}</td>
+            <td style="width:5rem">{{pricelist.createdOn | date : 'dd-MM-yyyy HH:mm' :'GMT +3' }}</td>
+            <td style="width:5rem">  
+              <button class="mx-2"  mat-icon-button (click)="delete(pricelist)">
+                 <mat-icon class="text-danger">delete_outline</mat-icon>
+               </button>
+            
+             </td>
+              </tr>
+            </ng-template>
+          </p-table>
+      </div>
+    </div>
+    </div>
+    </div>
+  
+  </div>

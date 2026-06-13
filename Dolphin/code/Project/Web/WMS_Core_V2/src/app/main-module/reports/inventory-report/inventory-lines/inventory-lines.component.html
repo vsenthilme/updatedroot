@@ -1,0 +1,285 @@
+<div class="card  border-0 bg-white " style="overflow: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center header_colour text-white p-2">
+      <h6 class="my-auto">Order Management Lines</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+   
+    <div class="col-12 mainsection mt-1  border-top px-0 uatwhite" style="height: calc(100vh - 12rem);  ">
+      <div class="example-sidenav-content">
+        <div class="row " style="padding-right: 15px !important;">
+            <p-table #orderManagementTag [value]="orderManagement"
+            [globalFilterFields]="['companyDescription','plantDescription','warehouseDescription','partnerCode','tokenNumber','salesOrderNumber', 'actions', 'statusDescription', 'refDocNumber',  'outboundOrderTypeId','lineNumber','itemCode','orderQty','inventoryQty','allocatedQty','requiredDeliveryDate','preOutboundNo','partnerItemBarcode','proposedStorageBin','description']"
+            styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true" selectionMode="multiple"
+            scrollDirection="both" [(selection)]="selectedOrderManagement" scrollHeight="calc(100vh - 15.2rem)"
+            sortField="refDocNumber" [sortOrder]="-1" [paginator]="true" [rows]="100" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [resizableColumns]="true"
+            style="width: 100%;margin-left: 10px;background-color:white">
+            <ng-template pTemplate="header">
+              <tr>
+            
+        
+                <th style="width: 6rem;" pSortableColumn="plantDescription"   pResizableColumn>Branch<p-sortIcon field="plantDescription"></p-sortIcon></th>
+                <th style="width: 6rem;" pSortableColumn="warehouseDescription"   pResizableColumn>Warehouse<p-sortIcon field="warehouseDescription"></p-sortIcon></th>
+                <th style="width: 6rem;" pSortableColumn="targetBranchCode" pResizableColumn>Target Branch<p-sortIcon field="targetBranchCode"></p-sortIcon>
+  
+                </th>
+                <th style="width: 6rem;" pSortableColumn="tokenNumber" pResizableColumn>Token Number<p-sortIcon field="tokenNumber"></p-sortIcon>
+  
+                </th>
+                <th style="width: 6rem;" pSortableColumn="salesOrderNumber"   pResizableColumn>Sales Order No<p-sortIcon field="salesOrderNumber"></p-sortIcon>
+           
+                </th>
+                <th style="width: 6rem" pSortableColumn="statusDescription" pResizableColumn>Status <p-sortIcon field="statusDescription"></p-sortIcon>
+               
+                </th>
+                <th style="width: 6rem" pSortableColumn="refDocNumber" pResizableColumn> Order No<p-sortIcon field="refDocNumber"></p-sortIcon>
+                 
+                </th>
+             
+                <th style="width: 8rem;" pSortableColumn="referenceDocumentType"   pResizableColumn>Order Type<p-sortIcon field="referenceDocumentType"></p-sortIcon>
+           
+                </th>
+                <th style="width: 6rem;" pSortableColumn="lineNumber"   pResizableColumn>Line No<p-sortIcon field="lineNumber"></p-sortIcon>
+           
+                </th>
+                <th style="width: 6rem;" pSortableColumn="manufacturerName" pResizableColumn>Mfr Name<p-sortIcon field="manufacturerName"></p-sortIcon>
+  
+                </th>
+                <th style="width: 6rem;" pSortableColumn="itemCode" pResizableColumn>Part No<p-sortIcon field="itemCode"></p-sortIcon>
+  
+                </th>
+               
+               
+               
+  
+  
+                <th style="width: 6rem;" pSortableColumn="orderQty" pResizableColumn>Order Qty<p-sortIcon
+                    field="orderQty"></p-sortIcon>
+  
+                </th>
+                <th style="width: 6rem;" pSortableColumn="inventoryQty" pResizableColumn>Inventory Qty<p-sortIcon
+                  field="inventoryQty"></p-sortIcon>
+                  <th style="width: 6rem;" pSortableColumn="allocatedQty" pResizableColumn>Allocated Qty<p-sortIcon
+                    field="allocatedQty"></p-sortIcon>
+  
+              </th>
+      
+                
+                <th style="width: 6rem;" pSortableColumn="partnerItemBarcode" pResizableColumn>Barcode Id<p-sortIcon
+                    field="partnerItemBarcode"></p-sortIcon>
+  
+                </th>
+                <th style="width: 8rem;" pSortableColumn="proposedStorageBin" pResizableColumn>Bin Location<p-sortIcon
+                    field="proposedStorageBin"></p-sortIcon>
+  
+                </th>
+                 
+               <!--<th style="width: 5rem;" pSortableColumn="proposedStorageBin" pResizableColumn>Details<p-sortIcon
+                  field="proposedStorageBin"></p-sortIcon>
+  
+              </th>-->
+               
+                <th style="width: 15rem;" pSortableColumn="description" pResizableColumn>
+                  Description<p-sortIcon field="description"></p-sortIcon>
+  
+                </th>
+                <th style="width: 8rem;" pSortableColumn="preOutboundNo" pResizableColumn>Preoutbound No<p-sortIcon field="preOutboundNo"></p-sortIcon>
+  
+                </th>
+                <th style="width: 8rem;" pSortableColumn="levelId" pResizableColumn> Level<p-sortIcon field="levelId"></p-sortIcon>
+  
+                </th>
+                <!-- <th style="width: 10rem;" pResizableColumn>Approval Process
+                 
+                </th>
+                <th style="width: 8rem;" pResizableColumn>Approver Code
+                 
+                </th>
+                <th style="width: 10rem;" pResizableColumn>Approver Name
+                 
+                </th>-->
+  
+  
+              </tr>
+  
+              <tr>
+              
+            
+                <th style="width: 6rem">
+                  <input pInputText  type="text" (input)="orderManagementTag.filter($any($event.target)?.value, '[plantDescription]', 'contains')" 
+                  [value]="$any(orderManagementTag.filters['plantDescription'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'warehouseDescription', 'contains')"
+                    [value]="$any(orderManagementTag.filters['warehouseDescription'])?.value" placeholder="Search"
+                    class=" w-100 p-column-filter">
+                </th>
+                <th style="width: 6rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'targetBranchCode', 'contains')"
+                    [value]="$any(orderManagementTag.filters['targetBranchCode'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'tokenNumber', 'contains')"
+                    [value]="$any(orderManagementTag.filters['tokenNumber'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'salesOrderNumber', 'contains')"
+                    [value]="$any(orderManagementTag.filters['salesOrderNumber'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'statusDescription', 'contains')"
+                    [value]="$any(orderManagementTag.filters['statusDescription'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'refDocNumber', 'contains')"
+                    [value]="$any(orderManagementTag.filters['refDocNumber'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+  
+                <th style="width: 8rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'referenceDocumentType', 'contains')"
+                    [value]="$any(orderManagementTag.filters['referenceDocumentType'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'lineNumber', 'contains')"
+                    [value]="$any(orderManagementTag.filters['lineNumber'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'manufacturerName', 'contains')"
+                    [value]="$any(orderManagementTag.filters['manufacturerName'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'itemCode', 'contains')"
+                    [value]="$any(orderManagementTag.filters['itemCode'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalId"></p-columnFilter>-->
+                </th>
+               
+                <th style="width: 6rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'orderQty', 'contains')"
+                    [value]="$any(orderManagementTag.filters['orderQty'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!--<p-columnFilter type="text" placeholder="Search" field="approvalLevel"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'inventoryQty', 'contains')"
+                    [value]="$any(orderManagementTag.filters['inventoryQty'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+                <th style="width: 6rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'allocatedQty', 'contains')"
+                    [value]="$any(orderManagementTag.filters['allocatedQty'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+  
+                <th style="width: 6rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'partnerItemBarcode', 'contains')"
+                    [value]="$any(orderManagementTag.filters['partnerItemBarcode'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+                <th style="width: 8rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'proposedStorageBin', 'contains')"
+                    [value]="$any(orderManagementTag.filters['proposedStorageBin'])?.value" placeholder="Search"
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdOn"></p-columnFilter>-->
+                </th>
+               <!--<th style="width: 5rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'proposedStorageBin', 'contains')"
+                    [value]="$any(orderManagementTag.filters['proposedStorageBin'])?.value" placeholder="Search"
+                    class=" w-100 p-column-filter">
+                   <p-columnFilter type="text" placeholder="Search" field="createdOn"></p-columnFilter>
+                </th>-->
+                <th style="width: 15rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'description', 'contains')"
+                    [value]="$any(orderManagementTag.filters['description'])?.value" placeholder="Search"
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdOn"></p-columnFilter>-->
+                </th>
+               
+                <th style="width: 8rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'preOutboundNo', 'contains')"
+                    [value]="$any(orderManagementTag.filters['preOutboundNo'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+                <th style="width: 8rem;">
+                  <input pInputText type="text"
+                    (input)="orderManagementTag.filter($any($event.target)?.value, 'levelId', 'contains')"
+                    [value]="$any(orderManagementTag.filters['levelId'])?.value" placeholder="Search "
+                    class=" w-100 p-column-filter">
+                  <!-- <p-columnFilter type="text" placeholder="Search" field="createdBy"></p-columnFilter>-->
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-orderManagement let-rowIndex="rowIndex">
+              <tr>
+  
+               
+             
+          
+                <td style="width: 6rem">{{orderManagement.plantDescription}}</td>
+                <td style="width: 6rem">{{orderManagement.warehouseDescription}}</td>
+                <td style="width: 6rem;">{{orderManagement.targetBranchCode }}</td>
+                <td style="width: 6rem;">{{orderManagement.tokenNumber }}</td>
+                <td style="width: 6rem">{{orderManagement.salesOrderNumber}}</td>
+                <td style="width: 6rem"> {{orderManagement.statusDescription}}</td>
+                <td style="width: 6rem">{{orderManagement.refDocNumber}}</td>
+                <td style="width: 8rem">{{orderManagement.referenceDocumentType}}</td>
+                <td style="width: 6rem">{{orderManagement.lineNumber}}</td>
+                <td style="width: 6rem">{{orderManagement.manufacturerName}}</td>
+                <td style="width: 6rem">{{orderManagement.itemCode}}</td>
+                <td style="width: 6rem;">{{orderManagement.orderQty }}</td>
+                <td style="width: 6rem;">{{orderManagement.inventoryQty }}</td>
+                <td style="width: 6rem;">{{orderManagement.allocatedQty }}</td>
+                <td style="width: 6rem;">{{orderManagement.partnerItemBarcode }}</td>
+                <td style="width: 8rem;">{{orderManagement.proposedStorageBin }}</td>
+               <!--<td style="width: 5rem;"><i *ngIf="orderManagement.proposedStorageBin" class="bi pl-3 bi-archive-fill" style="font-size: 1rem;"    (click)="iotBinLocation(orderManagement)"></i></td>-->
+                <td style="width: 15rem;">{{orderManagement.description }}</td>
+                <td style="width: 8rem;">{{orderManagement.preOutboundNo }}</td>
+                <td style="width: 8rem;">{{orderManagement.levelId }}</td>
+  
+              </tr>
+            </ng-template>
+          </p-table>
+      </div>
+    </div>
+    </div>
+  
+  </div>

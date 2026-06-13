@@ -1,0 +1,138 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="card bg-white " style="overflow-x: hidden;">
+      <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+        class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+        <h6 class="my-auto">Add Line</h6>
+        <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+      </div>
+      <div class="mt-2 px-4">
+        <div class="row  p-1">
+  
+         
+  
+        
+  
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black required">Module</p>
+              <p-dropdown placeholder="Select" class="w-100" [filter]="true" [options]="moduleList"  
+                formControlName="moduleId" #moduleId  (onChange)="onpartnertytpeChange(moduleId.value)"
+                [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Order No</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput formControlName="referenceField2">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="form-group mb-0">
+              <label for="inputEmail4" class="mb-0">Part No</label>
+              <!-- <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput placeholder="Enter" [(ngModel)]="itemCode" [ngModelOptions]="{standalone: true}">
+              </mat-form-field> -->
+              <p-dropdown placeholder="Select" [filter]="true" class="w-100" [options]="multiselectItemCodeList"
+              [resetFilterOnHide]="true"  #itemcode (onChange)="itemCodeChanged(itemcode.selectedOption)"
+                formControlName="itemCodeFE" name="product" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}"
+                  (onFilter)="onItemType($event)"  >
+            </p-dropdown>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Description</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput formControlName="referenceField5">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Transaction Qty</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput type ="number" formControlName="billQuantity">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Transaction Date</p>
+              <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+                <input matInput [matDatepicker]="picker" placeholder="Start date" formControlName="referenceField8">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+        
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Charge Value</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput formControlName="referenceField6">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Rate Unit</p>
+              <p-dropdown placeholder="Select" class="w-100" [filter]="true" [options]="currencyList" #chargeUnit
+                formControlName="priceUnit"  (onChange)="currencychange(chargeUnit.value)" 
+                [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Charge Unit</p>
+              <p-dropdown placeholder="Select" class="w-100" [filter]="true" [options]="uomList"  
+                formControlName="chargeUnit"
+                [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Service Type</p>
+              <p-dropdown placeholder="Select" class="w-100" [filter]="true" [options]="serviceTypeList"  
+                formControlName="serviceTypeId" #serviceTypeId  (onChange)="onservicetypeChange(serviceTypeId.value)"
+                [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Rate/Unit</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput  formControlName="rateUnit">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Total Value</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput type ="number" formControlName="totalValue">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center align-items-center py-2">
+        <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+            class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+        <button mat-raised-button class="mx-2 bg-darkblue px-4 text-white"> <i
+            class="bi bi-check2 mr-1 font-size-1_5rem"></i>
+          Save</button>
+      </div>
+  
+  
+    </div>
+  </form>
+  
+
+

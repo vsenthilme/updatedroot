@@ -1,0 +1,57 @@
+<form [formGroup]="form">
+    <div class="card bg-white " style="overflow-x: hidden;">
+      <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+        class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+        <h6 class="my-auto">{{data.title}} </h6>
+        <mat-icon class="text-white" (click)="cancel()">close</mat-icon>
+      </div>
+      <mat-accordion>
+  
+        <div class="mt-2" >
+          <div class="row  mx-0 mt-2 ">
+            <div class="col-4 mt-1">
+              <p class="mb-0 py-0 text-black">Analysis</p>
+              <mat-form-field class="form-group input_field mb-0  w-100" appearance="outline">
+                <input matInput formControlName="remarks">
+              </mat-form-field>
+            </div>
+            <div class="col-4 mt-1">
+                <p class="mb-0 py-0 text-black">Impurities</p>
+                <mat-form-field class="form-group input_field mb-0  w-100" appearance="outline">
+                  <input matInput formControlName="impurities">
+                </mat-form-field>
+              </div>
+              <div class="col-4 mt-1">
+                <p class="mb-0 py-0 text-black">Status</p>
+                <p-dropdown [options]="statusIdList" [style]="{'width': '80%'}"
+                 class="w-100" appendTo="body" formControlName="statusId"
+                placeholder="Select">
+              </p-dropdown>
+              </div>
+              <div class="col-4 mt-1">
+                <p class="mb-0 py-0 text-black">Storage Section</p>
+                <p-dropdown [options]="multiSelectstorageList"
+                 [style]="{'width': '80%'}" appendTo="body" class="w-100"
+                 formControlName="storageSectionId" placeholder="Select">
+                  </p-dropdown>
+              </div>
+              <div class="col-4 mt-1">
+                <p class="mb-0 py-0 text-black">Sample Qty</p>
+                <mat-form-field class="form-group input_field mb-0  w-100" appearance="outline">
+                    <input matInput formControlName="sampleQuantity">
+                  </mat-form-field>
+              </div>
+          </div>
+        </div>
+       
+  
+      </mat-accordion>
+      <div class="d-flex justify-content-center align-items-center py-2">
+        <button mat-raised-button color="warn" mat-dialog-close class="mx-2" (click)="cancel()"> <i
+            class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+        <button mat-raised-button class="mx-2 bg-darkblue text-white" (click)="submit()"> <i
+            class="bi bi-check2 mr-1 font-size-1_5rem"></i>
+          Confirm</button>
+      </div>
+    </div>
+  </form>

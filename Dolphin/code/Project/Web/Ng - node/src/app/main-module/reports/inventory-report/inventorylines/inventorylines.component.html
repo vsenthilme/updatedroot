@@ -1,0 +1,151 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Order Management  Lines </h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <div class="row  p-1">
+      <div class="d-flex ml-auto my-auto">
+      <div> <input matInput (keyup)="applyFilter($event)"
+        class="form-control filter_button mt-2 mt-2 mx-2 border-bottom" placeholder="Search" style="width:90%">
+    </div>
+      </div>
+      <div class="scroll mt-2 mx-3 w-100">
+        <table mat-table matSort [dataSource]="dataSource" class="w-100">
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              <mat-checkbox (change)="$event ? toggleAllRows() : null" [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="clearselection(row)"
+                [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="refDocNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Order No </th>
+            <td mat-cell *matCellDef="let element;let i = index">{{element.refDocNumber}} </td>
+          </ng-container>
+
+          <!-- Weight Column -->
+
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="requiredDeliveryDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Required Date</th>
+            <td mat-cell *matCellDef="let element"> {{element.requiredDeliveryDate| date : 'dd-MM-yyyy' :'GMT'}}
+            </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="lineNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Line No</th>
+            <td mat-cell *matCellDef="let element"> {{element.lineNumber}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+
+          <ng-container matColumnDef="deliverystatus">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+            <td *matCellDef="let element" class="tableborder p-0 border-bottom text-center">
+              <i  [ngClass]="{'statusgreen': (element.statusId == 41) , 'statusblue': (element.statusId == 42), 'statusred': (element.statusId == 43)
+              , 'statusgrey': (element.statusId == 47), 'statusyellow': (element.statusId == 59), 'statusorange': (element.statusId == 48)}" class="fas fa-circle" style="font-size:11px"></i>
+              <!-- <i *ngIf="element.statusId == 48" class="fas fa-people-carry text-info" style="font-size:1.4rem"></i> -->
+            </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="variant">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Vairant </th>
+            <td mat-cell *matCellDef="let element"> {{element.variantCode}} </td>
+          </ng-container>
+              <!-- Weight Column -->
+              <ng-container matColumnDef="partnerCode">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Store</th>
+                <td mat-cell *matCellDef="let element"> {{element.partnerCode}} </td>
+              </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="outboundOrderTypeId">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Order Type </th>
+            <td mat-cell *matCellDef="let element"> {{cs.getoutboundOrderType_text(element.outboundOrderTypeId)}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="preOutboundNo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Preoutbound No </th>
+            <td mat-cell *matCellDef="let element"> {{element.preOutboundNo}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="order">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Mfr Part No </th>
+            <td mat-cell *matCellDef="let element"> {{element.manufacturerPartNo}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="orderQty">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Order Qty </th>
+            <td mat-cell *matCellDef="let element"> {{element.orderQty}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="req">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Order Date </th>
+            <td mat-cell *matCellDef="let element"> {{element.createdOn| date : 'dd-MM-yyyy HH:mm' :'GMT'}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="itemCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Code </th>
+            <td mat-cell *matCellDef="let element"> {{element.itemCode}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Description </th>
+            <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="inventoryQty">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Inv Qty </th>
+            <td mat-cell *matCellDef="let element"> {{element.inventoryQty}} </td>
+          </ng-container>
+          <!--Symbol Column -->
+          <ng-container matColumnDef="allocatedQty">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Allocated Qty </th>
+            <td mat-cell *matCellDef="let element"> {{element.allocatedQty}} </td>
+          </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="ref3">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Reallocated Qty </th>
+            <td mat-cell *matCellDef="let element"> {{element.reAllocatedQty}} </td>
+          </ng-container>
+               <!-- Symbol Column -->
+               <ng-container matColumnDef="proposedStorageBin">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Bin Location </th>
+                <td mat-cell *matCellDef="let element"> {{element.proposedStorageBin}} </td>
+              </ng-container>
+                   <!-- Symbol Column -->
+          <ng-container matColumnDef="proposedPackBarCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Pallet ID </th>
+            <td mat-cell *matCellDef="let element"> {{element.proposedPackBarCode}} </td>
+          </ng-container>
+          <!-- Symbol Column-->
+          <ng-container matColumnDef="referenceField7">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+            <td mat-cell *matCellDef="let element"> {{element.referenceField7}} </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="clearselection(row)">
+          </tr>
+        </table>
+        
+      </div>
+      
+    <div class="d-flex ml-auto">
+      <mat-paginator [pageSizeOptions]="[100, 150, 200]" showFirstLastButtons
+      aria-label="Select page of periodic elements">
+    </mat-paginator>
+    </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+          <!-- <button mat-raised-button color="warn" mat-dialog-close class="mx-2 bg-darkblue px-4 text-white" (click)="submit()"> <i
+            class="bi bi-check2 me-1 font-size-1_5rem"></i>Create Quote</button> -->
+    </div>
+  </div>
+  

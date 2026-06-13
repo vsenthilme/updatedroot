@@ -1,0 +1,450 @@
+<div class="row mx-1 pl-2">
+    <div class="col-12">
+
+        <div class="row  text-secondary pr-0 mt-1">
+            <div class="col bg-white d-flex align-items-center mt-1 px-1 py-1 pathname">
+                <nav aria-label="breadcrumb" class="d-flex align-items-center">
+                    <ol class="breadcrumb mb-0 bg-white">
+                        <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto"><a
+                                routerLink="/main/dashboard/landingPage">Home</a></li>
+                        <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto"><a
+                                routerLink="/main/inbound/container-receipt">Inbound</a></li>
+                        <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto"><a>Quality Confirm</a></li>
+                    </ol>
+                </nav>
+
+
+                <div class="d-flex ml-auto my-auto">
+                    <div [hidden]="isShowDiv"> <input matInput
+                            class="form-control filter_button mt-2 mx-2 border-bottom" placeholder="Search"
+                            style="width:90%">
+                    </div>
+                    <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+                        class="button-row d-flex align-items-center">
+                        <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                            class=" floating-buttons  d-flex align-items-center justify-content-center text-white yellowaction"
+                            matTooltip="Display">
+                            <mat-icon
+                                class="action-icon d-flex align-items-center justify-content-center">search</mat-icon>
+                        </button>
+                        <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                            class="floating-buttons  d-flex align-items-center justify-content-center text-white blueaction "
+                            matTooltip="Edit">
+                            <mat-icon
+                                class="action-icon d-flex align-items-center justify-content-center">edit</mat-icon>
+                        </button>
+                        <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                            class=" floating-buttons  d-flex align-items-center justify-content-center redaction text-white align-middle"
+                            matTooltip="Delete">
+                            <mat-icon
+                                class="action-icon d-flex align-items-center justify-content-center">delete</mat-icon>
+                        </button>
+                        <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                            class="floating-buttons  d-flex align-items-center justify-content-center text-white darkblueaction "
+                            matTooltip="Download">
+                            <mat-icon
+                                class="action-icon d-flex align-items-center justify-content-center">download</mat-icon>
+                        </button>
+
+
+                        <button mat-mini-fab (click)="toggleFloat()" class="mx-2 text-white action-button"
+                            [ngClass]="{'bg-orange' : toggle, 'purple': !toggle}">
+                            <mat-icon>{{icon}}</mat-icon>Options</button>
+                        <button mat-mini-fab disabled
+                            class=" floating-buttons1 disabled d-flex align-items-center justify-content-center darkaction text-white mx-2 mr-3 align-middle"
+                            matTooltip="New">
+                            <mat-icon
+                                class="action-icon d-flex align-items-center justify-content-center my-auto">add</mat-icon>
+                        </button>
+                        <button mat-mini-fab
+                            class=" floating-buttons1  d-flex align-items-center justify-content-center greyaction text-white mx-2 mr-3 align-middle"
+                            matTooltip="Save">
+                            <mat-icon
+                                class="action-icon d-flex align-items-center justify-content-center my-auto">save</mat-icon>
+                        </button>
+                        <button mat-mini-fab disabled class="text-white mx-2 action-button  bg-red disabled"
+                            type="button" mat-button>
+                            <mat-icon class="">tune</mat-icon>Filter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabbar1  uatwhite mt-1 px-0 bg-white row d-flex align-items-center">
+            <h5 class="my-auto mb-0 mx-4 font-weight-bold whs-text-grey">Order No - {{code.refDocNumber}}</h5>
+        </div>
+
+        <div class="row  mt-1 pr-1" style="height: calc(100vh - 11rem)">
+            <div class="col-md-12 px-0">
+                <div class="">
+                    <mat-accordion>
+                        <form [formGroup]="form">
+                            <mat-expansion-panel #panel hideToggle>
+                                <mat-expansion-panel-header class="border-bottom padding-space border-top bg-white">
+                                    <mat-panel-title
+                                        class="d-flex justify-content-between collapsefont align-items-center">
+                                        <div><img src="./assets/img/icons/header.png" class="header_icon mr-2" alt=""
+                                                srcset="">Header</div>
+                                        <mat-icon class="collapsefont text-secondary">{{panel.expanded? 'remove' :
+                                            'add'}}</mat-icon>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div class="row boxgrey mt-2">
+                                    <div class="col-lg-4 col-md-6 mt-2">
+                                        <p class="mb-0 py-0">Order No</p>
+                                        <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                                            <input matInput placeholder="Enter" formControlName="refDocNumber">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 mt-2">
+                                        <p class="mb-0 py-0">Quality No</p>
+                                        <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                                            <input matInput placeholder="Enter" formControlName="inboundQualityNumber">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 mt-2">
+                                        <div class="d-flex flex-column">
+                                            <p class="mb-0 py-0">Status</p>
+                                            <mat-form-field class="form-group input_field mb-0 w-100"
+                                                appearance="outline">
+                                                <input matInput placeholder="Enter" [disabled]="true"
+                                                    formControlName="statusId">
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 mt-2">
+                                        <p class="mb-0 py-0">Part No</p>
+                                        <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                                            <input matInput placeholder="Enter" [disabled]="true" formControlName="itemCode">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 mt-2">
+                                        <p class="mb-0 py-0">Batch No</p>
+                                        <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                                            <input matInput placeholder="Enter" [disabled]="true" formControlName="batchSerialNumber">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </mat-expansion-panel>
+                        </form>
+
+                        <mat-expansion-panel #panel5 [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+                            <mat-expansion-panel-header class="border-bottom padding-space border-top">
+                                <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+                                    <div> <img src="./assets/img/icons/signal.png" class="header_icon mr-2" alt=""
+                                            srcset="">Lines</div>
+                                    <mat-icon class="collapsefont">{{panel5.expanded? 'remove' : 'add'}}</mat-icon>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-tab-group>
+                            <mat-tab label="Open">
+                            <div class="row mt-2">
+                                <p-table #qualityLineTag [value]="qualityLine"
+                                    styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"
+                                    scrollHeight="calc(1100vh - 27.5rem)"
+                                    sortField="inboundQualityNumber" [sortOrder]="-1" [paginator]="true" [rows]="100"
+                                    [showCurrentPageReport]="true" [resizableColumns]="true" selectionMode="multiple"  scrollDirection="both" [(selection)]="selectedQualityLine"
+                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                                    style="width: 100%;margin-left: 10px;background-color:white">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                           <th style="max-width: 3.5rem; justify-content: center;">
+                                                <p-tableHeaderCheckbox [disabled]="true"></p-tableHeaderCheckbox>
+                                            </th>
+                                            <th style="width: 4.5rem;" pSortableColumn="lineNo" pResizableColumn>
+                                                Line No<p-sortIcon field="lineNo"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="itemCode" pResizableColumn>
+                                                Part No<p-sortIcon field="itemCode"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="itemDescription" pResizableColumn>
+                                                    Description<p-sortIcon field="itemDescription"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="batchSerialNumber"
+                                                pResizableColumn>
+                                                Batch No<p-sortIcon field="batchSerialNumber"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="goodReceiptQty" pResizableColumn>Received
+                                                Qty<p-sortIcon field="goodReceiptQty"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="sampleQuantity" pResizableColumn>Sample Qty<p-sortIcon
+                                                    field="sampleQuantity"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="analysis" pResizableColumn>Analysis<p-sortIcon
+                                                    field="analysis"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="impurities" pResizableColumn>Impurities<p-sortIcon
+                                                    field="impurities"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="statusDescription" pResizableColumn>Status<p-sortIcon
+                                                    field="statusDescription"></p-sortIcon></th>
+                                            <th style="width: 9rem;" pSortableColumn="storageSectionId" pResizableColumn>Storage Section
+                                                ID<p-sortIcon field="storageSectionId"></p-sortIcon></th>
+                                           
+                                        </tr>
+
+                                        <tr>
+                                            <th style="max-width: 3.5rem; justify-content: center;">
+                                                <p-tableHeaderCheckbox  ></p-tableHeaderCheckbox>
+                                            </th>
+                                            <th style="width: 4.5rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'lineNo', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['lineNo'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'itemCode', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['itemCode'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'itemDescription', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['itemDescription'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'batchSerialNumber', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['batchSerialNumber'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'goodReceiptQty', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['goodReceiptQty'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'sampleQuantity', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['sampleQuantity'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'analysis', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['analysis'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'impurities', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['impurities'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'statusId', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['statusId'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                            <th style="width: 9rem;">
+                                                <input pInputText type="text"
+                                                    (input)="qualityLineTag.filter($any($event.target)?.value, 'storageSectionId', 'contains')"
+                                                    [value]="$any(qualityLineTag.filters['storageSectionId'])?.value"
+                                                    placeholder="Search" class="w-100 p-column-filter">
+                                            </th>
+                                           
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-qualityLine let-rowIndex="rowIndex">
+                                        <tr>
+                                            <td style="max-width:3.5rem;  justify-content: center;">
+                                                <p-tableCheckbox  [value]="qualityLine" ></p-tableCheckbox>
+                                              </td>
+                                            <td style="width: 4.5rem;">{{rowIndex+1}}</td>
+                                            <td style="width: 9rem;">{{qualityLine.itemCode}}</td>
+                                            <td style="width: 9rem;">{{qualityLine.itemDescription}}</td>
+                                            <td style="width: 9rem;">{{qualityLine.batchSerialNumber}}</td>
+                                            <td style="width: 9rem;">{{qualityLine.receivedQuantity}}</td>
+                                            <td  style="width: 9rem;">
+                                                <mat-form-field class="form-group input_field mb-0 w-150"
+                                                    appearance="outline">
+                                                    <input matInput placeholder="Qty Required" type="number"
+                                                        class="small-font" [(ngModel)]="qualityLine.sampleQuantity"
+                                                        required [disabled]="pageflow == 'Display'">
+                                                </mat-form-field>
+                                            </td>
+                                            <td style="width: 9rem;">
+                                                <input matInput placeholder="Enter" type="text" class="small-font"
+                                                    [(ngModel)]="qualityLine.analysis" required
+                                                    [disabled]="pageflow == 'Display'">
+                                            </td>
+                                            <td style="width: 9rem;">
+                                                <input matInput placeholder="Enter" type="text" class="small-font"
+                                                    [(ngModel)]="qualityLine.impurities" required
+                                                    [disabled]="pageflow == 'Display'">
+                                            </td>
+                                            <td style="width: 9rem;">
+                                                <p-dropdown [filter]="true" [options]="statusIdList" [style]="{'width': '100%'}"
+                                                    class="w-100" appendTo="body" [(ngModel)]="qualityLine.statusId"
+                                                    placeholder="Select">
+                                                </p-dropdown>
+                                            </td>
+                                            <td style="width: 9rem;">
+                                                <p-dropdown [filter]="true" [options]="multiSelectstorageList"
+                                                    [style]="{'width': '100%'}" appendTo="body" class="w-100"
+                                                    [(ngModel)]="qualityLine.storageSectionId" placeholder="Select">
+                                                </p-dropdown>
+                                            </td>
+                                          
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                            </mat-tab>
+                            <mat-tab label="Closed">
+                                <div class="row mt-2">
+                                    <p-table #qualityLineTag2 [value]="qualityLineclosed"
+                                        styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"
+                                        scrollHeight="calc(1100vh - 27.5rem)"
+                                        sortField="inboundQualityNumber" [sortOrder]="-1" [paginator]="true" [rows]="100"
+                                        [showCurrentPageReport]="true" [resizableColumns]="true" selectionMode="multiple"  scrollDirection="both" [(selection)]="selectedQualityLine"
+                                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                                        style="width: 100%;margin-left: 10px;background-color:white">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                             
+                                                <th style="width: 4.5rem;" pSortableColumn="lineNo" pResizableColumn>
+                                                    Line No<p-sortIcon field="lineNo"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="itemCode" pResizableColumn>
+                                                    Part No<p-sortIcon field="itemCode"></p-sortIcon></th>
+                                                    <th style="width: 9rem;" pSortableColumn="itemDescription" pResizableColumn>
+                                                        Description<p-sortIcon field="itemDescription"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="batchSerialNumber"
+                                                    pResizableColumn>
+                                                    Batch No<p-sortIcon field="batchSerialNumber"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="goodReceiptQty" pResizableColumn>Received
+                                                    Qty<p-sortIcon field="goodReceiptQty"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="sampleQuantity" pResizableColumn>Sample Qty<p-sortIcon
+                                                        field="sampleQuantity"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="analysis" pResizableColumn>Analysis<p-sortIcon
+                                                        field="analysis"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="impurities" pResizableColumn>Impurities<p-sortIcon
+                                                        field="impurities"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="statusDescription" pResizableColumn>Status<p-sortIcon
+                                                        field="statusDescription"></p-sortIcon></th>
+                                                <th style="width: 9rem;" pSortableColumn="storageSectionId" pResizableColumn>Storage Section
+                                                    ID<p-sortIcon field="storageSectionId"></p-sortIcon></th>
+                                               
+                                            </tr>
+    
+                                            <tr>
+                                               
+                                                <th style="width: 4.5rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'lineNo', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['lineNo'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'itemCode', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['itemCode'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'itemDescription', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['itemDescription'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'batchSerialNumber', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['batchSerialNumber'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'goodReceiptQty', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['goodReceiptQty'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'sampleQuantity', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['sampleQuantity'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'analysis', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['analysis'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'impurities', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['impurities'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'statusId', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['statusId'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                                <th style="width: 9rem;">
+                                                    <input pInputText type="text"
+                                                        (input)="qualityLineTag.filter($any($event.target)?.value, 'storageSectionId', 'contains')"
+                                                        [value]="$any(qualityLineTag.filters['storageSectionId'])?.value"
+                                                        placeholder="Search" class="w-100 p-column-filter">
+                                                </th>
+                                               
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-qualityLine let-rowIndex="rowIndex">
+                                            <tr>
+                                               
+                                                <td style="width: 4.5rem;">{{rowIndex+1}}</td>
+                                                <td style="width: 9rem;">{{qualityLine.itemCode}}</td>
+                                                <td style="width: 9rem;">{{qualityLine.itemDescription}}</td>
+                                                <td style="width: 9rem;">{{qualityLine.batchSerialNumber}}</td>
+                                                <td style="width: 9rem;">{{qualityLine.receivedQuantity}}</td>
+                                                <td  style="width: 9rem;">
+                                                   {{qualityLine.sampleQuantity}}
+                                                </td>
+                                                <td style="width: 9rem;">
+                                                   {{qualityLine.analysis}}
+                                                </td>
+                                                <td style="width: 9rem;">
+                                                    {{qualityLine.impurities}}
+                                                </td>
+                                                <td style="width: 9rem;">
+                                                   {{qualityLine.statusDescription}}
+                                                </td>
+                                                <td style="width: 9rem;">
+                                                  {{qualityLine.storageSectionId}}
+                                                </td>
+                                              
+                                            </tr>
+                                        </ng-template>
+                                    </p-table>
+                                </div>
+                              </mat-tab>
+                            </mat-tab-group>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                    <div class=" pb-1 w-100 d-flex justify-content-center fixed-bottom">
+                        <div class="py-2 mr-5 pr-5">
+                            <button mat-raised-button class="text-white mx-1" color="warn"
+                                routerLink="/main/inbound/qualityHeader">
+                                <mat-icon class="">close</mat-icon>Cancel</button>
+                            <button mat-raised-button class="bg-darkblue text-white mx-1" (click)="submit()"
+                                *ngIf="pageflow != 'Display'">
+                                <mat-icon class="">done</mat-icon>Confirm</button>
+                                <button mat-raised-button type="button" (click)="assigninvoice()" *ngIf="this.selectedQualityLine.length  > 0" class="text-white  bg-yellow demo-button mt-2">
+                                     Assign Quality
+                                  </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--right pane-->
+    <div class="col-3 pl-1 pr-1 mt-1 d-none">
+        <div class="whs-rightpane bg-white shadow ">
+        </div>
+    </div>
+</div>

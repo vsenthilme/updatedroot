@@ -1,0 +1,135 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">Stock Movement </h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <div class="row  p-1">
+      <div class="d-flex ml-auto my-auto">
+      <div> <input matInput (keyup)="applyFilter($event)"
+        class="form-control filter_button mt-2 mt-2 mx-2 border-bottom" placeholder="Search" style="width:90%">
+    </div>
+      </div>
+      <div class="scroll mt-2 mx-3 w-100">
+        <table mat-table [dataSource]="dataSource" matSort class=" w-100">
+
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()" disabled
+                  [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="clearselection(row)"
+                  [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="warehouseno">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Warehouse No</th>
+              <td mat-cell *matCellDef="let element"> {{element.warehouseId}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="countno">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>MFR Part No</th>
+              <td mat-cell *matCellDef="let element"> {{element.manufacturerSKU}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="by">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Code</th>
+              <td mat-cell *matCellDef="let element"> {{element.itemCode}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="preinboundno">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Item Description</th>
+              <td mat-cell *matCellDef="let element"> {{element.itemText}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="damage">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Document Type</th>
+              <td mat-cell *matCellDef="let element"> {{element.documentType}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="hold">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Document Number </th>
+              <td mat-cell *matCellDef="let element"> {{element.documentNumber}} </td>
+            </ng-container>
+            <!-- open qty -->
+            <ng-container matColumnDef="opening">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Opening Qty</th>
+              <td mat-cell *matCellDef="let element"> {{element.openingStock}} </td>
+            </ng-container>
+            <!-- move qty -->
+            <ng-container matColumnDef="moveQty">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Movement Quantity</th>
+              <td mat-cell *matCellDef="let element"> {{element.newmMovementQty}} </td>
+            </ng-container>
+            <!-- balance qty -->
+            <ng-container matColumnDef="balance">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Balance OH Qty</th>
+              <td mat-cell *matCellDef="let element"> {{element.balanceOHQty}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="available">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Code</th>
+              <td mat-cell *matCellDef="let element"> {{element.customerCode}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="stype">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+              <td mat-cell *matCellDef="let element"> {{element.confirmedOn | date: "dd-MM-yyyy"}} </td>
+            </ng-container>
+            <!-- Weight Column -->
+            <ng-container matColumnDef="time">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Time</th>
+              <td mat-cell *matCellDef="let element"> {{element.confirmedOn | date : "HH:mm"}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="putaway">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Putaway Details</th>
+              <td mat-cell *matCellDef="let element">
+                <button  mat-icon-button [disabled]="element.documentType == 'OutBound'" [ngClass]="element.documentType == 'OutBound' ? 'disabled' : '' "
+                  (click)="putaway(element)">
+                  <mat-icon class="text-secondary">open_in_new</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="picking">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Picking Details</th>
+              <td mat-cell *matCellDef="let element">
+                <button [disabled]="element.documentType == 'InBound'" mat-icon-button
+                  [ngClass]="element.documentType == 'InBound' ? 'disabled' : '' " (click)="picking(element)">
+                  <mat-icon class="text-secondary">open_in_new</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+            </tr>
+          </table>
+        
+      </div>
+      
+    <div class="d-flex ml-auto">
+      <mat-paginator [pageSizeOptions]="[100, 150, 200]" showFirstLastButtons
+      aria-label="Select page of periodic elements">
+    </mat-paginator>
+    </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+          class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+          <!-- <button mat-raised-button color="warn" mat-dialog-close class="mx-2 bg-darkblue px-4 text-white" (click)="submit()"> <i
+            class="bi bi-check2 me-1 font-size-1_5rem"></i>Create Quote</button> -->
+    </div>
+  </div>
+  

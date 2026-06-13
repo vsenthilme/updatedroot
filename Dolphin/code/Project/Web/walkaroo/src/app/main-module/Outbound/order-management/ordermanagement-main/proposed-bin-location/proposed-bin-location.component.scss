@@ -1,0 +1,247 @@
+
+
+.loader{
+  position: absolute;
+  top: 38%;
+  left: 6%;
+  width: 34%;
+  height: 4px;
+  background-color: transparent;
+  
+  background-color: #389fe8; //#05fc8c;
+  transform-origin: left;
+  animation: animate 7s linear;
+}
+
+
+.loader1{
+  position: absolute;
+  top: 68%;
+  width: 63%;
+  left: 6%;
+  height: 4px;
+  background-color: transparent;
+  
+  background-color: #05ff16; //#05fc8c;
+  transform-origin: left;
+  animation: animate 12s linear;
+}
+
+.ball{ 
+  border-radius: 100%;
+  height: 10px;
+  width: 10px;
+  background-color: #ff8400;
+}
+
+
+@keyframes animate {
+  0% {transform: scaleX(0);}
+
+  20%{transform: scaleX(0.2);}
+
+  40%{transform: scaleX(0.4);}
+  
+  60%{transform: scaleX(0.6);}
+  
+  80%{transform: scaleX(0.8);}
+  
+  100%{transform: scaleX(1);}
+}
+
+
+.seconds6 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 2s; /* Delay the animation for 10 seconds */
+}
+
+.seconds8 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 8s; /* Delay the animation for 10 seconds */
+}
+
+.seconds7 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 7s; /* Delay the animation for 10 seconds */
+}
+
+.seconds9 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 9s; /* Delay the animation for 10 seconds */
+}
+
+.seconds5 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 5s; /* Delay the animation for 10 seconds */
+}
+
+.seconds4 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 1.6s; /* Delay the animation for 10 seconds */
+}
+
+
+.seconds10 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 10s; /* Delay the animation for 10 seconds */
+}
+
+.seconds2 {
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 0.8s; /* Delay the animation for 10 seconds */
+}
+
+.seconds12{
+  opacity: 0; /* Initially hide the element */
+  animation: fadeIn 0.5s ease-in-out forwards; /* Fade in animation */
+  animation-delay: 12s; /* Delay the animation for 10 seconds */
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+
+
+.badgegreen{
+  background-color: #ffc688;
+  color:#ff8400;
+  border: 1px solid #ff8400;
+  border-radius: 10%;
+  font-size: 12px;
+}
+
+.graph{
+  background:
+  linear-gradient(-90deg, rgba(0,0,0,.05) 1px, transparent 1px),
+  linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px), 
+  linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+  linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+  linear-gradient(transparent 3px, #ffffff 3px, #ffffff 78px, transparent 78px),
+  linear-gradient(-90deg, #aaa 1px, transparent 1px),
+  linear-gradient(-90deg, transparent 3px, #ffffff 3px, #ffffff 78px, transparent 78px),
+  linear-gradient(#aaa 1px, transparent 1px),
+  #ffffff;
+background-size:
+  4px 4px,
+  4px 4px,
+  80px 80px,
+  80px 80px,
+  80px 80px,
+  80px 80px,
+  80px 80px,
+  80px 80px;
+}
+
+
+
+.legendfilled{width: 20px;
+  height: 10px;
+  background-color: #389fe8;
+  border: 1px solid #389fe8;}
+
+
+.legendpartial{width: 20px;
+  height: 10px;
+background-color: #05ff16;
+border: 1px solid #05ff16;}
+
+
+.pulsate {
+  animation: pulsate 1.5s ease-out;
+  animation-iteration-count: infinite; 
+}
+@keyframes pulsate {
+  0% { 
+      opacity: 0;
+  }
+  50% { 
+      opacity: 1.0;
+  }
+  100% { 
+      opacity: 0;
+  }
+}
+
+
+.bgblue{background-color: #248eff; height: 3rem; width: 100%;}
+.textblue{color: #027ae4 !important;}
+
+::ng-deep.mat-dialog-container{padding: 0px;}
+
+.header_colour{background-color: #4faf99;}
+
+//input
+::ng-deep .mat-dialog-container {
+    color: rgba(0,0,0,1);
+}
+.input_field{width: 100%;border-color: #dee2e6;}
+.input_field1{width: 30%;border-color: #dee2e6;}
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 0.5em 0 0.7em 0 !important;
+}
+::ng-deep .mat-form-field-wrapper{padding-bottom: 0.5rem;}
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    background-color: rgb(167 167 167 / 4%);
+}
+
+
+.font-size-1_5rem{font-size: 1.5rem;}
+.scroll{height: calc(100vh - 14rem);overflow-y: scroll; overflow-x: hidden;}
+
+
+
+.editor {
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  
+    .NgxEditor__MenuBar {
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  
+    .NgxEditor {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border: none;
+    }
+  
+    .CodeMirror {
+      border: 1px solid #eee;
+      height: auto;
+      margin-bottom: 0.7rem;
+  
+      pre {
+        white-space: pre !important;
+      }
+    }
+  }
+  
+
+
+  ::ng-deep.mat-dialog-container{padding: 0px;}
+::ng-deep.mat-expansion-panel-body {
+    padding: 0 24px 16px !important;
+}
+
+::ng-deep.mat-expansion-panel-body {
+    padding: 0 24px 16px !important;
+}
+//input
+::ng-deep .mat-dialog-container {
+    color: rgba(0,0,0,1);
+}
+.mat-expansion-panel-spacing {
+    margin: 0px 0;
+}
+
+

@@ -1,0 +1,444 @@
+<div class="card  border-0 bg-white " style="overflow: hidden;">
+  <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+    class="d-flex justify-content-between align-items-center header_colour text-white p-2">
+    <h6 class="my-auto">GR Release - {{this.data.line.goodsReceiptNo}}</h6>
+    <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+  </div>
+  <mat-tab-group [(selectedIndex)]="selectedIndex" (selectedTabChange)="tabChanged($event)">
+    <mat-tab class="mx-2" label="Part Details" *ngIf="this.data.pageflow != 'Print'"> 
+      <div class="d-flex justify-content-end mt-2">
+        <!-- <mat-slide-toggle
+        class="example-margin" color="primary"  [(ngModel)]="printLabel"> Generate Barcode
+        </mat-slide-toggle> -->
+      </div>
+      <div class="row scroll mx-0 mt-2 ">
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Part No</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" disabled [value]="this.data.line.itemCode">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0"> Description</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" disabled [value]="this.data.line.itemDescription">
+            </mat-form-field>
+          </div>
+        </div>
+    <!--    <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Mfr Name</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" disabled [value]="this.data.line.manufacturerName">
+            </mat-form-field>
+          </div>
+        </div>-->
+        
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0 required">HU Serial No</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput [disabled]="this.auth.userTypeId != 1" placeholder="Enter" [value]="this.data.line.partner_item_barcode"
+                [(ngModel)]="this.data.line.partner_item_barcode">
+              <button matSuffix mat-icon-button (click)="searchBarcode()">
+                <mat-icon>search</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+        </div>
+     <!--   <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0 required">Bin Location</label>
+            <mat-form-field *ngIf="!showDropdown1" class="form-group input_field mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" [(ngModel)]="this.data.line.interimStorageBin" disabled>
+              <button matSuffix mat-icon-button (click)="showDropdown()">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-form-field>
+
+
+            <p-dropdown *ngIf="showDropdown1" placeholder="Select" [filter]="true" class="w-100"
+              [options]="multiselectStorageList" appendTo="body" [resetFilterOnHide]="true" [(ngModel)]="this.data.line.interimStorageBin"
+              name="product" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}"
+              (onFilter)="onStorageType($event)"> </p-dropdown>
+
+          </div>
+        </div>-->
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0 required">Order Qty</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput type="number" placeholder="Enter" [disabled]="true"
+                [(ngModel)]="this.data.line.orderQty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0 required">Release Qty</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput type="number" placeholder="Enter" min="0" (keyup)="getVariance('accepted')"
+                [(ngModel)]="this.data.line.acceptedQty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Reject Qty</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput type="number" placeholder="Enter" min="0" (keyup)=" getVariance('rejected')"
+                [(ngModel)]="this.data.line.damageQty">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Variance Qty</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput type="number" placeholder="Enter" disabled [(ngModel)]="this.data.line.varianceQty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showremarks">
+          <label for="inputEmail4" class="mb-0">Remarks</label>
+          <div class="form-group mb-0 d-flex align-items-end">
+            
+            <mat-form-field appearance="outline" class="mb-0 w-100">
+              <input matInput placeholder="Enter" [(ngModel)]="data.line.referenceField5" name="Remarks">
+            </mat-form-field>
+            <button mat-icon-button (click)="remarks(this.data.line)">
+              <mat-icon class="text-info">edit</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0"> Receiver's Name</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"  [(ngModel)]="this.data.line.referenceField6">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0"> Unloader's Name</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"  [(ngModel)]="this.data.line.referenceField7">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab class="mx-2" label="Batch/Serial No" *ngIf="this.data.pageflow != 'Print' ">
+      <div class="row scroll mx-0 mt-2 ">
+       
+        <div class="col-4 mt-1" *ngIf="showexpirtaiondate"> 
+          <p class="mb-0 py-0 mb-1">Storage Method</p>
+          <p-dropdown   placeholder="Select" class="w-100" [filter]="true" [options]="storageMethodList" [(ngModel)]="this.data.line.storageMethod"
+         [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}" 
+        [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown >
+       
+        </div>
+        <div class="col-4 mt-1" *ngIf="showexpirtaiondate"> 
+          <p class="mb-0 py-0 mb-1 ">Maintenance</p>
+          <p-dropdown   placeholder="Select" class="w-100" [filter]="true" [options]="maintainanceList" [(ngModel)]="this.data.line.maintenance" (onChange)="onMaintenanceChange($event)"
+         [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}" 
+        [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown >
+       
+        </div>
+        <div class="col-4 mt-1" *ngIf="showexpirtaiondate">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 required">Manufactured Date </p>
+            <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+              <input  matInput [matDatepicker]="picker1" placeholder="End date"  [(ngModel)]="this.data.line.manufacturerDate">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+      
+        <div class="col-4 mt-1" *ngIf="showexpirtaiondate">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 required">Expiration Date </p>
+            <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+              <input matInput [matDatepicker]="picker" placeholder="Start date" [(ngModel)]="this.data.line.expiryDate"
+               >
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showBatchserialNumber">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 required">Batch Serial Number </p>
+            <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Start date" [(ngModel)]="this.data.line.batchSerialNumber"
+               >
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showotherdate">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 ">Batch/Serial Date </p>
+            <mat-form-field class="form-group input_field2 mb-0 w-100" appearance="outline">
+              <input matInput [matDatepicker]="picker" placeholder="Start date" [(ngModel)]="this.data.line.referenceField8"
+               >
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+      
+       
+      
+       
+     
+     <!--   <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0 required">Bin Location</label>
+            <mat-form-field *ngIf="!showDropdown1" class="form-group input_field mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" [(ngModel)]="this.data.line.interimStorageBin" disabled>
+              <button matSuffix mat-icon-button (click)="showDropdown()">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-form-field>
+
+
+            <p-dropdown *ngIf="showDropdown1" placeholder="Select" [filter]="true" class="w-100"
+              [options]="multiselectStorageList" appendTo="body" [resetFilterOnHide]="true" [(ngModel)]="this.data.line.interimStorageBin"
+              name="product" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}"
+              (onFilter)="onStorageType($event)"> </p-dropdown>
+
+          </div>
+        </div>-->
+      </div>
+    </mat-tab>
+    <mat-tab class="mx-2" label="3PL Charges" *ngIf="this.show3pl">
+      <div class="row scroll mx-0 mt-2 ">
+       
+        <div class="col-4 mt-1" *ngIf="showCBMVALUE">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Length</label>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter"  [value]="data.line.length" [(ngModel)]="data.line.length">
+            </mat-form-field>
+          </div>
+        </div>
+        
+        <div class="col-4 mt-1" *ngIf="showCBMVALUE">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0"> Width</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"  [value]="this.data.line.width"
+              [(ngModel)]="this.data.line.width">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showCBMVALUE">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Height</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"  [value]="this.data.line.height" (keyup)=" getheight('accepted')"
+              [(ngModel)]="this.data.line.height">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showCBMVALUE">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Charge Value/Unit</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" type ="number"  [value]="this.data.line.cbmQty"
+              [(ngModel)]="this.data.line.cbmQty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showCBMVALUE">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" [value]="this.data.line.acceptedCbmQty"
+              [(ngModel)]="this.data.line.acceptedCbmQty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showwieghtCBMVALUE">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value/Unit</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"   type ="number" [value]="this.data.line.weight" 
+              [(ngModel)]="this.data.line.weight">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showwieghtCBMVALUE">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" [value]="this.data.line.totalweight"
+              [(ngModel)]="this.data.line.totalweight">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showvolumeCBMVALUE">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value/Unit</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"   type ="number" [value]="this.data.line.qty" 
+              [(ngModel)]="this.data.line.qty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showvolumeCBMVALUE">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" [value]="this.data.line.totalqty"
+              [(ngModel)]="this.data.line.totalqty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="!showElseCbm">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0">Charge Unit</label>
+            <mat-form-field class="mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" [value]="data.line.threePLUom" [(ngModel)]="data.line.threePLUom">
+            </mat-form-field>
+          </div>
+        </div>
+        
+        <div class="col-4 mt-1" *ngIf="showElseCbm">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0 text-black">Charge Unit</p>
+            <p-dropdown placeholder="Select" class="w-100" [filter]="true" [options]="uomList" [(ngModel)]="data.line.threePLUom"
+              [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}" [panelStyle]="{'width':'20%'}"
+              appendTo="body"> </p-dropdown>
+          </div>
+        </div>
+        
+        <div class="col-4 mt-1" *ngIf="showElseCbm">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value/Unit</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter"   type ="number" [value]="this.data.line.qty" 
+              [(ngModel)]="this.data.line.qty">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-4 mt-1" *ngIf="showElseCbm">
+          <div class="form-group mb-0" >
+            <label for="inputEmail4" class="mb-0">Charge Value</label>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <input matInput placeholder="Enter" [value]="this.data.line.totalqty"
+              [(ngModel)]="this.data.line.totalqty">
+            </mat-form-field>
+          </div>
+        </div>
+     <!--   <div class="col-4 mt-1">
+          <div class="form-group mb-0">
+            <label for="inputEmail4" class="mb-0 required">Bin Location</label>
+            <mat-form-field *ngIf="!showDropdown1" class="form-group input_field mb-0 w-100" appearance="outline">
+              <input matInput placeholder="Enter" [(ngModel)]="this.data.line.interimStorageBin" disabled>
+              <button matSuffix mat-icon-button (click)="showDropdown()">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-form-field>
+
+
+            <p-dropdown *ngIf="showDropdown1" placeholder="Select" [filter]="true" class="w-100"
+              [options]="multiselectStorageList" appendTo="body" [resetFilterOnHide]="true" [(ngModel)]="this.data.line.interimStorageBin"
+              name="product" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}"
+              (onFilter)="onStorageType($event)"> </p-dropdown>
+
+          </div>
+        </div>-->
+      </div>
+    </mat-tab>
+ 
+    <mat-tab class="mx-2" label="Barcode Details" *ngIf="printLabel">
+      <div class="scroll">
+        <div *ngIf="this.data.line.acceptedQty != null && this.data.line.acceptedQty != '' && this.data.line.acceptedQty != 0">
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <h6 for="inputEmail4" class="mb-0 font-weigt-bold mx-3">Accepted Qty</h6>
+            <button *ngIf="this.printLabel" mat-raised-button matTooltip="Barcode Preview" class="bg-orange px-4 text-white mx-1"
+            (click)="printLabel1('preview');">
+            <mat-icon class="">visibility</mat-icon>
+          </button>
+          </div>
+          <div class="row  mx-0 mt-2 ">
+            <div class="col-4 mt-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0 required">HU Serial No</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+                  <input matInput placeholder="Enter" [value]="this.data.line.partner_item_barcode"
+                    [(ngModel)]="this.data.line.partner_item_barcode">
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-4 mt-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">No of Label</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+                  <input matInput placeholder="Enter" [value]="this.data.line.noOfAcceptedLabel">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="this.data.line.damageQty != null && this.data.line.damageQty != '' && this.data.line.damageQty != 0">
+          <h6 for="inputEmail4" class="mb-0 mt-3 font-weigt-bold mx-3">Rejected Qty</h6>
+          <div class="row  mx-0 mt-2 ">
+            <div class="col-4 mt-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0 required">HU Serial No</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+                  <input matInput placeholder="Enter" [value]="this.data.line.partner_item_barcode"
+                    [(ngModel)]="this.data.line.partner_item_barcode">
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-4 mt-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">No of Label</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+                  <input matInput placeholder="Enter" [value]="this.data.line.noOfDamageLabel">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  
+  </mat-tab-group>
+
+
+
+  <div class="d-flex justify-content-center mr-3 mb-1 pb-2">
+    <!-- <button mat-raised-button mat-dialog-close class=" bg-red text-white mx-1">
+      <mat-icon class="">close</mat-icon> Cancel
+    </button> -->
+    <button *ngIf="this.selectedIndex != 0 && this.auth.companyId != '1001'" mat-raised-button (click)="previousStep()" class=" bg-red text-white mx-1">
+      <mat-icon class="">arrow_back_ios</mat-icon> Back
+    </button>
+    <button *ngIf="this.printed == true && this.auth.companyId != '1001'" mat-raised-button (click)="submitNew()"
+      class="bg-darkblue text-white mx-1">
+      <mat-icon class="">done</mat-icon> Confirm
+    </button>
+    <button *ngIf="!printLabel && auth.companyId !== '1001'" mat-raised-button (click)="submit()" class="bg-darkblue text-white mx-1">
+      <mat-icon>done</mat-icon> Confirm
+    </button>
+    
+    <button *ngIf="selectedIndex === 0 && auth.companyId !== '1001'" mat-raised-button (click)="nextStep()" class="bg-warning text-white mx-1">
+      <mat-icon>arrow_forward_ios</mat-icon> Next
+    </button>
+    
+    <button *ngIf="this.printLabel && this.selectedIndex != 0" mat-raised-button class="bg-yellow px-4 text-white mx-1"
+    (click)="printLabel1('print');">
+    <mat-icon class="">print</mat-icon> Print
+  </button>
+  </div>
+</div>

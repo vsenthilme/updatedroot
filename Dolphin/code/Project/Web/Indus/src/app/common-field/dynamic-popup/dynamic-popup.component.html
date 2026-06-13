@@ -1,0 +1,73 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+    <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+      class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+      <h6 class="my-auto">{{this.data.title}}</h6>
+      <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+    </div>
+    <div class="row">
+        <p-table #tableTag [columns]="data.cols"
+        [value]="line" styleClass="p-datatable-gridlines p-datatable-sm" [sortField]="sortField" [sortOrder]="sortOrder"
+        [scrollable]="true" selectionMode="single" scrollHeight="calc(100vh - 26.2rem)"
+        [paginator]="true" [rows]="100" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white">
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th style="max-width: 5rem;">
+                    <p-tableHeaderCheckbox class="pl-3"
+                        [disabled]="true"></p-tableHeaderCheckbox>
+                </th>
+                <th *ngFor="let col of columns">
+                    {{ col.header }}
+                </th>
+            </tr>
+            <tr>
+                <th style="max-width: 5rem;">
+                    <p-tableHeaderCheckbox class="pl-3"
+                        [disabled]="true"></p-tableHeaderCheckbox>
+                </th>
+                <th *ngFor="let col of columns">
+                    <input pInputText type="text"
+                        (input)="tableTag.filter($any($event.target)?.value, col.field, 'contains')"
+                        [value]="$any(tableTag.filters[col.field])?.value"
+                        placeholder="Search" class=" w-100 p-column-filter">
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+                <td style="max-width: 5rem;">
+                    <p-checkbox [disabled]="true" class="pl-3" [value]="rowData"></p-checkbox>
+                </td>
+                <td *ngFor="let col of columns">
+                    <ng-container
+                        *ngIf="col.format !== 'date' && col.format !== 'extra'; else dateTemplate">
+                        {{ rowData[col.field] }}
+                    </ng-container>
+                    <ng-template #dateTemplate>
+                        <span *ngIf="col.field == 'createdOn'">
+                            {{ rowData[col.field] | date: 'dd-MM-yyyy HH:mm' }}
+                        </span>
+                    </ng-template>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    </div>
+      <div class="d-flex justify-content-center align-items-center py-2">
+        <button mat-raised-button color="warn" mat-dialog-close class="mx-2"> <i
+            class="bi bi-x me-1 font-size-1_5rem"></i>Cancel</button>
+      </div>
+
+
+  </div>
+
+
+
+
+  <!-- <span *ngIf="col.field == 'actions'">
+    <button mat-icon-button [matMenuTriggerFor]="menu"
+        [matMenuTriggerData]="{rowData: rowData}">
+        <mat-icon class="text-secondary">more_horiz</mat-icon>
+    </button>
+</span> -->

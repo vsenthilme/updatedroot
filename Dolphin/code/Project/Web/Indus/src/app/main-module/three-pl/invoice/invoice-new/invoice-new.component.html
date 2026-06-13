@@ -1,0 +1,231 @@
+
+<div class="row mx-1 pl-2">
+  <div class="col-12">
+    <div class="row  text-secondary pr-0 mt-1">
+      <div class="col bg-white d-flex align-items-center mt-1 px-1 py-1 pathname">
+
+
+        <nav aria-label="breadcrumb" class="d-flex align-items-center">
+          <ol class="breadcrumb mb-0 bg-white">
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto"><a routerLink="/main/dashboard/landingPage">Home</a>
+            </li>
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto">Invoice</li>
+          <!--  <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto">Proforma Invoice-New</li>-->
+          </ol>
+        </nav>
+
+
+        <div class="d-flex ml-auto my-auto">
+          <div [hidden]="isShowDiv"> <input matInput 
+              class="form-control filter_button mt-2 mt-2 mx-2 border-bottom" placeholder="Search" style="width:90%">
+          </div>
+          <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+            class="button-row d-flex align-items-center">
+            <!--
+                          <button mat-mini-fab *ngIf="showFloatingButtons == true" class="floating-buttons  d-flex align-items-center justify-content-center bg-pink text-white mx-2"
+                          matTooltip="Add">
+                          <mat-icon class="action-icon d-flex align-items-center justify-content-center">add_circle_outline</mat-icon>
+                        </button>
+                        -->
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center text-white   yellowaction"
+              matTooltip="Display">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">search</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  blueaction "
+              matTooltip="Edit">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">edit</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center redaction text-white  align-middle"
+              matTooltip="Delete">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">delete</mat-icon>
+            </button>
+            <!-- 
+                          <button  mat-mini-fab *ngIf="showFloatingButtons == true"
+                        class="floating-buttons  d-flex align-items-center justify-content-center text-white  bg-success  " matTooltip="Info">
+                        <mat-icon class="action-icon d-flex align-items-center justify-content-center">info_outline</mat-icon>
+                      </button>
+                        -->
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  darkblueaction "
+              matTooltip="Download">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">download</mat-icon>
+            </button>
+
+
+            <button mat-mini-fab (click)="toggleFloat()" class="mx-2 text-white action-button"
+              [ngClass]="{'bg-orange' : toggle, 'purple': !toggle}">
+              <mat-icon>{{icon}}</mat-icon>Options
+            </button>
+            <button mat-mini-fab
+              class=" floating-buttons1  d-flex align-items-center justify-content-center darkaction text-white mx-2 mr-3 align-middle"
+              matTooltip="New">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">add</mat-icon>
+            </button>
+            <button disabled mat-mini-fab
+              class="disabled floating-buttons1  d-flex align-items-center justify-content-center greyaction text-white mx-2 mr-3 align-middle"
+              matTooltip="Save">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">save</mat-icon>
+            </button>
+            <button mat-mini-fab class="text-white mx-2 action-button  bg-red " type="button" mat-button>
+              <mat-icon class="">tune</mat-icon> Filter
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mainsection mt-1  border-top px-0 bg-white" style="height: calc(100vh - 12rem);  ">
+    <div class="d-flex align-items-center justify-content-between pb-2"
+      style="height: 3rem !important;background-color: #f5f5f5 !important;">
+      <div>
+        <h6 class="my-auto mb-0 mx-3 font-weight-bold whs-text-grey">Invoice-New</h6>
+      </div>
+    </div>
+    <div class="mt-3 mb-0">
+      <form [formGroup]="form">
+        <div class="row  px-3">
+        <div class="col-lg-3 col-md-4">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0"> Bill Period</p>
+            <mat-form-field class="mb-0 w-100 " appearance="outline">
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate placeholder="Start date" formControlName="billDateFrom" >
+                <input matEndDate placeholder="End date"  formControlName="billDateTo">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <div class="d-flex flex-column">
+            <p class="mb-0 py-0"> Bill Amount </p>
+            <mat-form-field class="form-group input_field mb-0" appearance="outline">
+              <input matInput placeholder="Enter" formControlName="billamount">
+            </mat-form-field>
+          </div>
+        </div>
+       
+        <div class="col-lg-3 col-md-4">
+        <div class="d-flex flex-column">
+          <p class="mb-0 py-0"> Customer </p>
+          <mat-form-field class="form-group input_field mb-0" appearance="outline">
+            <input matInput placeholder="Enter" formControlName="partnerCode">
+          </mat-form-field>
+        </div>
+      </div>
+      <div  class="d-flex justify-content-end align-items-center">
+        <button mat-raised-button [disabled]="this.js.pageflow == 'Display'" class="text-white bg-orange demo-button my-2" (click)="addLine()">
+          <mat-icon class="">add</mat-icon> Add Line
+        </button>
+      </div>
+      </div>
+    </form>
+    </div>
+    <div class="row  px-2">
+      <p-table #Setupinvoice
+        [globalFilterFields]="['customer','servicedetails','orderno','itemcode','des','qty','unit','date','CBMQ','value','type','rate','billamount']"
+        [value]="invoice" styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"
+        selectionMode="multiple"  [(selection)]="selectedinvoice" scrollHeight="calc(100vh - 33.05rem)" [resizableColumns]="true"
+        style="width: 100%;margin-left: 10px;background-color:white">
+        <ng-template pTemplate="header">
+          <tr>
+           
+            <th style="max-width: 3.5rem; justify-content: center;">
+              <p-tableHeaderCheckbox [disabled]="true"></p-tableHeaderCheckbox>
+            </th>
+            <th style="max-width: 16rem;" pResizableColumn>Customer
+            </th>
+            <th style="max-width: 10rem;" pResizableColumn>Service Details
+            </th>
+            <th style="max-width: 10rem;" pResizableColumn>Order No
+            </th>
+            <th style="max-width: 10rem;" pResizableColumn>Product Code
+            </th>
+            <th style="max-width: 16rem;" pResizableColumn>Description
+            </th>
+            <th style="max-width: 10rem;" pResizableColumn>Transaction Quantity
+            </th>
+
+            <th style="max-width: 16rem;" pResizableColumn>Unit
+            </th>
+            <th style="max-width: 16rem;" pResizableColumn>Transaction Date
+            </th>
+            <th style="max-width: 16rem;" pResizableColumn>Rate Unit
+            </th>
+            <th style="max-width: 16rem;" pResizableColumn>Charge Value
+            </th>
+            <th style="max-width: 16rem;" pResizableColumn>Service Type
+            </th>
+            <th style="max-width: 10rem;" pResizableColumn>Rate/Unit
+            </th>
+            <th pResizableColumn>Bill Amount
+            </th>
+          </tr>
+
+
+        </ng-template>
+        <ng-template pTemplate="body" let-invoice let-rowIndex="rowIndex">
+          <tr>
+           <td style="max-width:3.5rem;  justify-content: center;">
+              <p-tableCheckbox [value]="invoice"></p-tableCheckbox>
+            </td>
+          
+           
+            <td style="max-width: 16rem;">{{invoice.partnerCode}}</td>
+            <td style="max-width: 10rem">{{invoice.referenceField1 }}</td>
+            <td style="max-width: 10rem">{{invoice.referenceField2 }}</td>
+            <td style="max-width: 10rem">{{invoice.referenceField3 }}</td>
+            <td style="max-width: 16rem;">{{invoice.referenceField5}}</td>
+            <td style="max-width: 16rem;">{{invoice.billQuantity}}</td>
+            <td style="max-width: 16rem;">{{invoice.billUnit}}</td>
+            <td style="max-width: 16rem;">{{invoice.referenceField8}}</td>
+            <td style="max-width: 16rem;">{{invoice.referenceField10}}</td>
+            <td style="max-width: 16rem;">{{invoice.referenceField6}}</td>
+            <td style="max-width: 16rem;">{{invoice.referenceField4}}</td>
+            <td style="max-width: 10rem;">{{invoice.priceUnit}}</td>
+            <td>{{invoice.billQuantity}}</td>
+          </tr>
+        </ng-template>
+        
+        <ng-template class="footer1" pTemplate="footer">
+          <tr>
+            <td style="max-width: 1.5rem"></td>
+            <td style="max-width: 16rem">Total</td>
+            <td style="max-width: 10rem;"></td>
+            <td style="max-width: 10rem;"></td>
+            <td style="max-width: 10rem;"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 16rem"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 16rem;"></td>
+            <td style="max-width: 10rem;"></td>
+            <td>{{getInvQty()}}</td>
+          
+          </tr>
+      </ng-template>
+     
+      </p-table>
+      
+      
+    </div>
+<div class="d-flex justify-content-center  align-items-center py-2 fixed-bottom">
+      
+  <button mat-raised-button class="text-white mx-1 px-3" color="warn" routerLink="/main/threePL/invoice">
+    <mat-icon class="">close</mat-icon>Cancel
+  </button>
+  <button   mat-raised-button class="bg-darkblue text-white mx-1 px-3" (click)="Submit()"> 
+    <mat-icon class="">done</mat-icon>Save
+  </button>
+</div>
+</div>
+
+</div>

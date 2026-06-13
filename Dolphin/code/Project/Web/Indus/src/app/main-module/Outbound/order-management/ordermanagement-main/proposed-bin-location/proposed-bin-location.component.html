@@ -1,0 +1,97 @@
+<div class="card bg-white" style="overflow-x: hidden;">
+  <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+    class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+    <h6 class="my-auto"> Bin Determination History</h6>
+    <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+  </div>
+
+<div class="bgblue" style="position: absolute; top: 7%;"></div>
+  <p style="position: absolute; top: 10%; left: 2%" class="text-white">Order No / Part No</p>
+  <p style="position: absolute; top: 10%; left: 21%" class="text-white">Strategy</p>
+  <p style="position: absolute; top: 10%; left: 35%" class="text-white">Proposed Bin 1</p>
+  <p style="position: absolute; top: 10%; left: 50%" class="text-white">Proposed Bin 2</p>
+  <p style="position: absolute; top: 10%; left: 65%" class="text-white">Proposed Bin 3</p>
+  <p style="position: absolute; top: 10%; left: 80%" class="text-white">Proposed Bin 4</p>
+
+  <div class="px-5 scroll graph pt-4 ">
+
+    <h6 class="text-primary px-4 mb-4 mt-2" style="position: absolute; top: 20%; left: 0%"><img
+        src="./assets/img/icons1/system.png" style="height: 35px; width: 35px;" class="mr-2" alt="" srcset="">Preset Strategy</h6>
+
+    <div class="loader"></div>
+    <div class="seconds2" style="position: absolute;top: 35%; left: 6%;">
+      <img src="./assets/img/icons1/document.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+      <p class="font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 0.8s;">
+        {{this.data.line.refDocNumber}} <br> {{this.data.line.itemCode}}</p>
+    </div>
+
+    <div class="seconds4" style="position: absolute; left: 22%; top:  35%">
+      <img src="./assets/img/icons1/giftick1.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+      <p class=" font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 1.6s;">FIFO</p>
+    </div>
+
+    <div class="seconds6" style="position: absolute; left: 37%; top: 35%">
+      <!-- <div class="ball"></div> -->
+      <img src="./assets/img/icons1/bin.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+      <p class=" font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 2s;">A1-030-32A
+        <br>A001</p>
+    </div>
+
+    <div *ngIf="showAI">
+      <h6 class="text-success px-4 my-4" style="position: absolute; top: 50%; left: 0%"><img
+          src="./assets/img/icons1/ai.png" style="height: 35px; width: 35px;" class="mr-2" alt="" srcset="">AI Determined Strategy</h6>
+      <div class="loader1"></div>
+      <div class="seconds2" style="position: absolute; top: 65% !important; left: 6%">
+        <!-- <div class="ball"></div> -->
+        <img src="./assets/img/icons1/document.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+        <p class="font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 1s;">
+          {{this.data.line.refDocNumber}} <br> {{this.data.line.itemCode}}</p>
+      </div>
+
+      <div class="seconds4" style="position: absolute; left: 22%; top: 65%;">
+        <!-- <div class="ball"></div> -->
+        <img src="./assets/img/icons1/giftick1.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+        <p class=" font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 4s;">FIFO</p>
+      </div>
+
+      <div class="seconds6" style="position: absolute; left: 37%; top:65%;">
+        <!-- <div class="ball"></div> -->
+        <img src="./assets/img/icons1/cancel.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+        <p class=" font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 6s;">A1-030-32A
+          <br>
+        <p class="text-danger font12 pulsate mb-0">Aisle Blocked</p>
+        <p class="text-primary" type="button" (click)="aisleBlocked()"><u>Get Report</u></p>
+      </div>
+
+      <div class="seconds9" style="position: absolute; left: 52%; top:65%;">
+        <!-- <div class="ball"></div> -->
+        <img src="./assets/img/icons1/cancel.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+        <p class=" font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 9s;">A1-030-32B
+          <br>
+        <p class="text-danger font12 pulsate mb-0">More Picking Time</p>
+        <p class="text-primary" type="button" (click)="routetoDashboard('A1-030-32B', 'rejected')"><u>Get Report</u></p>
+      </div>
+
+      <div class="seconds12" style="position: absolute; left: 67%; top: 65%">
+        <!-- <div class="ball"></div> -->
+        <img src="./assets/img/icons1/bin.gif" style="height: 35px; width: 35px;" alt="" srcset="">
+        <p class=" font12 p-2 mb-0 mt-2 animate__animated animate__slideInDown" style="animation-delay: 12s;">
+          {{this.data.line.proposedStorageBin}} <br>
+        <p class="text-primary" type="button" (click)="routetoDashboard(this.data.line.proposedStorageBin, 'Picking')">
+          <u>Get Report</u></p>
+      </div>
+
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center" style="position: absolute; top: 95%; left: 40%;">
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="legendfilled mb-0 "></p>
+        <p class="mx-3 mb-0 " style="font-size: 11px;  color: #666666;;">Preset Strategy</p>
+      </div>
+      <div class="d-flex align-items-center">
+        <p class="legendpartial mb-0 "></p>
+        <p class="mx-3 mb-0 " style="font-size: 11px;  color: #666666;;">AI Strategy</p>
+      </div>
+    </div>
+  </div>
+</div>

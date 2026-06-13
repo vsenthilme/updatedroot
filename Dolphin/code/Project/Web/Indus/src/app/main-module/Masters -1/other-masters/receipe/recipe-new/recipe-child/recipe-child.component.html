@@ -1,0 +1,114 @@
+<div class="card bg-white " style="overflow-x: hidden;">
+  <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+    class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+    <h6 class="my-auto">BOM</h6>
+    <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+  </div>
+  <div class="col-12 mainsection mt-1  border-top px-0 uatwhite" style="height: calc(100vh - 12rem);  ">
+    <div class="">
+      <p-table #Setupstoragesection [globalFilterFields]="['childItemCode','childItemQuantity']" [value]="bomLines"
+      styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true" selectionMode="single"  scrollDirection="Both"
+      scrollHeight="calc(100vh - 26.2rem)"  [paginator]="false" [rows]="100" [showCurrentPageReport]="true"  sortField="sequenceNo"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white" >
+      <ng-template pTemplate="header">
+        <tr>
+    
+          <th *ngIf="this.data.pageflow == 'Display'" pSortableColumn="phaseNumber"   pResizableColumn>Operation Number<p-sortIcon field="phaseNumber"></p-sortIcon>
+            <th *ngIf="this.data.pageflow == 'Display'"  pSortableColumn="phaseDescription"   pResizableColumn>Operation Description<p-sortIcon field="phaseDescription"></p-sortIcon>
+          <th *ngIf="this.data.pageflow != 'Display'"  pSortableColumn="sequenceNo"   pResizableColumn>Sequence No<p-sortIcon field="sequenceNo"></p-sortIcon>
+          </th>
+      <th  pSortableColumn="childItemCode"   pResizableColumn>Ingredient<p-sortIcon field="childItemCode"></p-sortIcon>
+        <th   pSortableColumn="referenceField6"   pResizableColumn>Description<p-sortIcon field="referenceField6"></p-sortIcon>
+            <th  pSortableColumn="referenceField8"   pResizableColumn>Item Type<p-sortIcon field="referenceField8"></p-sortIcon>
+            <th  pSortableColumn="referenceField7"   pResizableColumn>UOM<p-sortIcon field="referenceField7"></p-sortIcon>
+            
+                <th  *ngIf="this.data.pageflow != 'Display'"  pSortableColumn="childItemQuantity"   pResizableColumn>Ingredient Quantity<p-sortIcon field="childItemQuantity"></p-sortIcon>
+                  <th  pSortableColumn="requiredQuantity"   pResizableColumn>Required  Quantity<p-sortIcon field="requiredQuantity"></p-sortIcon>
+      </th>
+      
+         
+        </tr>
+        <tr >
+          <th *ngIf="this.data.pageflow == 'Display'">
+            <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'phaseNumber', 'contains')" 
+                [value]="$any(Setupstoragesection.filters['phaseNumber'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+              </th>
+              <th *ngIf="this.data.pageflow == 'Display'">
+                <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'phaseDescription', 'contains')" 
+                    [value]="$any(Setupstoragesection.filters['phaseDescription'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                  </th>
+          <th  *ngIf="this.data.pageflow != 'Display'">
+            <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'sequenceNo', 'contains')" 
+            [value]="$any(Setupstoragesection.filters['sequenceNo'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+          </th>
+             <th >
+              <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'childItemQuantity', 'contains')" 
+              [value]="$any(Setupstoragesection.filters['childItemQuantity'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+            </th>
+             
+            <th  >
+              <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'referenceField6', 'contains')" 
+                  [value]="$any(Setupstoragesection.filters['referenceField6'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                </th>
+             
+             <th >
+              <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'referenceField8', 'contains')" 
+                  [value]="$any(Setupstoragesection.filters['referenceField8'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                </th>
+             <th >
+              <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'referenceField7', 'contains')" 
+                  [value]="$any(Setupstoragesection.filters['referenceField7'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                </th>
+               
+                 <th  *ngIf="this.data.pageflow != 'Display'">
+                   <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'childItemQuantity', 'contains')" 
+                   [value]="$any(Setupstoragesection.filters['childItemQuantity'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                 </th>
+                 <th >
+                  <input pInputText  type="text" (input)="Setupstoragesection.filter($any($event.target)?.value, 'requiredQuantity', 'contains')" 
+                  [value]="$any(Setupstoragesection.filters['requiredQuantity'])?.value" placeholder="Search" class=" w-100 p-column-filter">
+                </th>
+          
+         </tr>
+      
+      </ng-template>
+      <ng-template pTemplate="body" let-sections let-rowIndex="rowIndex">
+        <tr >
+          <td *ngIf="this.data.pageflow == 'Display'">{{sections.phaseNumber}}</td>
+       
+          <td  *ngIf="this.data.pageflow == 'Display'">{{sections.phaseDescription}}</td>
+          <td  *ngIf="this.data.pageflow != 'Display'">{{sections.sequenceNo}}</td>
+         
+        <td >{{sections.childItemCode}}</td>
+       
+        <td  >{{sections.referenceField6}}</td>
+    
+        <td >{{sections.referenceField10}}</td>
+        <td >{{sections.referenceField7}}</td>
+      
+        <td  *ngIf="this.data.pageflow != 'Display'">{{sections.childItemQuantity}}</td>
+      
+        <td >
+          <input matInput placeholder="Enter" type="text" class="small-font" [(value)]="sections.childItemQuantity"
+              [(ngModel)]="sections.requiredQuantity"   [disabled]="this.data.pageflow == 'Display'"
+              >
+        </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  </div>
+    <div class="d-flex justify-content-center align-items-center py-2">
+      <button mat-raised-button class="text-white mx-1 px-3" color="warn" (click)="cancel()">
+        <mat-icon class="">close</mat-icon>Cancel
+      </button>
+      <button  mat-raised-button class="bg-darkblue text-white mx-1 px-3" *ngIf="this.data.pageflow !='Display'" (click)="Submit()">
+         <mat-icon class="">done</mat-icon>Submit
+      </button>
+    </div>
+
+
+</div>
+
+
