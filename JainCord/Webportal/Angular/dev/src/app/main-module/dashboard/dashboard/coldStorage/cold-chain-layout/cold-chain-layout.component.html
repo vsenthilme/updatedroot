@@ -1,0 +1,841 @@
+<h4 class="text-secondary text-center" style="position: absolute;left: 37%;top: 3%;">AERIAL VIEW LAYOUT</h4>
+
+<div class="d-flex justify-content-between align-items-center mt-1 mx-2">
+    <img src="./assets/img/walkaroo1.png" class="invisible walkarooHide" style="width: 7rem; height: 2.5rem;" alt=""
+        srcset="">
+    <p-dropdown [filter]="true" class="dropdownLess" placeholder="Chennai" [options]="warehouseList"
+        [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+</div>
+<div class="d-flex justify-content-end mt-1 align-items-center mx-2">
+    <p-dropdown [filter]="true"  [options]="chamberList" placeholder="Chamber" class="px-2 dropdownLess" [style]="{'width': '100%'}"
+        [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+    <p-dropdown [filter]="true" placeholder="Block" [options]="zoneList" (onChange)="zoneChange($event)"
+        class="px-2 dropdownLess" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+    <p-dropdown [filter]="true" placeholder="Status" class="pl-2 dropdownLess" [style]="{'width': '100%'}"
+        [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+</div>
+<div class="row ml-2 mt-2">
+    <div class="col-9 border border-secondary ">
+        <div class="row">
+            <!-- bay path-->
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        C Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">4</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">3</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">12</div>
+                                <div type="button" class="bin emptyBin">18</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">11</div>
+                                <div type="button" class="bin emptyBin">17</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin filledBins emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">6</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">5</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">10</div>
+                                <div type="button" class="bin emptyBin">14</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin filledBins emptyBin">9</div>
+                                <div type="button" class="bin emptyBin">13</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        F Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">4</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">3</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">12</div>
+                                <div type="button" class="bin emptyBin">18</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin filledBins emptyBin">11</div>
+                                <div type="button" class="bin emptyBin">17</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">6</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">5</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">10</div>
+                                <div type="button" class="bin emptyBin">14</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">9</div>
+                                <div type="button" class="bin  emptyBin">13</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        I Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">4</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">3</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">12</div>
+                                <div type="button" class="bin emptyBin">18</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">11</div>
+                                <div type="button" class="bin emptyBin">17</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">6</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">5</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">10</div>
+                                <div type="button" class="bin emptyBin">14</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">9</div>
+                                <div type="button" class="bin emptyBin">13</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        L Block</legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">4</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">3</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">12</div>
+                                <div type="button" class="bin emptyBin">18</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">11</div>
+                                <div type="button" class="bin emptyBin">17</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">6</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">5</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">10</div>
+                                <div type="button" class="bin emptyBin">14</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">9</div>
+                                <div type="button" class="bin emptyBin">13</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        O Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">4</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">3</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">12</div>
+                                <div type="button" class="bin emptyBin">18</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">11</div>
+                                <div type="button" class="bin emptyBin">17</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">6</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">5</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">10</div>
+                                <div type="button" class="bin emptyBin">14</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">9</div>
+                                <div type="button" class="bin emptyBin">13</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        R Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">4</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">3</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">12</div>
+                                <div type="button" class="bin emptyBin">18</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">11</div>
+                                <div type="button" class="bin emptyBin">17</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">6</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">5</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">10</div>
+                                <div type="button" class="bin emptyBin">14</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">9</div>
+                                <div type="button" class="bin emptyBin">13</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+
+            <!-- bay path-->
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+        </div>
+        <div class="row">
+
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        B Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin blinkRed"  (click)="getStorageDetails('B-01-01')">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        E - Single</legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        H Block</legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin filledBins emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin  filledBins emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        K Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        N Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin filledBins emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin filledBins emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        Q Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin filledBins emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+
+            <!-- bay path-->
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+        </div>
+        <div class="row">
+
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        A Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin blinkGreen emptyBin"  (click)="getStorageDetails('A-01-01')">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        D Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        G Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        J Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        M Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        P Block </legend>
+                    <div class="d-flex justify-content-start">
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">2</div>
+                                <div type="button" class="bin emptyBin">4</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">1</div>
+                                <div type="button" class="bin emptyBin">3</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column blockLayout">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">6</div>
+                                <div type="button" class="bin emptyBin">8</div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin">5</div>
+                                <div type="button" class="bin emptyBin">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+
+            <!-- bay path-->
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+            <div class="col-4L bayPath textTransparent"> 5 </div>
+            <div class="col-auto verticalPath textTransparent"> 5 </div>
+        </div>
+        <img class="img-fluid" style="width: 100%;" src="./assets/img/walkaroo/staging1.png" alt="">
+    </div>
+    <div class="col-3">
+        <div class="scrollLayout bg-white">
+
+
+            <h6 *ngIf="inventoryList.length > 0" class="mt-3 "
+                style="color: #693af8; font-size: 0.8rem; margin: 16px 24px 16px !important;">Bin Location:
+                {{selectedStorageBin}}</h6>
+
+            <mat-accordion>
+                <ng-container *ngFor="let element of TransactionList">
+                    <mat-expansion-panel *ngIf="element.type === 'New'" [expanded]="true" hideToggle>
+                        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+                            <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+                                <div class="d-flex align-items-center">
+                                    {{element.type}}
+                                    <span *ngIf="element.type === 'New'"
+                                        class="badge px-2 mx-2 rounded-pill text-white bg-orange">{{element.lines.length}}</span>
+                                </div>
+                                <mat-icon class="text-secondary">remove</mat-icon>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="row p-1 scrollTable px-3 mt-2">
+                            <table class="table table-sm table-bordered" style="font-size: 0.6rem;">
+                                <thead class="sticky-top bg-white" style="background-color: #f2f2f2 !important;">
+                                    <tr>
+                                        <th scope="row">SKU</th>
+                                        <th scope="row">HU NO</th>
+                                        <th scope="row">Date</th>
+                                        <th scope="row">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngFor="let line of element.lines">
+                                    <tr>
+                                        <td>{{line.itemCode}}</td>
+                                        <td>{{line.huNo}}</td>
+                                        <td>{{line.date}}</td>
+                                        <td>{{line.qty}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </mat-expansion-panel>
+                </ng-container>
+            </mat-accordion>
+
+            <div *ngIf="inventoryList.length > 0" style="margin: 0 24px 16px !important;">
+                <div class="row p-1 scrollTable px-3 mt-2">
+                    <table class="table table-sm table-bordered" style="font-size: 0.5rem;">
+                        <thead class="sticky-top bg-white" style="background-color: #f2f2f2 !important;">
+                            <tr>
+                                <th scope="row">SKU</th>
+                                <th scope="row">HU NO</th>
+                                <th scope="row">Date</th>
+                                <th scope="row">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngFor="let line of inventoryList">
+                            <tr>
+                                <td>{{line.itemCode}}</td>
+                                <td>{{line.barcodeId}}</td>
+                                <td>{{line.createdOn | date : 'dd-MM-yyyy' :'GMT +3'}}</td>
+                                <td>{{line.inventoryQuantity}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<img class="img-fluid" style="width: 19rem; position: absolute; bottom: 2%; right: 2%;"
+    src="./assets/img/walkaroo/units.png" alt="">

@@ -1,0 +1,344 @@
+<div class="row mx-1 pl-2">
+    <div class="col-12">
+      <!--inner header-->
+  
+      <div class="row  text-secondary pr-0 mt-1">
+        <div class="col bg-white d-flex align-items-center mt-1 px-1 py-1 pathname">
+  
+  
+          <nav aria-label="breadcrumb" class="d-flex align-items-center">
+            <ol class="breadcrumb mb-0 bg-white d-flex align-items-center">
+              <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto"><a
+                  routerLink="/main/dashboard/landingPage">Home</a></li>
+              <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto"><a
+                  routerLink="/main/inbound/container-receipt">Inbound</a></li>
+              <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto"><a routerLink="/main/inbound/palletization-main">Palletization</a></li>
+            </ol>
+          </nav>
+  
+  
+          <div class="d-flex ml-auto my-auto">
+            <!--matInput (input)="grNewTag.filterGlobal($any($event.target).value, 'contains');" -->
+            <!-- <div [hidden]="isShowDiv"><input
+                class="form-control filter_button mt-2 mx-2 border-bottom" placeholder="Scan Barcode" style="width:90%"  autofocus>
+            </div> -->
+  
+            <!-- (keyup.enter)="lablelGenerate($event)"-->
+            <div [hidden]="isShowDiv"> <input autofocus matInput
+                (input)="grNewTag.filterGlobal($any($event.target).value, 'contains')"
+                class="form-control filter_button mt-2 mt-2 mx-2 border-bottom" placeholder="Search" style="width:90%">
+            </div>
+  
+            <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+              class="button-row d-flex align-items-center">
+  
+              <button mat-mini-fab *ngIf="showFloatingButtons == true" (click)="printLabel1()"
+                class="floating-buttons  d-flex align-items-center justify-content-center bg-pink text-white mx-2"
+                matTooltip="Print Label">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center">print</mat-icon>
+              </button>
+  
+              <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class=" floating-buttons  d-flex align-items-center justify-content-center text-white   yellowaction"
+                matTooltip="Display">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center">search</mat-icon>
+              </button>
+              <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class="floating-buttons  d-flex align-items-center justify-content-center text-white  blueaction "
+                matTooltip="Edit">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center">edit</mat-icon>
+              </button>
+              <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class=" floating-buttons  d-flex align-items-center justify-content-center redaction text-white  align-middle"
+                matTooltip="Delete">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center">delete</mat-icon>
+              </button>
+              <!--
+                        <button  mat-mini-fab *ngIf="showFloatingButtons == true"
+                      class="floating-buttons  d-flex align-items-center justify-content-center text-white  bg-success  " matTooltip="Info">
+                      <mat-icon class="action-icon d-flex align-items-center justify-content-center">info_outline</mat-icon>
+                    </button>
+                      -->
+              <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class="floating-buttons  d-flex align-items-center justify-content-center text-white  darkblueaction "
+                matTooltip="Download" (click)="downloadexcel()">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center">download</mat-icon>
+              </button>
+  
+  
+              <button mat-mini-fab (click)="toggleFloat()" class="mx-2 text-white action-button"
+                [ngClass]="{'bg-orange' : toggle, 'purple': !toggle}">
+                <mat-icon>{{icon}}</mat-icon>Options
+              </button>
+              <button mat-mini-fab disabled
+                class=" floating-buttons1 disabled d-flex align-items-center justify-content-center darkaction text-white mx-2 mr-3 align-middle"
+                matTooltip="New">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">add</mat-icon>
+              </button>
+              <button mat-mini-fab
+                class=" floating-buttons1  d-flex align-items-center justify-content-center greyaction text-white mx-2 mr-3 align-middle"
+                matTooltip="New">
+                <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">save</mat-icon>
+              </button>
+              <button disabled mat-mini-fab class=" disabled text-white mx-2 action-button  bg-red" type="button"
+                mat-button>
+                <mat-icon class="">tune</mat-icon> Filter
+              </button>
+            </div>
+  
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--main section-->
+    <mat-drawer-container class="example-container w-100 pr-0">
+      <mat-drawer #drawer class="example-sidenav " mode="over" position="end">
+  
+      </mat-drawer>
+      <div class="example-sidenav-content  mt-1 pr-1">
+        <div class="tabbar1 px-0 uatwhite my-auto col d-flex align-items-center mt-1">
+          <h5 class="my-auto mb-0 mx-4 font-weight-bold whs-text-grey">Order No - {{code.refDocNumber}}</h5>
+        </div>
+        <div class="row mt-1 pr-1" style="height: calc(100vh - 11.7rem);">
+          <div class="col-md-12 px-0">
+            <div class="">
+              <mat-tab-group class="mx-3 mt-1">
+                <mat-tab label="Lines">
+                  <div class="row ">
+  
+                    <p-table #grNewTag [columns]="cols" [value]="grNew" class="ddsdsd" styleClass="p-datatable-gridlines p-datatable-sm"
+                      [scrollable]="true" selectionMode="multiple" [(selection)]="selectedgrNew"
+                      [tableStyle]="{'width': '130rem'}" scrollHeight="calc(100vh - 21rem)" [paginator]="true"
+                      [rows]="100" [showCurrentPageReport]="true"
+                      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                      [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white">
+                      <ng-template pTemplate="header" let-columns>
+                        <tr>
+                          <th style="width: 5rem; justify-content: center;">
+                            <p-tableHeaderCheckbox class="pl-3"></p-tableHeaderCheckbox>
+                          </th>
+                          <th pSortableColumn="actions" pResizableColumn>Actions<p-sortIcon field="actions"></p-sortIcon>
+                          </th>
+                          <th pSortableColumn="no" pResizableColumn>S No<p-sortIcon field="no"></p-sortIcon></th>
+                          <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                            {{ col.header }}
+                            <p-sortIcon [field]="col.field"></p-sortIcon>
+                          </th>
+                        </tr>
+                        <tr>
+                          <th style="width: 5rem; justify-content: center;">
+                            <p-tableHeaderCheckbox class="pl-3" [disabled]="true"></p-tableHeaderCheckbox>
+                          </th>
+                          <th>
+                            <input pInputText type="text"
+                              (input)="grNewTag.filter($any($event.target)?.value, 'no', 'contains')"
+                              [value]="$any(grNewTag.filters['no'])?.value" placeholder="Search"
+                              class=" w-100 p-column-filter">
+                          </th>
+                          <th>
+                            <input pInputText type="text"
+                              (input)="grNewTag.filter($any($event.target)?.value, 'no', 'contains')"
+                              [value]="$any(grNewTag.filters['no'])?.value" placeholder="Search"
+                              class=" w-100 p-column-filter">
+                          </th>
+                          <th *ngFor="let col of columns">
+                            <input pInputText appTrim type="text"
+                              (input)="grNewTag.filter($any($event.target)?.value, col.field, 'contains')"
+                              [value]="$any(grNewTag.filters[col.field])?.value" placeholder="Search"
+                              class="p-column-filter">
+                          </th>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-rowData let-i="rowIndex" let-columns="columns"
+                        let-editing="editing">
+                        <tr [ngClass]="rowData.packBarcodesState == true ? 'text-primary' : ''"
+                         #row>  
+                          <td style="width: 5rem; justify-content: center;">
+                            <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                          </td>
+                          <td>
+                            <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{grNew: rowData  }">
+                              <mat-icon class="text-secondary">more_horiz</mat-icon>
+                            </button>
+                          </td>
+                          <td>{{i+1}}</td>
+                          <td *ngFor="let col of columns" [style]="col.style"  [pEditableColumn]="rowData[columns.field]">
+                            <ng-container
+                              *ngIf="col.format !== 'date' && col.format !== 'calculation' && col.format !== 'variance'  && col.format !== 'editable'; else dateTemplate">
+                              <input matInput placeholder="Enter" [(ngModel)]="rowData[col.field]">
+                            </ng-container>
+                            <ng-template #dateTemplate>
+  
+                              <ng-container *ngIf="(col.field == 'itemCode' || 'orderUom') && rowData.newCreated == true">
+                                <p-cellEditor>
+                                  <ng-template pTemplate="input" *ngIf="col.field == 'itemCode'">
+                                    <p-dropdown placeholder="Select" [filter]="true" appendTo="body" class="w-100"
+                                      appendTo="body" [options]="multiselectItemCodeList" [resetFilterOnHide]="true"
+                                      [(ngModel)]="rowData[col.field]" name="product" [style]="{'width': '100%'}"
+                                      [panelStyle]="{'width':'20%'}" (onFilter)="onItemType($event)" #itemcode
+                                      (onChange)="itemCodeChanged(rowData)">
+                                    </p-dropdown>
+                                  </ng-template>
+                                  <ng-template pTemplate="input" *ngIf="col.field == 'orderUom'">
+                                    <p-dropdown placeholder="Select" [filter]="true" appendTo="body" class="w-100"
+                                      appendTo="body" [options]="uomList" [resetFilterOnHide]="true"
+                                      [(ngModel)]="rowData[col.field]" name="uom" [style]="{'width': '100%'}"
+                                      [panelStyle]="{'width':'20%'}" #orderUom
+                                      (onChange)="altUomChange(orderUom.value,rowData)">
+                                    </p-dropdown>
+                                  </ng-template>
+                                  <ng-template pTemplate="output" *ngIf="col.field == 'itemCode' || col.field == 'orderUom'">
+                                    <span>{{ rowData[col.field] }} <i *ngIf="rowData[col.field]"
+                                        class="bi bi-pencil-square pl-2"></i></span>
+                                  </ng-template>
+                                </p-cellEditor>
+                              </ng-container>
+                              
+                              <ng-container *ngIf="rowData.newCreated != true && col.format1 == true">
+                                <span>{{ rowData[col.field] }}</span>
+                              </ng-container>
+                            
+  
+                              <span *ngIf="col.format == 'calculation'">
+                                <input matInput placeholder="Enter" [(ngModel)]="rowData[col.field]"
+                                  (change)="calculateOrderQty(rowData)">
+                              </span>
+  
+                              <span *ngIf="col.format == 'date'">{{ rowData[col.field] | date : 'dd-MM-yyyy HH:mm'
+                                }}</span>
+                            </ng-template>
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td [attr.colspan]="4">
+                            <p class="my-2 w-100 pl-3">No records found</p>
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </mat-tab>
+                <form [formGroup]="form" class="w-100">
+                  <mat-tab label="Header">
+                    <div class="row mt-2 boxgrey pb-3">
+                      <div class="col-lg-3 col-md-6 mt-2">
+                        <p class="mb-0 py-0">Order No</p>
+                        <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                          <input matInput placeholder="Enter" formControlName="refDocNumber">
+                        </mat-form-field>
+                      </div>
+                      <div class="col-lg-3 col-md-6 mt-2">
+                        <div class="d-flex flex-column">
+                          <p class="mb-0 py-0">Preinbound No</p>
+                          <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                            <input matInput placeholder="Enter" formControlName="preInboundNo">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-md-6 mt-2">
+                        <div class="d-flex flex-column">
+                          <p class="mb-0 py-0">GR No</p>
+                          <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                            <input matInput placeholder="Enter" formControlName="goodsReceiptNo">
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="col-lg-3 col-md-6 mt-2">
+                        <div class="d-flex flex-column">
+                          <p class="mb-0 py-0">Order Received On</p>
+                          <mat-form-field class="form-group input_field mb-0 w-100" appearance="outline">
+                            <input matInput [matDatepicker]="picker" placeholder="Choose Date "
+                              formControlName="createdOn">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                          </mat-form-field>
+  
+                        </div>
+                      </div>
+  
+                    </div>
+                  </mat-tab>
+                </form>
+                <mat-tab label="Closed">
+                  <div class="row bg-white" style="padding-right: 15px !important;">
+                    <p-table #itemReceiptTag [columns]="closed" [value]="itemReceipt"
+                      styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true" selectionMode="single"
+                      scrollHeight="calc(100vh - 21rem)" [paginator]="true" [rows]="100" [showCurrentPageReport]="true"
+                      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                      [resizableColumns]="true" style="width: 100%;margin-left: 10px;background-color:white">
+                      <ng-template pTemplate="header" let-columns>
+                        <tr>
+                          <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                            {{ col.header }}
+                            <p-sortIcon [field]="col.field"></p-sortIcon>
+                          </th>
+                        </tr>
+                        <tr>
+                          <th *ngFor="let col of columns">
+                            <input pInputText appTrim type="text"
+                              (input)="itemReceiptTag.filter($any($event.target)?.value, col.field, 'contains')"
+                              [value]="$any(itemReceiptTag.filters[col.field])?.value" placeholder="Search"
+                              class="p-column-filter">
+                          </th>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-rowData let-i="rowIndex" let-columns="columns">
+                        <tr>
+                          <td *ngFor="let col of columns" [style]="col.style">
+                            <ng-container *ngIf="col.format !== 'date' && col.format !== 'hyperLink'; else dateTemplate">
+                              <input matInput placeholder="Enter" [(ngModel)]="rowData[col.field]">
+                            </ng-container>
+                            <ng-template #dateTemplate>
+                              <span *ngIf="col.format == 'date'">{{ rowData[col.field] | date : 'dd-MM-yyyy HH:mm'
+                                }}</span>
+                            </ng-template>
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td [attr.colspan]="4">
+                            <p class="my-2 w-100 pl-3">No records found</p>
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+              <div class="d-flex justify-content-center align-items-center pt-2  bottombutton">
+                <button mat-raised-button class="text-white mx-1 px-4" color="warn" routerLink="/main/inbound/item-main">
+                  <mat-icon class="">close</mat-icon>Cancel
+                </button>
+                <button mat-raised-button class="bg-darkblue px-4 text-white mx-1"
+                  (click)="assignPalletID()">
+                  <mat-icon class="">done</mat-icon> Assign Pallet
+                </button>
+                <button mat-raised-button class="bg-orange px-4 text-white mx-1" (click)="addLines()">
+                  <mat-icon class="">add</mat-icon> Add Lines
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-drawer-container>
+  </div>
+  
+  
+  
+  
+  <mat-menu #menu="matMenu">
+    <ng-template matMenuContent let-aliasMenuItems="grNew">
+      <button *ngIf="aliasMenuItems.packBarcodesState" mat-menu-item
+        (click)="lablelGenerate(aliasMenuItems, 'Print')">Print</button>
+      <button *ngIf="aliasMenuItems.packBarcodesState" mat-menu-item (click)="printLabel(aliasMenuItems)">Print
+        Preview</button>
+      <button mat-menu-item (click)="lablelGenerate(aliasMenuItems,'New')">Confirm</button>
+      <button mat-menu-item (click)="onDeleteRow(aliasMenuItems)">Delete</button>
+      <button mat-menu-item (click)="Edit(aliasMenuItems)">Edit</button>
+    </ng-template>
+  
+  </mat-menu>

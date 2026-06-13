@@ -1,0 +1,840 @@
+<h4 class="text-secondary text-center" style="position: absolute;left: 37%;top: 3%;">AERIAL VIEW LAYOUT</h4>
+
+<div class="d-flex justify-content-between align-items-center mt-1 mx-2">
+    <img src="./assets/img/walkaroo1.png" class="invisible walkarooHide" style="width: 7rem; height: 2.5rem;" alt="" srcset="">
+    <p-dropdown [filter]="true" class="dropdownLess" placeholder="Chennai" [options]="warehouseList" [style]="{'width': '100%'}"
+        [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+</div>
+<div class="d-flex justify-content-end mt-1 align-items-center mx-2">
+    <p-dropdown [filter]="true" placeholder="Floor" class="px-2 dropdownLess" [style]="{'width': '100%'}"
+        [panelStyle]="{'width':'20%'}"> 
+    </p-dropdown>
+    <p-dropdown [filter]="true" placeholder="Zone" [options]="zoneList" (onChange)="zoneChange($event)"
+        class="px-2 dropdownLess" [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+    <p-dropdown [filter]="true" placeholder="Status" class="pl-2 dropdownLess" [style]="{'width': '100%'}"
+        [panelStyle]="{'width':'20%'}">
+    </p-dropdown>
+</div>
+<div class="row ml-2 mt-2">
+    <div class="col-9 border border-secondary ">
+        <div class="row">
+            <div class="col-12 py-1 bayPath textTransparent">5</div>
+
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        H - Single</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">H-01-01 - H-01-08</p>
+                        <p class="mb-0">H-01-09 - H-01-16</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        H - Single</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">H-01-17 - H-01-24</p>
+                        <p class="mb-0">H-01-25 - H-01-32</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-4L">
+                <fieldset class="boxLg">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        H - Single</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">H-01-33 - H-01-40</p>
+                        <p class="mb-0">H-01-41 - H-01-48</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Single</div>
+            <div class="col-11 mx-5 py-1 bayPath textTransparent"> 5 </div>
+        </div>
+
+        <div class="row">
+            <div class="col-auto side-column textTransparent">Boys</div>
+            <div class="col-4L">
+                <div class="row">
+                    <div class="col-6 pr-0">
+                        <fieldset class="longbox">
+                            <legend id="Legend5" runat="server" visible="true"
+                                style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                                A - Boys</legend>
+                            <div class="d-flex justify-content-between">
+                                <div class="div  px-1">
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-01-01')"
+                                            (click)="getStorageDetails('A-01-01')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-05')"
+                                            (click)="getStorageDetails('A-01-05')" class="bin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">   
+                                        <div type="button" [ngClass]="getClass('A-01-02')"
+                                            (click)="getStorageDetails('A-01-02')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-06')"
+                                            (click)="getStorageDetails('A-01-06')" class="bin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-03-03')"
+                                            (click)="getStorageDetails('A-03-03')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-07')"
+                                            (click)="getStorageDetails('A-01-07')" class="bin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-03-04')"
+                                            (click)="getStorageDetails('A-03-04')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-08')"
+                                            (click)="getStorageDetails('A-01-08')" class="bin"></div>
+                                    </div>
+                                </div>
+                                <div class="div px-1">
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-01-09')"
+                                            (click)="getStorageDetails('A-01-09')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-13')"
+                                            (click)="getStorageDetails('A-01-13')" class="bin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-01-10')"
+                                            (click)="getStorageDetails('A-01-10')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-14')"
+                                            (click)="getStorageDetails('A-01-14')" class="bin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-01-11')"
+                                            (click)="getStorageDetails('A-01-11')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-15')"
+                                            (click)="getStorageDetails('A-01-15')" class="bin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('A-01-12')"
+                                            (click)="getStorageDetails('A-01-12')" class="bin"></div>
+                                        <div type="button" [ngClass]="getClass('A-01-16')"
+                                            (click)="getStorageDetails('A-01-16')" class="bin"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-around"
+                                style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                                <p class="mb-0"> A-01-01 - A-01-16</p>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-6 pl-1">
+                        <fieldset class="longbox">
+                            <legend id="Legend5" runat="server" visible="true"
+                                style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                                D - Girls</legend>
+                            <div></div>
+                            <div class="d-flex justify-content-between">
+                                <div class="div  px-1">
+                                    <div class="d-flex flex-row">
+                                        <div type="button" [ngClass]="getClass('D-01-01')"
+                                            (click)="getStorageDetails('D-01-01')" class="bin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                </div>
+                                <div class="div px-1">
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                    <div class="d-flex flex-row">
+                                        <div type="button" class="bin emptyBin"></div>
+                                        <div type="button" class="bin emptyBin"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-around"
+                                style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                                <p class="mb-0"> B-01-01 - B-01-16</p>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto side-column textTransparent">Girls</div>
+            <div class="col-4L">
+                <fieldset class="longbox">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        G - Other Brands</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">G-01-01 - G-01-16</p>
+                        <p class="mb-0">G-01-17 - G-01-32</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">Other Brands</div>
+            <div class="col-4L">
+                <fieldset class="longbox">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        E - Male Kids</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('E-01-01')"  (click)="getStorageDetails('E-01-01')"  class="bin"></div>
+                                <div type="button" class="emptyBin bin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('E-02-02')"  (click)="getStorageDetails('E-02-02')" class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('E-02-03')"  (click)="getStorageDetails('E-02-03')" class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">E-01-01 - E-01-16</p>
+                        <p class="mb-0">E-01-17 - E-01-32</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class=" col-auto side-column textTransparent">Male Kids</div>
+
+            <div class="col-11 mx-5 py-1 bayPath textTransparent"> 5 </div>
+        </div>
+        <div class="row">
+            <div class=" col-auto side-column textTransparent">8</div>
+            <div class="col-4L">
+                <fieldset class="longbox">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        C - Ladies</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('C-01-01')"
+                                    (click)="getStorageDetails('C-01-01')" class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('C-01-02')"
+                                    (click)="getStorageDetails('C-01-02')" class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('C-02-03')"
+                                    (click)="getStorageDetails('C-02-03')" class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('C-02-04')"
+                                    (click)="getStorageDetails('C-02-04')" class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">C-01-01 - C-01-16</p>
+                        <p class="mb-0">C-01-17 - C-01-32</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">9</div>
+            <div class="col-4L">
+                <fieldset class="longbox">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        F - Fast Moving</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">F-01-01 - F-01-16</p>
+                        <p class="mb-0">F-01-17 - F-01-32</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">10</div>
+            <div class="col-4L">
+                <fieldset class="longbox">
+                    <legend id="Legend5" runat="server" visible="true"
+                        style="width:auto; margin-bottom: 0px; font-size: 10px; font-weight: bold;">
+                        B - Gents</legend>
+                    <div class="d-flex justify-content-between">
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" [ngClass]="getClass('B-01-01')"
+                                (click)="getStorageDetails('B-01-01')"  class="bin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div  px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                        <div class="div px-1">
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div type="button" class="bin emptyBin"></div>
+                                <div type="button" class="bin emptyBin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around"
+                        style="width:auto; margin-bottom: 0px; margin-top: 2px; font-size:  8px; font-weight: bold; border-top: 1px solid #000000 !important;">
+                        <p class="mb-0">B-01-01 - B-01-16</p>
+                        <p class="mb-0">B-01-17 - B-01-32</p>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-auto side-column textTransparent">11</div>
+
+            <div class="col-12 py-1 bayPath textTransparent">5</div>
+        </div>
+        <img class="img-fluid" style="width: 100%;" src="./assets/img/walkaroo/staging1.png" alt="">
+    </div>
+    <div class="col-3">
+        <div class="scrollLayout bg-white">
+
+
+            <h6 *ngIf="inventoryList.length > 0" class="mt-3 "
+                style="color: #693af8; font-size: 0.8rem; margin: 16px 24px 16px !important;">Bin Location:
+                {{selectedStorageBin}}</h6>
+
+            <mat-accordion>
+                <ng-container *ngFor="let element of TransactionList">
+                    <mat-expansion-panel *ngIf="element.type === 'New'" [expanded]="true" hideToggle>
+                        <mat-expansion-panel-header class="border-bottom padding-space border-top">
+                            <mat-panel-title class="d-flex justify-content-between collapsefont align-items-center">
+                                <div class="d-flex align-items-center">
+                                    {{element.type}}
+                                    <span *ngIf="element.type === 'New'"
+                                        class="badge px-2 mx-2 rounded-pill text-white bg-orange">{{element.lines.length}}</span>
+                                </div>
+                                <mat-icon class="text-secondary">remove</mat-icon>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <div class="row p-1 scrollTable px-3 mt-2">
+                            <table class="table table-sm table-bordered" style="font-size: 0.6rem;">
+                                <thead class="sticky-top bg-white"
+                                    style="background-color: #f2f2f2 !important;">
+                                    <tr>
+                                        <th scope="row">SKU</th>
+                                        <th scope="row">HU NO</th>
+                                        <th scope="row">Date</th>
+                                        <th scope="row">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngFor="let line of element.lines">
+                                    <tr>
+                                        <td>{{line.itemCode}}</td>
+                                        <td>{{line.huNo}}</td>
+                                        <td>{{line.date}}</td>
+                                        <td>{{line.qty}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </mat-expansion-panel>
+                </ng-container>
+            </mat-accordion>
+
+            <div *ngIf="inventoryList.length > 0" style="margin: 0 24px 16px !important;">
+                <div class="row p-1 scrollTable px-3 mt-2">
+                    <table class="table table-sm table-bordered" style="font-size: 0.5rem;">
+                        <thead class="sticky-top bg-white"  style="background-color: #f2f2f2 !important;">
+                            <tr>
+                                <th scope="row">SKU</th>
+                                <th scope="row">HU NO</th>
+                                <th scope="row">Date</th>
+                                <th scope="row">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngFor="let line of inventoryList">
+                            <tr>
+                                <td>{{line.itemCode}}</td>
+                                <td>{{line.barcodeId}}</td>
+                                <td>{{line.createdOn | date : 'dd-MM-yyyy' :'GMT +3'}}</td>
+                                <td>{{line.inventoryQuantity}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<img class="img-fluid"  style="width: 19rem; position: absolute; bottom: 2%; right: 2%;"  src="./assets/img/walkaroo/units.png" alt="">

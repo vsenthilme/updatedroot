@@ -1,0 +1,106 @@
+<form [formGroup]="form">
+    <div class="card bg-white " style="overflow-x: hidden;">
+      <div mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle
+        class="d-flex justify-content-between align-items-center whs-bg-grey text-white p-2">
+        <h6 class="my-auto">Add Operation </h6>
+        <mat-icon class="text-white" mat-dialog-close>close</mat-icon>
+      </div>
+      <div class="mt-2 px-4">
+        <div class="row  p-1">
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black required">Operation Number</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput placeholder="Enter" formControlName="phaseNumber">
+              </mat-form-field>
+              <mat-error *ngIf="errorHandling('phaseNumber')">{{getErrorMessage()}}</mat-error>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Description</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput placeholder="Enter" formControlName="referenceField1">
+              </mat-form-field>
+              <mat-error *ngIf="errorHandling('referenceField1')">{{getErrorMessage()}}</mat-error>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Work Center</p>  
+              <p-dropdown  placeholder="Select" [filter]="true" appendTo="body" class="form-group input_field mb-0"
+                [options]="workcenterList" [resetFilterOnHide]="true" #serviceTypeId   (onChange)="onservetypeChange1(serviceTypeId.value)" 
+                formControlName="workCenterId" name="product"
+                [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}" (onFilter)="onItemType($event)">
+            </p-dropdown>
+           
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Loading Time</p>  
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput placeholder="Enter" formControlName="loadingTime">
+              </mat-form-field>
+            </div>
+            <mat-error *ngIf="errorHandling('loadingTime')">{{getErrorMessage()}}</mat-error>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black">Machine Time</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput placeholder="Enter" formControlName="machineTime">
+              </mat-form-field>
+            </div>
+            <mat-error *ngIf="errorHandling('machineTime')">{{ getErrorMessage() }}</mat-error>
+          </div>
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Setup Time</p>
+              <mat-form-field class="mb-0 w-100 " appearance="outline">
+                <input matInput placeholder="Enter" formControlName="setupTime">
+              </mat-form-field>
+            </div>
+           
+          </div>
+        <!--  <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Lead Time</p>
+              <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                <input matInput formControlName="leadTimeFE" [owlDateTime]="leadTime"
+                    [owlDateTimeTrigger]="leadTime" placeholder="Enter"
+                    formControlName="leadTime">
+            </mat-form-field>
+            <owl-date-time #leadTime [pickerType]="'timer'"></owl-date-time>
+            </div>
+            <mat-error *ngIf="errorHandling('leadTime')">{{getErrorMessage()}}</mat-error>
+          </div>
+         -->
+         
+          <div class="col-lg-6 col-md-6 mt-1">
+            <div class="d-flex flex-column">
+              <p class="mb-0 py-0 text-black ">Time Unit</p>
+              <p-dropdown  placeholder="Select" [filter]="true" appendTo="body" class="form-group input_field mb-0"
+              [options]="itemTypeList" [resetFilterOnHide]="true" #serviceTypeId   (onChange)="onservetypeChange(serviceTypeId.value)" 
+              formControlName="timeUnit" name="product"
+              [style]="{'width': '100%'}" [panelStyle]="{'width':'20%'}" >
+          </p-dropdown>
+            </div>
+            <mat-error *ngIf="errorHandling('timeUnit')">{{getErrorMessage()}}</mat-error>
+          </div>
+         
+         
+        </div>
+      </div>
+      <div class="d-flex justify-content-center align-items-center py-2">
+        <button mat-raised-button class="text-white mx-1 px-3" color="warn" (click)="cancel()">
+          <mat-icon class="">close</mat-icon>Cancel
+        </button>
+        <button mat-raised-button class="bg-darkblue  text-white mx-1" (click)="submit()">
+          <mat-icon class="">done</mat-icon> Save
+        </button>
+      </div>
+  
+  
+    </div>
+  </form>

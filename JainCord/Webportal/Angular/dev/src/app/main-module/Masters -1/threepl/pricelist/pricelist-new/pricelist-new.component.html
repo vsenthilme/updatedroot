@@ -1,0 +1,271 @@
+<div class="row mx-1 pl-2">
+  <div class="col-12">
+    <!--inner header-->
+
+    <div class="row  text-secondary pr-0 mt-1">
+      <div class="col bg-white d-flex align-items-center mt-1 px-1 py-1 pathname">
+
+
+        <nav aria-label="breadcrumb" class="d-flex align-items-center">
+          <ol class="breadcrumb mb-0 bg-white">
+            <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto"><a routerLink="/main/dashboard/landingPage">Home</a></li>
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto">Master</li>
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto">Billing</li>
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto">Price List</li>
+          </ol>
+        </nav>
+
+
+        <div class="d-flex ml-auto my-auto">
+          <div [hidden]="isShowDiv"> <input matInput class="form-control filter_button mt-2 mt-2 mx-2 border-bottom"
+              placeholder="Search" style="width:90%">
+          </div>
+          <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+            class="button-row d-flex align-items-center">
+            <!--
+                              <button mat-mini-fab *ngIf="showFloatingButtons == true" class="floating-buttons  d-flex align-items-center justify-content-center bg-pink text-white mx-2"
+                              matTooltip="Add">
+                              <mat-icon class="action-icon d-flex align-items-center justify-content-center">add_circle_outline</mat-icon>
+                            </button>
+                            -->
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center text-white   yellowaction"
+              matTooltip="Display">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">search</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  blueaction "
+              matTooltip="Edit">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">edit</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center redaction text-white  align-middle"
+              matTooltip="Delete">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">delete</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  darkblueaction "
+              matTooltip="Download">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">download</mat-icon>
+            </button>
+            <button mat-mini-fab (click)="toggleFloat()" class="mx-2 text-white action-button"
+              [ngClass]="{'bg-orange' : toggle, 'purple': !toggle}">
+              <mat-icon>{{icon}}</mat-icon>Options
+            </button>
+            <button mat-mini-fab
+              class=" floating-buttons1  d-flex align-items-center justify-content-center darkaction text-white mx-2 mr-3 align-middle"
+              matTooltip="New">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">add</mat-icon>
+            </button>
+            <button mat-mini-fab
+              class=" floating-buttons1  d-flex align-items-center justify-content-center greyaction text-white mx-2 mr-3 align-middle"
+              matTooltip="New">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">save</mat-icon>
+            </button>
+            <button mat-mini-fab disabled class="text-white mx-2 action-button  bg-red " type="button" mat-button>
+              <mat-icon class="">tune</mat-icon> Filter
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-2 mx-1 pr-0 w-100">
+    <div class=" bg-white col-md-12 px-0" style="height:calc(100vh - 12rem);">
+      <div class="">
+        <mat-stepper [linear]="isLinear" #stepper>
+          <mat-step>
+            <ng-template matStepLabel>General</ng-template>
+            <div class="row  boxgrey  mt-2">
+              <div class="col-lg-3 col-md-6 mt-2">
+                <div class="d-flex flex-column">
+                  <p class="mb-0 py-0 text-black required">Language</p>
+                  <p-dropdown placeholder="Select" class="w-100" [disabled]="true" [ngModel]="languageSelection"
+                    [filter]="true" [options]="languageList"
+                    [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                    [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 mt-2">
+                <div class="d-flex flex-column">
+                  <p class="mb-0 py-0 text-black required">Company</p>
+                  <p-dropdown placeholder="Select" class="w-100" [disabled]="true" [ngModel]="companySelection"
+                    [filter]="true" [options]="companyList"
+                    [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                    [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 mt-2">
+                <div class="d-flex flex-column">
+                  <p class="mb-0 py-0 text-black required">Plant</p>
+                  <p-dropdown placeholder="Select" class="w-100" [disabled]="true" [ngModel]="plantSelection"
+                    [filter]="true" [options]="plantList"
+                    [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                    [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 mt-2">
+                <p class="mb-0 py-0 mb-1">Warehouse </p>
+                <p-dropdown placeholder="Select" class="w-100" [disabled]="true" [ngModel]="warehouseSelection"
+                  [filter]="true" #warehouseId (onChange)="onWarehouseChange(warehouseId.selectedOption)"
+                  [options]="warehouseIdList"
+                  [style]="{'width': '100%', 'margin-top': '0.3rem', 'margin-bottom': '0.3rem'}"
+                  [panelStyle]="{'width':'20%'}" appendTo="body"> </p-dropdown>
+              </div>
+              <div class="col-lg-3 col-md-6 mt-2">
+                <div class="d-flex flex-column">
+                  <p class="mb-0 py-0 required"> Price List ID</p>
+                  <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                    <input matInput placeholder="Enter" [(ngModel)]="pricelist"  [disabled]="this.js.pageflow == 'Edit'|| this.js.pageflow=='Display'">
+                    <mat-error *ngIf="this.pricelist==null" class="mt-1">Field Should not be blank</mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6 mt-2">
+                <div class="d-flex flex-column">
+                  <p class="mb-0 py-0"> Description </p>
+                  <mat-form-field class="form-group input_field mb-0" appearance="outline">
+                    <input matInput placeholder="Enter" [(ngModel)]="description" >
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </mat-step>
+          <mat-step>
+            <ng-template matStepLabel>Price List</ng-template>
+            <div class="mt-0">
+                <button mat-raised-button [disabled]="this.js.pageflow == 'Display'" class="text-white bg-orange demo-button my-2 ml-auto" (click)="openDialog('New')">
+                  <mat-icon class="">add</mat-icon> Add Charges
+                </button>
+              <div class="row  px-2 w-100">
+                  <p-table #Setupbatch
+                    [globalFilterFields]="['businessPartnerType','businessPartnerCode','partnerItemNo','partnerItemBarcode','brandName']"
+                    [value]="resultTable" styleClass="p-datatable-gridlines p-datatable-sm"
+                    [scrollable]="true" selectionMode="single" scrollHeight="calc(100vh - 24.5rem)" [paginator]="true"
+                    [rows]="100" [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                       [resizableColumns]="true"
+                    style="width: 100%; margin-left: 10px;background-color:white">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="max-width: 9rem;" pResizableColumn>x
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Module
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Type
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Service Type </th>
+                        <th style="max-width: 9rem;" pResizableColumn>ID</th>
+                        <th style="max-width: 9rem;" pResizableColumn>Unit </th>
+                        <th style="max-width: 7rem;" pResizableColumn>From
+                        </th>
+                        <th style="max-width: 7rem;" pResizableColumn>To
+                        </th>
+                        <th style="max-width: 13rem;" pResizableColumn>Minimum Month Cost
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Rate Per Unit 
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Rate Unit 
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Valid From 
+                        </th>
+                        <th style="max-width: 9rem;" pResizableColumn>Valid To 
+                        </th>
+                        <th pResizableColumn>Edit</th>
+                      </tr>
+
+
+                    </ng-template>
+                    <ng-template pTemplate="body" let-batch let-rowIndex="rowIndex" >
+                      <tr>
+                        <td style="max-width: 9rem;">{{rowIndex}} </td>
+                        <td style="max-width: 9rem;">{{batch.moduleId+'-'+batch.referenceField9 }} </td>
+                        <td style="max-width: 9rem;">{{batch.referenceField1 }} </td>  
+                        <td style="max-width: 9rem;">{{batch.serviceTypeId+'-'+batch.referenceField10}}</td>
+                        <td style="max-width: 9rem;"><input matInput [disabled]="true" [value]="batch.chargeRangeId"> </td>
+                        <td style="max-width: 9rem;">{{batch.chargeUnit}} </td>
+                        <td style="max-width: 7rem;">{{batch.chargeRangeFrom}} </td>
+                        <td style="max-width: 7rem;">{{batch.chargeRangeTo}} </td>
+                        <td style="max-width: 13rem;">{{batch.minMonthlyPrice}} </td>
+                        <td style="max-width: 9rem;">{{batch.pricePerChargeUnit}} </td>
+                        <td style="max-width: 9rem;">{{batch.priceUnit+'-'+batch.referenceField4}} </td>
+                        <td style="max-width: 9rem;">{{batch.fromPeriod| date : 'dd-MM-yyyy HH:mm' :'GMT +3'}} </td>
+                        <td style="max-width: 9rem;">{{batch.toPeriod| date : 'dd-MM-yyyy HH:mm' :'GMT +3'}} </td>
+                        <td> 
+                         <button class="mx-2" [disabled]="this.js.pageflow == 'Display'" mat-icon-button (click)="delete(rowIndex)">
+                            <mat-icon class="text-danger">delete_outline</mat-icon>
+                          </button>
+                          <button class="mx-2" [disabled]="this.js.pageflow == 'Display'" mat-icon-button (click)="openDialog('Edit', batch, rowIndex)">
+                            <mat-icon class="text-info">edit</mat-icon>
+                          </button>
+                        </td>
+                      </tr>
+                    </ng-template>
+
+                  </p-table>
+          
+              </div>
+           </div>
+
+          </mat-step>
+          <mat-step  *ngIf =" this.js.pageflow=='Display' || this.js.pageflow =='Edit' ">
+            <ng-template matStepLabel>Admin</ng-template>
+           
+              <div class="row  boxgrey  mt-2">
+                <div class="col-lg-3 col-md-6 mt-2">
+                  <p class="mb-0 py-0 mb-1 required">Updated On</p>
+                  <mat-form-field  class="mb-0 w-100" appearance="outline">
+                    <input matInput [disabled]="true" placeholder="Enter" [(ngModel)]="updatedOnFE">
+                  </mat-form-field>
+                </div>
+                <div class="col-lg-3 col-md-6 mt-2">
+                  <p class="mb-0 py-0 mb-1 required">Updated By</p>
+                  <mat-form-field  class="mb-0 w-100" appearance="outline">
+                    <input matInput [disabled]="true" placeholder="Enter" [(ngModel)]="updatedBy">
+                  </mat-form-field>
+                </div>
+                <div class="col-lg-3 col-md-6 mt-2">
+                  <p class="mb-0 py-0 mb-1 required">Created On</p>
+                  <mat-form-field  class="mb-0 w-100" appearance="outline">
+                    <input matInput [disabled]="true" placeholder="Enter" [(ngModel)]="createdOnFE">
+                  </mat-form-field>
+                </div>
+                <div class="col-lg-3 col-md-6 mt-2">
+                  <p class="mb-0 py-0 mb-1 required">Created By</p>
+                  <mat-form-field  class="mb-0 w-100" appearance="outline">
+                    <input matInput [disabled]="true" placeholder="Enter" [(ngModel)]="createdBy">
+                  </mat-form-field>
+                </div>
+              </div>
+           
+          </mat-step>
+      
+
+          <ng-template matStepperIcon="phone">
+            <mat-icon>call_end</mat-icon>
+          </ng-template>
+          <ng-template matStepperIcon="chat">
+            <mat-icon>forum</mat-icon>
+          </ng-template>
+        </mat-stepper>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="d-flex justify-content-center  align-items-center py-2 fixed-bottom">
+
+    <button mat-raised-button class="text-white mx-1 px-3" color="warn" routerLink="/main/threePLmaster/pricelist">
+      <mat-icon class="">close</mat-icon>Cancel
+    </button>
+    <button *ngIf="this.js.pageflow != 'Display'"  mat-raised-button class="bg-darkblue text-white mx-1 px-3" (click)="submit()"> 
+      <mat-icon class="">done</mat-icon>{{ this.js.pageflow =='Edit'? 'Update': 'Save'}}
+    </button>
+  
+   
+  </div>
+</div>

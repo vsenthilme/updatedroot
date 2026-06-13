@@ -1,0 +1,6 @@
+<div class="container">
+    <div *ngFor="let index of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]" class="square" [style.transform]="'rotateX(' + (index * 10) + 'deg) rotateY(' + (index * 10) + 'deg)'">
+      {{ index }}
+    </div>
+  </div>
+  

@@ -1,0 +1,263 @@
+<div class="row mx-1 pl-2">
+  <div class="col-12">
+    <!--inner header-->
+
+    <div class="row  text-secondary pr-0 mt-1">
+      <div class="col bg-white d-flex align-items-center mt-1 px-1 py-1 pathname">
+
+
+        <nav aria-label="breadcrumb" class="d-flex align-items-center">
+          <ol class="breadcrumb mb-0 bg-white">
+            <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto"><a routerLink="/main/dashboard/landingPage">Home</a></li>
+            <li class="breadcrumb-item" class=" whs-fontsize-1-2rem  my-auto"><a
+                routerLink="/main/make&change/inhouse-transfer">Make & Change</a></li>
+            <li class="breadcrumb-item whs-fontsize-1-2rem  my-auto">Inhouse Transfer</li>
+          </ol>
+        </nav>
+
+
+        <div class="d-flex ml-auto my-auto">
+          <div [hidden]="isShowDiv"> <input matInput (input)="inhouseTag.filterGlobal($any($event.target).value, 'contains')"
+            class="form-control filter_button mt-2 mt-2 mx-2 border-bottom"
+              placeholder="Search" style="width:90%">
+          </div>
+          <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+            class="button-row d-flex align-items-center">
+            <!--
+                    <button mat-mini-fab *ngIf="showFloatingButtons == true" class="floating-buttons  d-flex align-items-center justify-content-center bg-pink text-white mx-2"
+                    matTooltip="Add">
+                    <mat-icon class="action-icon d-flex align-items-center justify-content-center">add_circle_outline</mat-icon>
+                  </button>
+                  -->
+            <button disabled mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" disabled floating-buttons  d-flex align-items-center justify-content-center text-white   yellowaction"
+              matTooltip="Display" [disabled]="!RA.view">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">search</mat-icon>
+            </button>
+            <button disabled  mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" disabled floating-buttons  d-flex align-items-center justify-content-center text-white  blueaction "
+              matTooltip="Edit" [disabled]="!RA.createUpdate"  >
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">edit</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+              class=" floating-buttons  d-flex align-items-center justify-content-center redaction text-white  align-middle"
+              matTooltip="Delete"  [disabled]="!RA.delete" >
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">delete</mat-icon>
+            </button>
+            <!-- 
+                    <button  mat-mini-fab *ngIf="showFloatingButtons == true"
+                  class="floating-buttons  d-flex align-items-center justify-content-center text-white  bg-success  " matTooltip="Info">
+                  <mat-icon class="action-icon d-flex align-items-center justify-content-center">info_outline</mat-icon>
+                </button>
+                  -->
+            <button mat-mini-fab *ngIf="showFloatingButtons == true" (click)="downloadexcel()"
+              class="floating-buttons  d-flex align-items-center justify-content-center text-white  darkblueaction "
+              matTooltip="Download">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center">download</mat-icon>
+            </button>
+
+
+            <button mat-mini-fab (click)="toggleFloat()" class="mx-2 text-white action-button"
+              [ngClass]="{'bg-orange' : toggle, 'purple': !toggle}">
+              <mat-icon>{{icon}}</mat-icon>Options
+            </button>
+            <button mat-mini-fab routerLink="/main/make&change/inhouse-new"
+              class=" floating-buttons1  d-flex align-items-center justify-content-center darkaction text-white mx-2 mr-3 align-middle"
+              matTooltip="New"  [disabled]="!RA.createUpdate"  >
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">add</mat-icon>
+            </button>
+            <button mat-mini-fab
+              class=" floating-buttons1  d-flex align-items-center justify-content-center greyaction text-white mx-2 mr-3 align-middle"
+              matTooltip="New">
+              <mat-icon class="action-icon d-flex align-items-center justify-content-center my-auto">save</mat-icon>
+            </button>
+            <button mat-mini-fab disabled class="text-white mx-2 action-button  bg-red disabled" type="button"
+              mat-button>
+              <mat-icon class="">tune</mat-icon> Filter
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!--main-section-tabbar-->
+    <!--      <app-main-section-tabbar>
+    </app-main-section-tabbar> -->
+    <!--main section-->
+    <div class="row pr-1 mt-2">
+      <div class="pr-1 mt-2 mx-0 w-100 ">
+        <app-makeandchange-tab></app-makeandchange-tab>
+      </div>
+    </div>
+    <!-- <div class="row "style="padding-right: 15px !important;"> -->
+      <div class="row " style="padding-right: 15px !important;">
+    
+          
+        <p-table #inhouseTag [columns]="cols" [value]="inhouse"
+        styleClass="p-datatable-gridlines p-datatable-sm" [scrollable]="true"selectionMode="single"
+        scrollHeight="calc(100vh - 16.5rem)" [paginator]="true"  sortField="createdOn" [sortOrder]="-1" [rows]="100" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [resizableColumns]="true"
+        style="width: 100%;margin-left: 10px;background-color:white">
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+              {{ col.header }}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th *ngFor="let col of columns">
+              <ng-container *ngIf="col.format != 'date'; else otherTemplate">
+                <input pInputText type="text"
+                  (input)="inhouseTag.filter($any($event.target)?.value, col.field, 'contains')"
+                  [value]="$any(inhouseTag.filters[col.field])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter"> </ng-container>
+              <ng-template #otherTemplate>
+                <input pInputText type="date"
+                  (input)="inhouseTag.filter($any($event.target)?.value, col.field, 'contains')"
+                  [value]="$any(inhouseTag.filters[col.field])?.value" placeholder="Search"
+                  class=" w-100 p-column-filter">
+              </ng-template>
+            </th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <tr>
+            <td *ngFor="let col of columns">
+              <ng-container *ngIf="col.format == 'normal'; else otherTemplate">
+                {{ rowData[col.field] }}
+              </ng-container>
+              <ng-template #otherTemplate>
+                <span *ngIf="col.format == 'lines'" ><button mat-icon-button (click)="openLines(rowData)"> <!-- (click)="openLines(element)"-->
+                  <mat-icon class="text-secondary">open_in_new</mat-icon>
+                </button></span>
+                <span *ngIf="col.format == 'type'" >{{rowData.transferTypeId == 1 ? 'Stock Type to Stock Type' : rowData.transferTypeId == 2 ? 'SKU to SKU' : rowData.transferTypeId == 3 ? 'Bin to Bin' : ''}}</span>
+                  <span *ngIf="col.format == 'date'">{{ rowData[col.field] | date : 'dd-MM-yyyy HH:mm' }}</span>
+              </ng-template>
+            </td>
+          </tr>
+        </ng-template>
+        
+      </p-table>
+
+      
+
+   
+
+    
+  </div>
+  </div>
+
+
+  <mat-menu #menu="matMenu">
+    <ng-template matMenuContent>
+      <button mat-menu-item>Edit</button>
+      <button mat-menu-item>Display</button>
+      <button mat-menu-item>Delete</button>
+    </ng-template>
+  </mat-menu>
+  <!--right pane-->
+  <div class="col-3 pl-1 pr-1 mt-1 d-none">
+    <div class="whs-rightpane bg-white shadow">
+      <div class="text-dark p-2 bg-white">
+        <div class="whs-vertical-scroll">
+          <div class="d-flex justify-content-start my-1">
+            <label for="" class="mr-5 mt-1">Variant</label>
+            <label for="" class=" mt-1 ml-4 pl-3">Inhouse</label>
+          </div>
+          <hr class="my-0">
+          <div class="row mt-1">
+            <div class="col-6 pr-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">Transfer No</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+
+                  <mat-select class="mb-0" placeholder="Select">
+                    <mat-option value="option">Option</mat-option>
+                    <mat-option value="option2">Option2</mat-option>
+                    <mat-option value="option3">Option3</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-6 pl-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">Transfer Type</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+
+                  <mat-select placeholder="select">
+                    <mat-option value="option">Option</mat-option>
+                    <mat-option value="option2">Option2</mat-option>
+                    <mat-option value="option3">Option3</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-6 pr-1">
+              <div class="form-group mb-1">
+                <label for="inputEmail4" class="mb-0">Transfer Date</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+                  <mat-label>Choose a date</mat-label>
+                  <input matInput [matDatepicker]="picker">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-6 pl-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">Transferred By</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+
+                  <mat-select class="mb-0" placeholder="Select">
+                    <mat-option value="option">Option</mat-option>
+                    <mat-option value="option2">Option2</mat-option>
+                    <mat-option value="option3">Option3</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-6 pr-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">Part No</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+
+                  <mat-select class="mb-0" placeholder="Select">
+                    <mat-option value="option">Option</mat-option>
+                    <mat-option value="option2">Option2</mat-option>
+                    <mat-option value="option3">Option3</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-6 pl-1">
+              <div class="form-group mb-0">
+                <label for="inputEmail4" class="mb-0">Status</label>
+                <mat-form-field class="mb-0 w-100 " appearance="outline">
+
+                  <mat-select class="mb-0" placeholder="Select">
+                    <mat-option value="option">Option</mat-option>
+                    <mat-option value="option2">Option2</mat-option>
+                    <mat-option value="option3">Option3</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center my-1">
+          <button mat-raised-button class="text-white mr-1" color="warn">
+            <mat-icon class="">close</mat-icon> Cancel
+          </button>
+          <button mat-raised-button class="bg-darkblue  text-white mx-1">
+            <mat-icon class="">search</mat-icon> Search
+          </button>
+        </div>
+      </div>
+      <div class="row  no-gutters">
+
+
+      </div>
+    </div>
+  </div>
+</div>

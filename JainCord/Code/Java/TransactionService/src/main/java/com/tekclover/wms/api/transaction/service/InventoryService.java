@@ -1,0 +1,4754 @@
+package com.tekclover.wms.api.transaction.service;
+
+import com.microsoft.sqlserver.jdbc.SQLServerException;
+import com.tekclover.wms.api.transaction.controller.exception.BadRequestException;
+import com.tekclover.wms.api.transaction.model.IKeyValuePair;
+import com.tekclover.wms.api.transaction.model.auditlog.AuditLog;
+import com.tekclover.wms.api.transaction.model.auth.AuthToken;
+import com.tekclover.wms.api.transaction.model.dto.*;
+import com.tekclover.wms.api.transaction.model.errorlog.ErrorLog;
+import com.tekclover.wms.api.transaction.model.impl.InventoryImpl;
+import com.tekclover.wms.api.transaction.model.inbound.gr.GrLine;
+import com.tekclover.wms.api.transaction.model.inbound.gr.v2.AddGrLineV2;
+import com.tekclover.wms.api.transaction.model.inbound.gr.v2.GrLineV2;
+import com.tekclover.wms.api.transaction.model.inbound.inventory.*;
+import com.tekclover.wms.api.transaction.model.inbound.inventory.v2.IInventoryImpl;
+import com.tekclover.wms.api.transaction.model.inbound.inventory.v2.InventoryV2;
+import com.tekclover.wms.api.transaction.model.inbound.inventory.v2.SearchInventoryV2;
+import com.tekclover.wms.api.transaction.model.inbound.putaway.v2.PutAwayLineV2;
+import com.tekclover.wms.api.transaction.model.inbound.staging.v2.StagingLineEntityV2;
+import com.tekclover.wms.api.transaction.model.mnc.ExecuteStockCountInput;
+import com.tekclover.wms.api.transaction.repository.*;
+import com.tekclover.wms.api.transaction.repository.specification.InventorySpecification;
+import com.tekclover.wms.api.transaction.repository.specification.InventoryV2Specification;
+import com.tekclover.wms.api.transaction.util.CommonUtils;
+import com.tekclover.wms.api.transaction.util.DateUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.LockAcquisitionException;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.expression.ParseException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class InventoryService extends BaseService {
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private InventoryMovementRepository inventoryMovementRepository;
+
+    @Autowired
+    private AuditLogService auditLogService;
+
+    //================================================================================================
+    @Autowired
+    private InventoryV2Repository inventoryV2Repository;
+
+    @Autowired
+    private ErrorLogRepository exceptionLogRepo;
+
+    @Autowired
+    private ImBasicData1Repository imbasicdata1Repository;
+
+    @Autowired
+    private MastersService mastersService;
+    //================================================================================================
+
+    /**
+     * getInventorys
+     *
+     * @return
+     */
+    public List<Inventory> getInventorys() {
+        List<Inventory> inventoryList = inventoryRepository.findAll();
+        inventoryList = inventoryList.stream().filter(n -> n.getDeletionIndicator() == 0).collect(Collectors.toList());
+        return inventoryList;
+    }
+
+    /**
+     * getInventory
+     *
+     * @param stockTypeId
+     * @return
+     */
+    public Inventory getInventory(String warehouseId, String packBarcodes, String itemCode, String storageBin, Long stockTypeId,
+                                  Long specialStockIndicatorId) {
+        Optional<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndStockTypeIdAndSpecialStockIndicatorIdAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        specialStockIndicatorId,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            throw new BadRequestException("The given Inventory ID : " +
+                    ", warehouseId: " + warehouseId +
+                    ", packBarcodes: " + packBarcodes +
+                    ", itemCode: " + itemCode +
+                    ", storageBin: " + storageBin +
+                    ", stockTypeId: " + stockTypeId +
+                    ", specialStockIndicatorId: " + specialStockIndicatorId +
+                    " doesn't exist.");
+        }
+        return inventory.get();
+    }
+
+    /**
+     * getInventory
+     *
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public Inventory getInventory(String warehouseId, String packBarcodes, String itemCode, Long binClassId) {
+        Optional<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndBinClassIdAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        binClassId,
+                        0L
+                );
+        if (inventory != null) {
+            return inventory.get();
+        }
+        return null;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param packBarcodes
+     * @param binClassId
+     * @return
+     */
+    public List<Inventory> getInventoryForDeliveryConfirmtion(String warehouseId, String itemCode,
+                                                              String packBarcodes, Long binClassId) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndPackBarcodesAndBinClassIdAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        packBarcodes,
+                        binClassId,
+                        0L
+                );
+        if (inventory != null) {
+            return inventory;
+        }
+        return null;
+    }
+
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @return
+     */
+    public List<Inventory> getInventoryForStockReport(String warehouseId, String itemCode, Long stockTypeId) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndAndStockTypeIdAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        stockTypeId,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public List<Inventory> getInventoryForOrderManagement(String warehouseId, String itemCode, Long stockTypeId, Long binClassId) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndAndStockTypeIdAndBinClassIdAndInventoryQuantityGreaterThanAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        stockTypeId,
+                        binClassId,
+                        0D,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @return
+     */
+    public List<Inventory> getInventoryForDelete(String warehouseId, String packBarcodes, String itemCode) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param palletCode
+     * @param caseCode
+     * @param packBarcodes
+     * @param itemCode
+     * @return
+     */
+    public List<Inventory> getInventory(String warehouseId, String palletCode, String caseCode, String packBarcodes,
+                                        String itemCode) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPalletCodeAndCaseCodeAndPackBarcodesAndItemCodeAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        palletCode,
+                        caseCode,
+                        packBarcodes,
+                        itemCode,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            throw new BadRequestException("The given Inventory ID : " +
+                    ", warehouseId: " + warehouseId +
+                    ", palletCode: " + palletCode +
+                    ", caseCode: " + caseCode +
+                    ", packBarcodes: " + packBarcodes +
+                    ", itemCode: " + itemCode +
+                    " doesn't exist.");
+        }
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param palletCode
+     * @param packBarcodes
+     * @param storageBin
+     * @return
+     */
+    public List<Inventory> getInventoryForTransfers(String warehouseId, String itemCode, String palletCode, String packBarcodes, String storageBin) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndPalletCodeAndPackBarcodesAndStorageBinAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        palletCode,
+                        packBarcodes,
+                        storageBin,
+                        0L
+                );
+
+        if (!inventory.isEmpty()) {
+            return inventory;
+        }
+        return null;
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @return
+     */
+    public Inventory getInventory(String warehouseId, String packBarcodes, String itemCode, String storageBin) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        Optional<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get());
+        return inventory.get();
+    }
+
+    /**
+     * @param warehouseId
+     * @param storageBin
+     * @return
+     */
+    public Inventory getInventoryByStorageBin(String warehouseId, String storageBin) {
+        Optional<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndStorageBinAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        storageBin,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        return inventory.get();
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public List<Inventory> getInventory(String warehouseId, String itemCode, Long binClassId) {
+        Warehouse warehouse = getWarehouse(warehouseId);
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndBinClassIdAndDeletionIndicator(
+                        warehouse.getLanguageId(),
+                        warehouse.getCompanyCode(),
+                        warehouse.getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        binClassId,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            throw new BadRequestException("The given PreInboundHeader ID : " +
+                    ", warehouseId: " + warehouseId +
+                    ", itemCode: " + itemCode +
+                    ", binClassId: " + binClassId +
+                    " doesn't exist.");
+        }
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @return
+     */
+    public List<Inventory> getInventory(String warehouseId, String itemCode) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndDeletionIndicator(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<Inventory> getInventoryForOrderMgmt(String warehouseId, String itemCode, Long binClassId, String storageBin, Long stockTypeId) {
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndBinClassIdAndStorageBinAndStockTypeIdAndDeletionIndicatorAndInventoryQuantityGreaterThanOrderByInventoryQuantity(
+                        getLanguageId(),
+                        getCompanyCode(),
+                        getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        binClassId,
+                        storageBin,
+                        stockTypeId,
+                        0L,
+                        0D
+                );
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param stSecIds
+     * @return
+     */
+    public List<IInventory> getInventoryGroupByStorageBin(String warehouseId, String itemCode, List<String> stSecIds) {
+        List<IInventory> inventory = inventoryRepository.findInventoryGroupByStorageBin(warehouseId, itemCode, stSecIds);
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param storageSectionIds
+     * @return
+     */
+    public List<Inventory> getInventoryForAdditionalBins(String warehouseId, String itemCode, List<String> storageSectionIds) {
+        Warehouse warehouse = getWarehouse(warehouseId);
+        log.info("InventoryForAdditionalBins ID : warehouseId: " + warehouseId + ", itemCode: " + itemCode + ", storageSectionIds: " + storageSectionIds);
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndReferenceField10InAndBinClassIdAndInventoryQuantityGreaterThan(
+                        warehouse.getLanguageId(),
+                        warehouse.getCompanyCode(),
+                        warehouse.getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        storageSectionIds,
+                        1L,
+                        0D
+                );
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param storageSectionIds
+     * @param stockTypeId
+     * @return
+     */
+    public List<Inventory> getInventoryForAdditionalBinsForOB2(String warehouseId, String itemCode, List<String> storageSectionIds, Long stockTypeId) {
+        Warehouse warehouse = getWarehouse(warehouseId);
+        List<Inventory> inventory =
+                inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndReferenceField10InAndStockTypeIdAndBinClassIdAndInventoryQuantityGreaterThan(
+                        warehouse.getLanguageId(),
+                        warehouse.getCompanyCode(),
+                        warehouse.getPlantId(),
+                        warehouseId,
+                        itemCode,
+                        storageSectionIds,
+                        stockTypeId,
+                        1L,
+                        0D
+                );
+
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<Long> getInventoryQtyCount(String warehouseId, String itemCode, List<String> storageBin,
+                                           Long stockTypeId) {
+        List<Long> inventory = inventoryRepository.findInventoryQtyCount(warehouseId, itemCode, storageBin, stockTypeId);
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @return
+     */
+    public Double getInventoryQtyCount(String warehouseId, String itemCode) {
+        Double inventoryQty = inventoryRepository.getInventoryQtyCount(warehouseId, itemCode);
+        return inventoryQty;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param manufacturerName
+     * @param itemCode
+     * @return
+     */
+    public Double getInventoryQtyCountV2(String companyCodeId, String plantId, String languageId, String warehouseId, String manufacturerName, String itemCode) {
+        Double inventoryQty = inventoryV2Repository.getInventoryQtyCountV2(companyCodeId, plantId, languageId, warehouseId, manufacturerName, itemCode);
+        return inventoryQty;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param manufacturerName
+     * @param itemCode
+     * @return
+     */
+    public Double getInventoryQtyCountForInvMmt(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                String manufacturerName, String itemCode) {
+        Double inventoryQty = inventoryV2Repository.getInventoryQtyCountForInvMmt(companyCodeId, plantId, languageId, warehouseId, manufacturerName, itemCode);
+        return inventoryQty;
+    }
+
+    /**
+     * @param warehouseId
+     * @param stBins
+     * @return
+     */
+    public List<Inventory> getInventoryByStorageBin(String warehouseId, List<String> stBins) {
+        List<Inventory> inventory = inventoryRepository.findByWarehouseIdAndStorageBinIn(warehouseId, stBins);
+        return inventory;
+    }
+
+    /**
+     * @param sortBy
+     * @param pageSize
+     * @param pageNo
+     * @param searchInventory
+     * @return
+     * @throws ParseException
+     */
+    public Page<Inventory> findInventory(SearchInventory searchInventory, Integer pageNo, Integer pageSize, String sortBy)
+            throws ParseException {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
+        InventorySpecification spec = new InventorySpecification(searchInventory);
+        Page<Inventory> results = inventoryRepository.findAll(spec, paging);
+        return results;
+    }
+
+    /**
+     * @param searchInventory
+     * @return
+     * @throws ParseException
+     */
+//	public List<Inventory> findInventory(SearchInventory searchInventory)
+//			throws ParseException {
+//		InventorySpecification spec = new InventorySpecification(searchInventory);
+//		List<Inventory> results = inventoryRepository.findAll(spec);
+//		return results;
+//	}
+    public List<Inventory> findInventory(SearchInventory searchInventory)
+            throws ParseException {
+        InventorySpecification spec = new InventorySpecification(searchInventory);
+        List<Inventory> results = inventoryRepository.findAll(spec);
+        results.stream().forEach(n -> {
+            if (n.getInventoryQuantity() == null) {
+                n.setInventoryQuantity(0D);
+            }
+            if (n.getAllocatedQuantity() == null) {
+                n.setAllocatedQuantity(0D);
+            }
+            n.setReferenceField4(round(n.getInventoryQuantity() + n.getAllocatedQuantity()));
+        });
+        return results;
+    }
+
+    @Transactional
+    public List<InventoryImpl> findInventoryNew(SearchInventory searchInventory)
+            throws ParseException {
+
+        List<InventoryImpl> results = inventoryRepository.findInventory(
+                searchInventory.getWarehouseId(),
+                searchInventory.getPackBarcodes(),
+                searchInventory.getItemCode(),
+                searchInventory.getStorageBin(),
+                searchInventory.getStorageSectionId(),
+                searchInventory.getStockTypeId(),
+                searchInventory.getSpecialStockIndicatorId(),
+                searchInventory.getBinClassId(),
+                searchInventory.getDescription()
+        );
+//		return results.collect(Collectors.toList());
+        return results;
+    }
+
+    /**
+     * @param searchInventory
+     * @return
+     * @throws ParseException
+     */
+    public List<Inventory> getQuantityValidatedInventory(SearchInventory searchInventory)
+            throws ParseException {
+        InventorySpecification spec = new InventorySpecification(searchInventory);
+        List<Inventory> results = inventoryRepository.findAll(spec);
+        if (!results.isEmpty()) {
+            results = results.stream().filter(x -> (x.getInventoryQuantity() != null && x.getInventoryQuantity() != 0) && (x.getAllocatedQuantity() != null && x.getAllocatedQuantity() != 0)).collect(Collectors.toList());
+        }
+        return results;
+    }
+
+    /**
+     * createInventory
+     *
+     * @param newInventory
+     * @param loginUserID
+     * @return
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public Inventory createInventory(AddInventory newInventory, String loginUserID)
+            throws IllegalAccessException, InvocationTargetException {
+        Inventory dbInventory = new Inventory();
+        log.info("newInventory : " + newInventory);
+        BeanUtils.copyProperties(newInventory, dbInventory, CommonUtils.getNullPropertyNames(newInventory));
+        dbInventory.setDeletionIndicator(0L);
+        dbInventory.setCreatedBy(loginUserID);
+        dbInventory.setCreatedOn(new Date());
+        return inventoryRepository.save(dbInventory);
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @param stockTypeId
+     * @param specialStockIndicatorId
+     * @param loginUserID
+     * @param updateInventory
+     * @return
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public Inventory updateInventory(String warehouseId, String packBarcodes, String itemCode, String storageBin,
+                                     Long stockTypeId, Long specialStockIndicatorId, UpdateInventory updateInventory, String loginUserID)
+            throws IllegalAccessException, InvocationTargetException {
+
+        Inventory dbInventory = getInventory(warehouseId, packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId);
+
+        //* ------------------------------------Audit Log----------------------------------------------------------------
+        // PALLET_CODE
+		/*if (updateInventory.getPalletCode() != null && updateInventory.getPalletCode() != dbInventory.getPalletCode()) {
+//			log.info("Inserting Audit log for PALLET_CODE");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+								warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"PAL_CODE", dbInventory.getPalletCode(), updateInventory.getPalletCode(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// CASE_CODE
+		if (updateInventory.getCaseCode() != null && updateInventory.getCaseCode() != dbInventory.getCaseCode()) {
+//			log.info("Inserting Audit log for CASE_CODE");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+								warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"CASE_CODE", dbInventory.getCaseCode(), updateInventory.getCaseCode(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// VAR_ID
+		if (updateInventory.getVariantCode() != null && updateInventory.getVariantCode() != dbInventory.getVariantCode()) {
+//			log.info("Inserting Audit log for VAR_ID");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+								warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"VAR_ID", String.valueOf(dbInventory.getVariantCode()), String.valueOf(updateInventory.getVariantCode()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// VAR_SUB_ID
+		if (updateInventory.getVariantSubCode() != null && updateInventory.getVariantSubCode() != dbInventory.getVariantSubCode()) {
+//			log.info("Inserting Audit log for VAR_SUB_ID");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"VAR_SUB_ID", dbInventory.getVariantSubCode(), updateInventory.getVariantSubCode(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// STR_NO
+		if (updateInventory.getBatchSerialNumber() != null && updateInventory.getBatchSerialNumber() != dbInventory.getBatchSerialNumber()) {
+//			log.info("Inserting Audit log for STR_NO");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"STR_NO", dbInventory.getBatchSerialNumber(), updateInventory.getBatchSerialNumber(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// STCK_TYP_ID
+		if (updateInventory.getStockTypeId() != null && updateInventory.getStockTypeId() != dbInventory.getStockTypeId()) {
+//			log.info("Inserting Audit log for STCK_TYP_ID");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"STCK_TYP_ID", String.valueOf(dbInventory.getStockTypeId()), String.valueOf(updateInventory.getStockTypeId()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_ORD_NO
+		if (updateInventory.getReferenceOrderNo() != null && updateInventory.getReferenceOrderNo() != dbInventory.getReferenceOrderNo()) {
+//			log.info("Inserting Audit log for REF_ORD_NO");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_ORD_NO", dbInventory.getReferenceOrderNo(), updateInventory.getReferenceOrderNo(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// STR_MTD
+		if (updateInventory.getStorageMethod() != null && updateInventory.getStorageMethod() != dbInventory.getStorageMethod()) {
+//			log.info("Inserting Audit log for STR_MTD");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"STR_MTD", String.valueOf(dbInventory.getStorageMethod()), updateInventory.getStorageMethod(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// BIN_CL_ID
+		if (updateInventory.getBinClassId() != null && updateInventory.getBinClassId() != dbInventory.getBinClassId()) {
+//			log.info("Inserting Audit log for BIN_CL_ID");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"BIN_CL_ID", String.valueOf(dbInventory.getBinClassId()), String.valueOf(updateInventory.getBinClassId()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// TEXT
+		if (updateInventory.getDescription() != null && updateInventory.getDescription() != dbInventory.getDescription()) {
+//			log.info("Inserting Audit log for TEXT");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"TEXT", dbInventory.getDescription(), updateInventory.getDescription(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// INV_QTY
+		if (updateInventory.getInventoryQuantity() != null && updateInventory.getInventoryQuantity() != dbInventory.getInventoryQuantity()) {
+//			log.info("Inserting Audit log for INV_QTY");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"INV_QTY", String.valueOf(dbInventory.getInventoryQuantity()), String.valueOf(updateInventory.getInventoryQuantity()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// ALLOC_QTY
+		if (updateInventory.getAllocatedQuantity() != null && updateInventory.getAllocatedQuantity() != dbInventory.getAllocatedQuantity()) {
+//			log.info("Inserting Audit log for ALLOC_QTY");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"ALLOC_QTY", String.valueOf(dbInventory.getAllocatedQuantity()), String.valueOf(updateInventory.getAllocatedQuantity()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// INV_UOM
+		if (updateInventory.getInventoryUom() != null && updateInventory.getInventoryUom() != dbInventory.getInventoryUom()) {
+//			log.info("Inserting Audit log for INV_UOM");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"INV_UOM", dbInventory.getInventoryUom(), updateInventory.getInventoryUom(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// MFR_DATE
+		if (updateInventory.getManufacturerDate() != null && updateInventory.getManufacturerDate() != dbInventory.getManufacturerDate()) {
+//			log.info("Inserting Audit log for MFR_DATE");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"MFR_DATE", String.valueOf(dbInventory.getManufacturerDate()), String.valueOf(updateInventory.getManufacturerDate()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// EXP_DATE
+		if (updateInventory.getExpiryDate() != null && updateInventory.getExpiryDate() != dbInventory.getExpiryDate()) {
+//			log.info("Inserting Audit log for EXP_DATE");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"EXP_DATE", String.valueOf(dbInventory.getExpiryDate()), String.valueOf(updateInventory.getExpiryDate()),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_FIELD_5
+		if (updateInventory.getReferenceField5() != null && updateInventory.getReferenceField5() != dbInventory.getReferenceField5()) {
+//			log.info("Inserting Audit log for REF_FIELD_5");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_FIELD_5", dbInventory.getReferenceField5(), updateInventory.getReferenceField5(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_FIELD_6
+		if (updateInventory.getReferenceField6() != null && updateInventory.getReferenceField6() != dbInventory.getReferenceField6()) {
+//			log.info("Inserting Audit log for REF_FIELD_6");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_FIELD_6", dbInventory.getReferenceField6(), updateInventory.getReferenceField6(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_FIELD_7
+		if (updateInventory.getReferenceField7() != null && updateInventory.getReferenceField7() != dbInventory.getReferenceField7()) {
+//			log.info("Inserting Audit log for REF_FIELD_7");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_FIELD_7", dbInventory.getReferenceField7(), updateInventory.getReferenceField7(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_FIELD_8
+		if (updateInventory.getReferenceField8() != null && updateInventory.getReferenceField8() != dbInventory.getReferenceField8()) {
+//			log.info("Inserting Audit log for REF_FIELD_8");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_FIELD_8", dbInventory.getReferenceField8(), updateInventory.getReferenceField8(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_FIELD_9
+		if (updateInventory.getReferenceField9() != null && updateInventory.getReferenceField9() != dbInventory.getReferenceField9()) {
+//			log.info("Inserting Audit log for REF_FIELD_9");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_FIELD_9", dbInventory.getReferenceField9(), updateInventory.getReferenceField9(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}
+
+		// REF_FIELD_10
+		if (updateInventory.getReferenceField10() != null && updateInventory.getReferenceField10() != dbInventory.getReferenceField10()) {
+//			log.info("Inserting Audit log for REF_FIELD_10");
+			createAuditLogRecord(dbInventory.getCompanyCodeId(), dbInventory.getPlantId(),
+					warehouseId, loginUserID, "INVENTORY", "INVENTORY",
+					"REF_FIELD_10", dbInventory.getReferenceField10(), updateInventory.getReferenceField10(),
+					packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId,"");
+		}*/
+        //* --------------------------------------------------------------------------------------------------------------------------------------*//
+
+        /*--------------------------------------Inventory Movement Create ---------------------------------------------------------*/
+		/* Inventory Movement will be created only when change in total quantity
+			i.e., INV_QTY+ALLOC_QTY and binClassId == 1; otherwise no record should be created */
+
+        if (updateInventory.getInventoryQuantity() == null) {
+            updateInventory.setInventoryQuantity(0D);
+        }
+        if (updateInventory.getAllocatedQuantity() == null) {
+            updateInventory.setAllocatedQuantity(0D);
+        }
+        if (dbInventory.getAllocatedQuantity() == null) {
+            dbInventory.setAllocatedQuantity(0D);
+        }
+        if (dbInventory.getInventoryQuantity() == null) {
+            dbInventory.setInventoryQuantity(0D);
+        }
+
+        Double newTotalQuantity = updateInventory.getInventoryQuantity() + updateInventory.getAllocatedQuantity();
+        Double dbTotalQuantity = dbInventory.getInventoryQuantity() + dbInventory.getAllocatedQuantity();
+        log.info("newTotalQuantity: " + newTotalQuantity + "dbTotalQuantity: " + dbTotalQuantity);
+        if (!newTotalQuantity.equals(dbTotalQuantity) && dbInventory.getBinClassId() == 1) {
+
+            InventoryMovement dbInventoryMovement = new InventoryMovement();
+
+            String movementDocumentNumber;
+            if (inventoryRepository.findMovementDocumentNo() != null) {
+                movementDocumentNumber = inventoryRepository.findMovementDocumentNo();
+            } else {
+                movementDocumentNumber = "1";
+            }
+
+            dbInventoryMovement.setLanguageId(dbInventory.getLanguageId());
+            dbInventoryMovement.setCompanyCodeId(dbInventory.getCompanyCodeId());
+            dbInventoryMovement.setPlantId(dbInventory.getPlantId());
+            dbInventoryMovement.setWarehouseId(dbInventory.getWarehouseId());
+            dbInventoryMovement.setMovementType(4L);
+            dbInventoryMovement.setSubmovementType(1L);
+            dbInventoryMovement.setPalletCode(dbInventory.getPalletCode());
+            dbInventoryMovement.setCaseCode(dbInventory.getCaseCode());
+            dbInventoryMovement.setPackBarcodes(dbInventory.getPackBarcodes());
+            dbInventoryMovement.setItemCode(dbInventory.getItemCode());
+            dbInventoryMovement.setVariantCode(dbInventory.getVariantCode());
+            dbInventoryMovement.setVariantSubCode(dbInventory.getVariantSubCode());
+            dbInventoryMovement.setBatchSerialNumber("1");
+//			dbInventoryMovement.setMovementDocumentNo("1");
+            dbInventoryMovement.setMovementDocumentNo(movementDocumentNumber);
+            dbInventoryMovement.setManufacturerName(dbInventory.getReferenceField9()); //Inventory Ref_Field_9 - ManufacturePartNo
+            dbInventoryMovement.setStorageBin(dbInventory.getStorageBin());
+            dbInventoryMovement.setStorageMethod(dbInventory.getStorageMethod());
+            dbInventoryMovement.setDescription(dbInventory.getReferenceField8());
+            dbInventoryMovement.setStockTypeId(dbInventory.getStockTypeId());
+            dbInventoryMovement.setSpecialStockIndicator(dbInventory.getSpecialStockIndicatorId());
+            if (newTotalQuantity < dbTotalQuantity) {
+                dbInventoryMovement.setMovementQtyValue("N");
+                log.info("MovementQtyValue: " + dbInventoryMovement.getMovementQtyValue());
+            } else {
+                dbInventoryMovement.setMovementQtyValue("P");
+                log.info("MovementQtyValue: " + dbInventoryMovement.getMovementQtyValue());
+            }
+            dbInventoryMovement.setMovementQty(newTotalQuantity - dbTotalQuantity);
+            dbInventoryMovement.setBalanceOHQty(newTotalQuantity);
+            dbInventoryMovement.setInventoryUom(dbInventory.getInventoryUom());
+//			dbInventoryMovement.setRefDocNumber("");
+            dbInventoryMovement.setDeletionIndicator(dbInventory.getDeletionIndicator());
+            dbInventoryMovement.setCreatedBy(dbInventory.getUpdatedBy());
+            dbInventoryMovement.setCreatedOn(new Date());
+            log.info("Inventory Movement: " + dbInventoryMovement);
+            inventoryMovementRepository.save(dbInventoryMovement);
+        }
+
+        BeanUtils.copyProperties(updateInventory, dbInventory, CommonUtils.getNullPropertyNames(updateInventory));
+        dbInventory.setUpdatedBy(loginUserID);
+        dbInventory.setUpdatedOn(new Date());
+        return inventoryRepository.save(dbInventory);
+    }
+
+    /**
+     * deleteInventory
+     *
+     * @param stockTypeId
+     */
+    public void deleteInventory(String warehouseId, String packBarcodes, String itemCode, String storageBin, Long stockTypeId,
+                                Long specialStockIndicatorId) {
+        Inventory inventory = getInventory(warehouseId, packBarcodes, itemCode, storageBin, stockTypeId, specialStockIndicatorId);
+        if (inventory != null) {
+            inventory.setDeletionIndicator(1L);
+            inventoryRepository.save(inventory);
+        } else {
+            throw new EntityNotFoundException("Error in deleting Id: " + stockTypeId);
+        }
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     */
+    public boolean deleteInventory(String warehouseId, String packBarcodes, String itemCode) {
+        try {
+            List<Inventory> inventoryList = getInventoryForDelete(warehouseId, packBarcodes, itemCode);
+            log.info("inventoryList : " + inventoryList);
+            if (inventoryList != null) {
+                for (Inventory inventory : inventoryList) {
+                    inventoryRepository.delete(inventory);
+                    log.info("inventory deleted.");
+                }
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Error in deleting Id: " + e.toString());
+        }
+    }
+
+    /**
+     * DeleteInventory
+     *
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBackParCode
+     * @param refDocNumber
+     * @param itemCode
+     * @param loginUserID
+     */
+    public void deleteInventory(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                String packBackParCode, String refDocNumber, String itemCode, String loginUserID) {
+
+        List<Inventory> dbInventory = inventoryRepository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndPackBarcodesAndReferenceOrderNoAndDeletionIndicator(
+                companyCodeId, languageId, plantId, warehouseId, itemCode, packBackParCode, refDocNumber, 0L);
+
+        if (dbInventory != null) {
+            for (Inventory inventory : dbInventory) {
+                inventory.setDeletionIndicator(1L);
+                inventory.setUpdatedBy(loginUserID);
+                inventoryRepository.save(inventory);
+            }
+        } else {
+            log.info("Error in deleting Id:  warehouseId:" + warehouseId +
+                    ", companyCodeId :" + companyCodeId +
+                    ", itemCode: " + itemCode +
+                    ", refDocNumber: " + refDocNumber +
+                    " doesn't exist.");
+        }
+    }
+
+    /*
+     * -------------------------Audit Log----------------------------------------------------------------
+     */
+    public void createAuditLogRecord(String companyCodeId, String plantId, String warehouseId,
+                                     String loginUserID, String tableName, String objectName,
+                                     String modifiedField, String oldValue, String newValue,
+                                     String packBarcodes, String itemCode, String storageBin,
+                                     Long stockTypeId, Long specialStockIndicatorId, String refDocNumber)
+            throws InvocationTargetException, IllegalAccessException {
+
+        AuditLog auditLog = new AuditLog();
+
+        auditLog.setCompanyCode(companyCodeId);
+
+        auditLog.setPlantID(plantId);
+
+        auditLog.setWarehouseId(warehouseId);
+
+        auditLog.setFiscalYear(DateUtils.getCurrentYear());
+
+        auditLog.setObjectName(objectName);
+
+        auditLog.setTableName(tableName);
+
+        auditLog.setRefDocNumber(refDocNumber);
+
+        // MOD_FIELD
+        auditLog.setModifiedField(modifiedField);
+
+        // OLD_VL
+        auditLog.setOldValue(oldValue);
+
+        // NEW_VL
+        auditLog.setNewValue(newValue);
+
+        // CTD_BY
+        auditLog.setCreatedBy(loginUserID);
+
+        // CTD_ON
+        auditLog.setCreatedOn(new Date());
+
+        // UTD_BY
+        auditLog.setUpdatedBy(loginUserID);
+
+        // UTD_ON
+        auditLog.setUpdatedOn(new Date());
+
+        auditLog.setReferenceField1(packBarcodes);
+        auditLog.setReferenceField2(itemCode);
+        auditLog.setReferenceField3(storageBin);
+        auditLog.setReferenceField4(String.valueOf(stockTypeId));
+        auditLog.setReferenceField5(String.valueOf(specialStockIndicatorId));
+
+        auditLogService.createAuditLog(auditLog, loginUserID);
+    }
+
+    //============================================================V2=============================================================
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public InventoryV2 getInventory(String companyCodeId, String plantId,
+                                    String languageId, String warehouseId,
+                                    String packBarcodes, String itemCode,
+                                    String manufacturerName, Long binClassId) {
+//        List<InventoryV2> inventory =
+//                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+//                        languageId,
+//                        companyCodeId,
+//                        plantId,
+//                        warehouseId,
+//                        packBarcodes,
+//                        itemCode,
+//                        manufacturerName,
+//                        binClassId,
+//                        0L
+//                );
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndReferenceField1AndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        binClassId,
+                        0L
+                );
+
+        if (inventory != null && !inventory.isEmpty()) {
+            return inventory.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @return
+     */
+    public IInventoryImpl getInventoryforExistingBin(String companyCodeId, String plantId,
+                                                     String languageId, String warehouseId,
+                                                     String packBarcodes, String itemCode,
+                                                     String manufacturerName, Long binClassId) {
+        IInventoryImpl getInventoryExistingBin =
+                inventoryV2Repository.getInventoryforExistingBin(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        manufacturerName,
+                        packBarcodes,
+                        itemCode,
+                        binClassId
+                );
+
+        if (getInventoryExistingBin != null) {
+            return getInventoryExistingBin;
+        }
+        return null;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<InventoryV2> getInventoryForOrderManagementV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                              String itemCode, Long stockTypeId, Long binClassId) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndAndStockTypeIdAndBinClassIdAndInventoryQuantityGreaterThanAndDeletionIndicator(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        stockTypeId,
+                        binClassId,
+                        0D,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                 String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+//        List<InventoryV2> inventory =
+//                inventoryV2Repository
+//                .findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndAndStockTypeIdAndBinClassIdAndManufacturerNameAndInventoryQuantityGreaterThanAndDeletionIndicatorOrderByInventoryIdDesc(
+//                        languageId,
+//                        companyCodeId,
+//                        plantId,
+//                        warehouseId,
+//                        itemCode,
+//                        stockTypeId,
+//                        binClassId,
+//                        manufacturerName,
+//                        0D,
+//                        0L
+//                );
+
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryForOrderManagement(companyCodeId, plantId, languageId, warehouseId, itemCode, binClassId, stockTypeId, manufacturerName);
+//        List<IInventoryImpl> inventory = inventoryV2Repository.
+//                findInventoryForOMmt(companyCodeId, languageId, plantId, warehouseId, itemCode, binClassId, stockTypeId, manufacturerName);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementOrderByCtdOnV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                             String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryOmlOrderByCtdOnId(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementOrderByLevelIdV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                               String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryOmlOrderByLevelId(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventory> getInventoryForOrderManagementGroupByLevelIdV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                           String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventory> inventory = inventoryV2Repository.findInventoryGroupByLevelId(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventory> getInventoryForOrderManagementByBatch(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                  String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventory> inventory = inventoryV2Repository.findInventoryByBatch(companyCodeId, plantId, languageId, warehouseId, binClassId, itemCode, manufacturerName);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param levelId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementGroupByLevelIdV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                               String itemCode, Long stockTypeId, Long binClassId, Long levelId, String manufacturerName) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryOmlGroupByLevelId(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, stockTypeId, binClassId, levelId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementGroupByBatch(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                           String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null || manufacturerName == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId + "," + manufacturerName);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryOmlGroupByBatch(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementV2GroupByBatch(String companyCodeId, String plantId, String languageId,
+                                                                             String warehouseId, String itemCode, String manufacturerName,
+                                                                             Long binClassId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryOmlGroupByBatch(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        manufacturerName,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForPutAwayCreate(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                             String itemCode, String manufacturerName, Long binClassId) {
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.
+//                inventoryForPutAway(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, binClassId);
+        inventoryForPutAwaytemp(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public List<String> getInventoryBinForPutAwayCreate(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                        String itemCode, Long binClassId) {
+
+        List<String> inventory = inventoryV2Repository.
+                inventoryForPutAwayCreate(companyCodeId, plantId, languageId, warehouseId, itemCode, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param referenceDocumentNo
+     * @param itemCode
+     * @return
+     */
+    public List<InventoryV2> getInventory(String companyCodeId, String plantId,
+                                          String languageId, String warehouseId,
+                                          String referenceDocumentNo, String itemCode) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndReferenceDocumentNoAndItemCodeAndDeletionIndicator(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        referenceDocumentNo,
+                        itemCode,
+                        0L
+                );
+
+        if (inventory == null) {
+            throw new BadRequestException("The given Inventory ID : " +
+                    ", warehouseId: " + warehouseId +
+                    ", companyCodeId: " + companyCodeId +
+                    ", plantId: " + plantId +
+                    ", languageId: " + languageId +
+                    ", referenceDocumentNo: " + referenceDocumentNo +
+                    ", itemCode: " + itemCode +
+                    " doesn't exist.");
+        }
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @param manufacturerCode
+     * @return
+     */
+    public InventoryV2 getInventory(String companyCode, String plantId, String languageId,
+                                    String warehouseId, String packBarcodes, String itemCode,
+                                    String storageBin, String manufacturerCode) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        Optional<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndManufacturerCodeAndDeletionIndicator(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        manufacturerCode,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get());
+        return inventory.get();
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerCode
+     * @return
+     */
+    public InventoryV2 getInventory(String companyCode, String plantId, String languageId,
+                                    String warehouseId, String packBarcodes, String itemCode,
+                                    String manufacturerCode) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode);
+        Optional<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerCodeAndDeletionIndicator(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerCode,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get());
+        return inventory.get();
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public List<InventoryV2> getInventory(String companyCode, String plantId, String languageId, String warehouseId, String itemCode, Long binClassId) {
+
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        binClassId,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            throw new BadRequestException("The given PreInboundHeader ID : " +
+                    ", warehouseId: " + warehouseId +
+                    ", itemCode: " + itemCode +
+                    ", binClassId: " + binClassId +
+                    " doesn't exist.");
+        }
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForInvMmt(String companyCode, String plantId, String languageId, String warehouseId,
+                                                      String itemCode, String manufacturerName, Long binClassId) {
+
+//        List<InventoryV2> inventory =
+//                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+//                        languageId,
+//                        companyCode,
+//                        plantId,
+//                        warehouseId,
+//                        itemCode,
+//                        manufacturerName,
+//                        binClassId,
+//                        0L
+//                );
+        List<IInventoryImpl> inventory = inventoryV2Repository.
+                findInventoryForInventoryMovement(companyCode, plantId, languageId, warehouseId, itemCode, binClassId, manufacturerName);
+
+        if (inventory == null || inventory.isEmpty()) {
+            return null;
+//            throw new BadRequestException("The given PreInboundHeader ID : " +
+//                    ", warehouseId: " + warehouseId +
+//                    ", itemCode: " + itemCode +
+//                    ", binClassId: " + binClassId +
+//                    " doesn't exist.");
+        }
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @return
+     */
+    public List<InventoryV2> getInventoryForInvMmt(String companyCode, String plantId, String languageId, String warehouseId, String itemCode, Long binClassId) {
+
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        binClassId,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            return null;
+        }
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @return
+     */
+    public List<InventoryV2> getInventoryV2(String companyCode, String plantId, String languageId, String warehouseId, String itemCode) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndDeletionIndicator(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @return
+     */
+    public List<InventoryV2> getInventoryForInhouseTransferV2(String companyCode, String plantId, String languageId,
+                                                              String warehouseId, String itemCode, String manufacturerName) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndManufacturerCodeAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        manufacturerName,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForStockAdjustment(String companyCodeId, String plantId, String languageId,
+                                                               String warehouseId, String itemCode, String manufacturerName) {
+//        List<InventoryV2> inventory =
+//                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndManufacturerCodeAndBinClassIdAndStockTypeIdAndDeletionIndicatorOrderByInventoryIdDesc(
+//                        languageId,
+//                        companyCode,
+//                        plantId,
+//                        warehouseId,
+//                        itemCode,
+//                        manufacturerName,
+//                        1L,
+//                        1L,
+//                        0L
+//                );
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryForStockAdjustmentGroupByPackBarcode(
+                        companyCodeId,
+                        plantId,
+                        languageId,
+                        warehouseId,
+                        itemCode,
+                        1L,
+                        1L,
+                        manufacturerName);
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param referenceDocumentNo
+     * @param stockTypeId
+     * @return
+     */
+    public List<InventoryV2> getInventoryV2(String companyCode, String plantId, String languageId,
+                                            String warehouseId, String referenceDocumentNo, Long stockTypeId) {
+        List<InventoryV2> inventoryList =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndReferenceDocumentNoAndStockTypeIdAndDeletionIndicator(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        referenceDocumentNo,
+                        stockTypeId,
+                        0L);
+        log.info("Inventory - stock type id to be updated: " + inventoryList);
+        return inventoryList;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param referenceDocumentNo
+     * @param stockTypeId
+     * @return
+     */
+    public List<InventoryV2> getInventoryForInboundConfirmV2(String companyCode, String plantId, String languageId,
+                                                             String warehouseId, String referenceDocumentNo, Long stockTypeId) {
+        List<InventoryV2> inventoryList =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndReferenceDocumentNoAndStockTypeIdAndDeletionIndicator(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        referenceDocumentNo,
+                        stockTypeId,
+                        0L);
+        log.info("Inventory - stock type id to be updated: " + inventoryList);
+        if (inventoryList == null || inventoryList.isEmpty() || inventoryList.size() == 0) {
+            log.info("inventory null ---> c_id, plant_id, lang_id, wh_id, ref_doc_no, stockTypeId: " + companyCode + ", " + plantId + ", " + languageId + ", " + warehouseId + "," + referenceDocumentNo + ", " + stockTypeId);
+            return null;
+        }
+//        if (inventoryList != null) {
+//            for (InventoryV2 dbInventory : inventoryList) {
+//                InventoryV2 newInventory = new InventoryV2();
+//                newInventory.setInventoryId(System.currentTimeMillis());
+//                BeanUtils.copyProperties(dbInventory, newInventory, CommonUtils.getNullPropertyNames(dbInventory));
+//                newInventory.setStockTypeId(1L);
+//                String stockTypeDesc = getStockTypeDesc(companyCode,plantId,languageId,warehouseId,1L);
+//                dbInventory.setStockTypeDescription(stockTypeDesc);
+//                inventoryV2Repository.save(newInventory);
+//                log.info("Inventory Updated to StockTypeId 1");
+//            }
+//        }
+        return inventoryList;
+    }
+
+    /**
+     *
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param referenceDocumentNo
+     * @param stockTypeId
+     */
+//    public void updateInventoryStockTypeId(String companyCode, String plantId, String languageId,
+//                                           String warehouseId, String referenceDocumentNo, Long stockTypeId) {
+//        inventoryV2Repository.updateInventoryStockTypeId(warehouseId, companyCode, plantId, languageId, referenceDocumentNo, stockTypeId);
+//    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<InventoryV2> getInventoryForOrderMgmtV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                        String itemCode, Long binClassId, String storageBin, Long stockTypeId) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndBinClassIdAndStorageBinAndStockTypeIdAndDeletionIndicatorAndInventoryQuantityGreaterThanOrderByInventoryQuantityAscInventoryIdDesc(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        binClassId,
+                        storageBin,
+                        stockTypeId,
+                        0L,
+                        0D
+                );
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                 String itemCode, String manufacturerName, Long binClassId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryOml(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        manufacturerName,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementV2OrderByLevelId(String companyCodeId, String plantId, String languageId,
+                                                                               String warehouseId, String itemCode, String manufacturerName,
+                                                                               Long binClassId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryOmlOrderByLevelId(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        manufacturerName,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @param levelId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementV2GroupByLevelId(String companyCodeId, String plantId, String languageId,
+                                                                               String warehouseId, String itemCode, String manufacturerName,
+                                                                               Long binClassId, Long levelId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryOmlGroupByLevelId(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        manufacturerName,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId,
+                        levelId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stSecIds
+     * @return
+     */
+    public List<IInventory> getInventoryGroupByStorageBinV2(String companyCodeId, String plantId, String languageId,
+                                                            String warehouseId, String itemCode, List<String> stSecIds) {
+        List<IInventory> inventory = inventoryV2Repository.findInventoryGroupByStorageBinV2(companyCodeId, plantId, languageId, warehouseId, itemCode, stSecIds);
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryV2(String companyCode, String plantId, String languageId,
+                                      String warehouseId, String packBarcodes, String itemCode, String storageBin) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get(0));
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @param manufacturerName
+     * @return
+     */
+    public InventoryV2 getInventoryV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                      String packBarcodes, String itemCode, String storageBin, String manufacturerName) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndManufacturerNameAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        manufacturerName,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get(0));
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @param manufacturerName
+     * @return
+     */
+    public InventoryV2 getInventoryForQualityConfirmV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                                       String packBarcodes, String itemCode, String storageBin, String manufacturerName) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        manufacturerName,
+                        4L,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get(0));
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForPerpetualCountV2(String companyCode, String plantId, String languageId,
+                                                                String warehouseId, String itemCode, String manufacturerName) {
+        log.info("getInventory----------> : " + warehouseId + "," + manufacturerName + "," + itemCode + "," + plantId);
+//        List<InventoryV2> inventory =
+//                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicator(
+//                        languageId,
+//                        companyCode,
+//                        plantId,
+//                        warehouseId,
+//                        itemCode,
+//                        manufacturerName,
+//                        1L,
+//                        0L
+//                );
+
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryForPerpertual(
+                        companyCode,
+                        plantId,
+                        languageId,
+                        warehouseId,
+                        itemCode,
+//                        1L,
+                        manufacturerName);
+        if (inventory == null || inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.size());
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryForInhouseTransferV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                                        String packBarcodes, String itemCode, String manufacturerName, String storageBin) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndStorageBinAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        storageBin,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get(0));
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param storageBin
+     * @param storageSectionId
+     * @return
+     */
+    public InventoryV2 getInventoryForInhouseTransferV2(String companyCode, String plantId, String languageId, String warehouseId, String packBarcodes,
+                                                        String itemCode, String manufacturerName, String storageBin, String storageSectionId) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndStorageBinAndStorageSectionIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        storageBin,
+                        storageSectionId,
+                        0L
+                );
+        if (inventory == null) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory);
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param binClassId
+     * @param storageSectionId
+     * @return
+     */
+    public InventoryV2 getInventoryForImfInhouseTransferV2(String companyCode, String plantId, String languageId, String warehouseId, String packBarcodes,
+                                                           String itemCode, String manufacturerName, Long binClassId, String storageSectionId) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + binClassId);
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndBinClassIdAndStorageSectionIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        binClassId,
+                        storageSectionId,
+                        0L
+                );
+        if (inventory == null) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory);
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param storageBin
+     * @param batchSerialNumber
+     * @return
+     */
+    public InventoryV2 getInventoryForInboundConfirmV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                                       String packBarcodes, String itemCode, String manufacturerName, String storageBin, String batchSerialNumber) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerCodeAndStorageBinAndBatchSerialNumberAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        storageBin,
+                        batchSerialNumber,
+                        0L);
+        if (inventory != null) {
+            log.info("getInventory record----------> : " + inventory);
+            return inventory;
+        }
+        log.info("getInventory record----------> : " + inventory);
+        return null;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param storageBin
+     * @param batchSerialNumber
+     * @param storageSectionId
+     * @return
+     */
+    public InventoryV2 getInventoryForInboundConfirmV2(String companyCode, String plantId, String languageId, String warehouseId, String packBarcodes,
+                                                       String itemCode, String manufacturerName, String storageBin, String batchSerialNumber, String storageSectionId) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerCodeAndStorageBinAndBatchSerialNumberAndStorageSectionIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        storageBin,
+                        batchSerialNumber,
+                        storageSectionId,
+                        0L);
+        if (inventory != null) {
+            log.info("getInventory record----------> : " + inventory);
+            return inventory;
+        }
+        log.info("getInventory record----------> : " + inventory);
+        return null;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryForAllocationV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                                   String packBarcodes, String itemCode, String manufacturerName, String storageBin) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        List<InventoryV2> inventory =
+                inventoryV2Repository
+                        .findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndManufacturerNameAndDeletionIndicatorOrderByInventoryIdDesc(
+                                languageId,
+                                companyCode,
+                                plantId,
+                                warehouseId,
+                                packBarcodes,
+                                itemCode,
+                                storageBin,
+                                manufacturerName,
+                                0L
+                        );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get(0));
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param storageSectionIds
+     * @return
+     */
+    public List<InventoryV2> getInventoryForAdditionalBinsV2(String companyCode, String plantId, String languageId,
+                                                             String warehouseId, String itemCode, List<String> storageSectionIds) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndReferenceField10InAndBinClassIdAndInventoryQuantityGreaterThan(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageSectionIds,
+                        1L,
+                        0D
+                );
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryV2ForAdditionalBinsV2(String companyCode, String plantId, String languageId,
+                                                                  String warehouseId, String itemCode, String manufacturerName, Long binClassId) {
+//        List<InventoryV2> inventory =
+//                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndReferenceField10InAndBinClassIdAndInventoryQuantityGreaterThan(
+//                        languageId,
+//                        companyCode,
+//                        plantId,
+//                        warehouseId,
+//                        itemCode,
+//                        storageSectionIds,
+//                        1L,
+//                        0D
+//                );
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryForInventoryMovement(
+                companyCode, plantId, languageId, warehouseId, itemCode, binClassId, manufacturerName);
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param itemCode
+     * @param storageSectionIds
+     * @param stockTypeId
+     * @return
+     */
+    public List<InventoryV2> getInventoryForAdditionalBinsForOB2V2(String companyCode, String plantId, String languageId, String warehouseId,
+                                                                   String itemCode, List<String> storageSectionIds, Long stockTypeId) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndReferenceField10InAndStockTypeIdAndBinClassIdAndInventoryQuantityGreaterThan(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageSectionIds,
+                        stockTypeId,
+                        1L,
+                        0D
+                );
+
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param packBarcodes
+     * @param binClassId
+     * @return
+     */
+    public InventoryV2 getInventoryForStockAdjustmentDamageV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                              String itemCode, String packBarcodes, Long binClassId, String manufacturerName) {
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndPackBarcodesAndBinClassIdAndManufacturerNameAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        packBarcodes,
+                        binClassId,
+                        manufacturerName,
+                        0L
+                );
+        if (inventory != null) {
+            log.info("InventoryForStockAdjustmentDamageV2: " + inventory);
+            return inventory;
+        }
+        return null;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryByStorageBinV2(String companyCode, String plantId, String languageId, String warehouseId, String storageBin) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndStorageBinAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        storageBin,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param pickedPackCode
+     * @param refDocNumber
+     * @param manufacturerName
+     * @return
+     */
+    public InventoryV2 getInventoryForPickUpLine(String companyCode, String plantId, String languageId, String warehouseId,
+                                                 String itemCode, String pickedPackCode, String refDocNumber, String manufacturerName) {
+        InventoryV2 inventory = inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndPackBarcodesAndReferenceDocumentNoAndManufacturerNameAndDeletionIndicator(
+                languageId,
+                companyCode,
+                plantId,
+                warehouseId,
+                itemCode,
+                pickedPackCode,
+                refDocNumber,
+                manufacturerName,
+                0L);
+        if (inventory == null) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        return inventory;
+    }
+
+    /**
+     * @param itemCode
+     * @param binClassId
+     * @param warehouseId
+     * @return
+     */
+    public List<InventoryV2> getInventoryForPutawayHeader(String itemCode, String manufacturerName, Long binClassId,
+                                                          String companycode, String plantId, String languageId, String warehouseId) {
+        log.info("itm_code,c_id,plant_id,lang_id,wh_id,bin_cl_id,mfr_name: " + itemCode + ", " + companycode + ", " + plantId + ", " + languageId + ", " + warehouseId + ", " + binClassId + ", " + manufacturerName);
+        List<InventoryV2> stBinInventoryList =
+                inventoryV2Repository.findByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        companycode, plantId, languageId, warehouseId, itemCode, manufacturerName, binClassId, 0L);
+        if (stBinInventoryList == null || stBinInventoryList.isEmpty()) {
+            // Exception Log
+            createInventoryLog9(languageId, companycode, plantId, warehouseId, itemCode, manufacturerName, binClassId, "Inventory is null.");
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("StBin Inventory List : " + stBinInventoryList);
+        return stBinInventoryList;
+    }
+
+    /**
+     * @param searchInventory
+     * @return
+     * @throws ParseException
+     */
+    public List<InventoryV2> findInventoryV2(SearchInventoryV2 searchInventory)
+            throws ParseException {
+        InventoryV2Specification spec = new InventoryV2Specification(searchInventory);
+        List<InventoryV2> results = inventoryV2Repository.findAll(spec);
+        return results;
+    }
+
+    public List<IInventoryImpl> findInventoryNewV2(SearchInventoryV2 searchInventory)
+            throws ParseException {
+
+        log.info("SearchInventory Input: " + searchInventory);
+        if (searchInventory.getCompanyCodeId() == null || searchInventory.getCompanyCodeId().isEmpty()) {
+            searchInventory.setCompanyCodeId(null);
+        }
+        if (searchInventory.getPlantId() == null || searchInventory.getPlantId().isEmpty()) {
+            searchInventory.setPlantId(null);
+        }
+        if (searchInventory.getLanguageId() == null || searchInventory.getLanguageId().isEmpty()) {
+            searchInventory.setLanguageId(null);
+        }
+        if (searchInventory.getWarehouseId() == null || searchInventory.getWarehouseId().isEmpty()) {
+            searchInventory.setWarehouseId(null);
+        }
+        if (searchInventory.getReferenceDocumentNo() == null || searchInventory.getReferenceDocumentNo().isEmpty()) {
+            searchInventory.setReferenceDocumentNo(null);
+        }
+        if (searchInventory.getBarcodeId() == null || searchInventory.getBarcodeId().isEmpty()) {
+            searchInventory.setBarcodeId(null);
+        }
+        if (searchInventory.getManufacturerCode() == null || searchInventory.getManufacturerCode().isEmpty()) {
+            searchInventory.setManufacturerCode(null);
+        }
+        if (searchInventory.getManufacturerName() == null || searchInventory.getManufacturerName().isEmpty()) {
+            searchInventory.setManufacturerName(null);
+        }
+        if (searchInventory.getPackBarcodes() == null || searchInventory.getPackBarcodes().isEmpty()) {
+            searchInventory.setPackBarcodes(null);
+        }
+        if (searchInventory.getItemCode() == null || searchInventory.getItemCode().isEmpty()) {
+            searchInventory.setItemCode(null);
+        }
+        if (searchInventory.getStorageBin() == null || searchInventory.getStorageBin().isEmpty()) {
+            searchInventory.setStorageBin(null);
+        }
+        if (searchInventory.getStockTypeId() == null || searchInventory.getStockTypeId().isEmpty()) {
+            searchInventory.setStockTypeId(null);
+        }
+        if (searchInventory.getStorageSectionId() == null || searchInventory.getStorageSectionId().isEmpty()) {
+            searchInventory.setStorageSectionId(null);
+        }
+        if (searchInventory.getSpecialStockIndicatorId() == null || searchInventory.getSpecialStockIndicatorId().isEmpty()) {
+            searchInventory.setSpecialStockIndicatorId(null);
+        }
+        if (searchInventory.getLevelId() == null || searchInventory.getLevelId().isEmpty()) {
+            searchInventory.setLevelId(null);
+        }
+        if (searchInventory.getItemType() != null && searchInventory.getItemType().isEmpty()) {
+            searchInventory.setItemType(null);
+        }
+        if (searchInventory.getBinClassId() == null || searchInventory.getBinClassId().isEmpty()) {
+            searchInventory.setBinClassId(null);
+        }
+        if (searchInventory.getDescription() == null || searchInventory.getDescription().isEmpty()) {
+            searchInventory.setDescription(null);
+        }
+        if (searchInventory.getPartnerCode() == null || searchInventory.getPartnerCode().isEmpty()) {
+            searchInventory.setPartnerCode(null);
+        }
+
+
+        List<IInventoryImpl> results = inventoryV2Repository.findInventoryNew(
+                searchInventory.getCompanyCodeId(),
+                searchInventory.getLanguageId(),
+                searchInventory.getPlantId(),
+                searchInventory.getWarehouseId(),
+                searchInventory.getReferenceDocumentNo(),
+                searchInventory.getBarcodeId(),
+                searchInventory.getManufacturerCode(),
+                searchInventory.getManufacturerName(),
+                searchInventory.getPackBarcodes(),
+                searchInventory.getItemCode(),
+                searchInventory.getStorageBin(),
+                searchInventory.getDescription(),
+                searchInventory.getStockTypeId(),
+                searchInventory.getStorageSectionId(),
+                searchInventory.getLevelId(),
+                searchInventory.getPartnerCode(),
+                searchInventory.getSpecialStockIndicatorId(),
+                searchInventory.getItemType(),
+                searchInventory.getBinClassId());
+        log.info("Inventory results: " + results.size());
+        return results;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @param stockTypeId
+     * @param specialStockIndicatorId
+     * @param updateInventory
+     * @param loginUserID
+     * @return
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public InventoryV2 updateInventoryV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                         String packBarcodes, String itemCode, String manufacturerName,
+                                         String storageBin, Long stockTypeId, Long specialStockIndicatorId,
+                                         InventoryV2 updateInventory, String loginUserID)
+            throws IllegalAccessException, InvocationTargetException {
+        try {
+            InventoryV2 dbInventory = inventoryV2Repository.findTopByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndStorageBinAndStockTypeIdAndSpecialStockIndicatorIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                    companyCodeId, plantId, languageId, warehouseId, packBarcodes, itemCode, manufacturerName, storageBin, stockTypeId, specialStockIndicatorId, 0L);
+            log.info("Inventory for Update: " + dbInventory);
+            if (dbInventory != null) {
+                InventoryV2 newInventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventory, newInventory, CommonUtils.getNullPropertyNames(dbInventory));
+                BeanUtils.copyProperties(updateInventory, newInventory, CommonUtils.getNullPropertyNames(updateInventory));
+                if (newInventory.getStorageSectionId() == null) {
+                    newInventory.setStorageSectionId(newInventory.getReferenceField10());
+                }
+                newInventory.setUpdatedBy(loginUserID);
+                newInventory.setUpdatedOn(new Date());
+//                newInventory.setInventoryId(System.currentTimeMillis());
+                return inventoryV2Repository.save(newInventory);
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Exception : " + e);
+        }
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param barcodeId
+     * @param loginUserID
+     * @return
+     */
+    public void updateInventoryForBarcodeV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                            String itemCode, String manufacturerName, String barcodeId, String loginUserID) {
+        List<InventoryV2> dbInventoryList = inventoryV2Repository.findAllByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndDeletionIndicator(
+                companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, 0L);
+        log.info("Inventory for UpdateBarcodeId: " + dbInventoryList);
+        if (dbInventoryList != null && !dbInventoryList.isEmpty()) {
+            for (InventoryV2 dbInventory : dbInventoryList) {
+                dbInventory.setBarcodeId(barcodeId);
+                dbInventory.setUpdatedBy(loginUserID);
+                dbInventory.setUpdatedOn(new Date());
+                inventoryV2Repository.save(dbInventory);
+            }
+        }
+    }
+
+    /**
+     * @param newInventory
+     * @param loginUserID
+     * @return
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public InventoryV2 createInventoryV2(InventoryV2 newInventory, String loginUserID)
+            throws IllegalAccessException, InvocationTargetException {
+        try {
+            InventoryV2 dbInventory = new InventoryV2();
+            log.info("newInventory : " + newInventory);
+            BeanUtils.copyProperties(newInventory, dbInventory, CommonUtils.getNullPropertyNames(newInventory));
+            if (dbInventory.getStorageSectionId() == null) {
+                dbInventory.setStorageSectionId(dbInventory.getReferenceField10());
+            }
+            dbInventory.setDeletionIndicator(0L);
+            dbInventory.setCreatedBy(loginUserID);
+            dbInventory.setCreatedOn(new Date());
+//            dbInventory.setInventoryId(System.currentTimeMillis());
+            return inventoryV2Repository.save(dbInventory);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Exception : " + e);
+        }
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @return
+     */
+    public List<InventoryV2> getInventoryForDeleteV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                     String packBarcodes, String itemCode, String manufacturerName) {
+        List<InventoryV2> inventory =
+                inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        3L,
+                        0L
+                );
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @return
+     */
+    public InventoryV2 getInventoryForReversalV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                 String packBarcodes, String itemCode, String manufacturerName) {
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        manufacturerName,
+                        3L,
+                        0L
+                );
+//        log.info("Inventory: " + inventory);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForDelete(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                      String packBarcodes, String itemCode, String manufacturerName) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryForInventoryDelete(
+                        companyCodeId,
+                        plantId,
+                        languageId,
+                        warehouseId,
+                        itemCode,
+                        packBarcodes,
+                        3L,
+                        manufacturerName);
+        return inventory;
+    }
+
+    /**
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     */
+    public boolean deleteInventoryV2(String companyCodeId, String plantId, String languageId, String warehouseId, Long stockTypeId, Long specialStockIndicatorId,
+                                     String packBarcodes, String itemCode, String manufacturerName, String storageBin, String loginUserId) {
+        try {
+            List<InventoryV2> inventoryList = inventoryV2Repository.findAllByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndStorageBinAndStockTypeIdAndSpecialStockIndicatorIdAndDeletionIndicator(
+                    companyCodeId, plantId, languageId, warehouseId, packBarcodes, itemCode, manufacturerName, storageBin, stockTypeId, specialStockIndicatorId, 0L);
+            log.info("inventoryList for Delete: " + inventoryList);
+            if (inventoryList != null) {
+                for (InventoryV2 inventory : inventoryList) {
+                    inventory.setDeletionIndicator(1L);
+                    inventory.setUpdatedOn(new Date());
+                    inventory.setUpdatedBy(loginUserId);
+                    inventoryV2Repository.save(inventory);
+//                    inventoryV2Repository.delete(inventory);
+                    log.info("inventory deleted.");
+                }
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Error in deleting Id: " + e.toString());
+        }
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param grLine
+     * @return
+     */
+    public InventoryV2 deleteInventoryInvoiceCancellation(String companyCodeId, String plantId, String languageId,
+                                                          String warehouseId, GrLineV2 grLine) {
+        InventoryV2 dbInventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndManufacturerNameAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCodeId,
+                        plantId,
+                        warehouseId,
+                        "99999",
+                        grLine.getItemCode(),
+                        grLine.getManufacturerName(),
+                        3L,
+                        0L
+                );
+        log.info("Inventory - Cancellation : " + dbInventory);
+        InventoryV2 newInventory = new InventoryV2();
+        if (dbInventory != null) {
+            BeanUtils.copyProperties(dbInventory, newInventory, CommonUtils.getNullPropertyNames(dbInventory));
+            newInventory.setInventoryQuantity(round(dbInventory.getInventoryQuantity() - grLine.getGoodReceiptQty()));
+            newInventory.setReferenceField4(round(dbInventory.getReferenceField4() - grLine.getGoodReceiptQty()));
+            newInventory.setCreatedOn(new Date());
+//            newInventory.setInventoryId(System.currentTimeMillis());
+            inventoryV2Repository.save(newInventory);
+        }
+        return newInventory;
+    }
+
+    /**
+     * CountOfCBMValue
+     *
+     * @param itemCode
+     * @param partnerCode
+     * @return
+     */
+    public List<InventoryV2> getCountOfCbmValue(String itemCode, String partnerCode) {
+
+        List<InventoryV2> inventoryV2List =
+                inventoryV2Repository.findByItemCodeAndThreePLPartnerIdAndDeletionIndicator(itemCode, partnerCode, 0L);
+
+        Map<String, InventoryV2> latestInventoryMap = new HashMap<>();
+
+        for (InventoryV2 inventoryV2 : inventoryV2List) {
+
+            String key = inventoryV2.getCompanyCodeId() + "-" +
+                    inventoryV2.getPlantId() + "-" +
+                    inventoryV2.getLanguageId() + "-" +
+                    inventoryV2.getPackBarcodes() + "-" +
+                    inventoryV2.getWarehouseId() + "-" +
+                    inventoryV2.getPalletCode() + "-" +
+                    inventoryV2.getItemCode() + "-" +
+                    inventoryV2.getSpecialStockIndicatorId() + "-" +
+                    inventoryV2.getStorageBin();
+
+            if (inventoryV2.getInventoryId() > latestInventoryMap.get(key).getInventoryId()) {
+                latestInventoryMap.put(key, inventoryV2);
+            } else {
+                latestInventoryMap.put(key, inventoryV2);
+            }
+        }
+        List<InventoryV2> latestInventoryList = new ArrayList<>(latestInventoryMap.values());
+
+        return latestInventoryList;
+    }
+
+    //===========================================IndusMegaFood================================================
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageSectionId
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 imfInventoryTransferV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                              String packBarcodes, String itemCode, String storageSectionId, String storageBin) {
+        log.info("getInventory----------> : " + companyCode + "," + plantId + "," + languageId + "," + warehouseId + "," + packBarcodes + ","
+                + itemCode + "," + storageSectionId + "," + storageBin);
+        Optional<InventoryV2> inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageSectionIdAndBinClassIdAndStorageBinAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageSectionId,
+                        1L,
+                        storageBin,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get());
+        return inventory.get();
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param storageSectionId
+     * @return
+     */
+    public InventoryV2 imfInventoryTransferV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                              String itemCode, String storageSectionId) {
+        log.info("getInventory----------> : " + companyCode + "," + plantId + "," + languageId + "," + warehouseId + "," + itemCode + "," + storageSectionId);
+        Optional<InventoryV2> inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndItemCodeAndStorageSectionIdAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageSectionId,
+                        1L,
+                        0L
+                );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get());
+        return inventory.get();
+    }
+
+    /**
+     * IMF
+     *
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                    String itemCode, Long stockTypeId, Long binClassId) {
+
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryForIMFOrderManagement(companyCodeId, plantId, languageId, warehouseId, itemCode, binClassId, stockTypeId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementOrderByCtdOnV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                                String itemCode, Long stockTypeId, Long binClassId) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryIMFOmlOrderByCtdOnId(companyCodeId, plantId, languageId, warehouseId, itemCode, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventory> getInventoryForIMFOrderManagementByBatch(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                     String itemCode, Long stockTypeId, Long binClassId) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventory> inventory = inventoryV2Repository.findInventoryByBatchIMF(companyCodeId, plantId, languageId, warehouseId, binClassId, itemCode);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementGroupByBatch(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                              String itemCode, Long stockTypeId, Long binClassId) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryIMFOmlGroupByBatch(companyCodeId, plantId, languageId, warehouseId, itemCode, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementV2GroupByBatch(String companyCodeId, String plantId, String languageId,
+                                                                                String warehouseId, String itemCode,
+                                                                                Long binClassId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryIMFOmlGroupByBatch(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryForIMFAllocationV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                                      String packBarcodes, String itemCode, String storageBin) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        List<String> storageSectionIds = new ArrayList<>();
+        storageSectionIds.add("6");
+        storageSectionIds.add("7");
+        List<InventoryV2> inventory =
+                inventoryV2Repository
+                        .findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndStorageSectionIdNotInAndDeletionIndicatorOrderByInventoryIdDesc(
+                                languageId,
+                                companyCode,
+                                plantId,
+                                warehouseId,
+                                packBarcodes,
+                                itemCode,
+                                storageBin,
+                                storageSectionIds,
+                                0L
+                        );
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get(0));
+        return inventory.get(0);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementOrderByLevelIdV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                                  String itemCode, Long stockTypeId, Long binClassId) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id, mfr_name---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryIMFOmlOrderByLevelId(companyCodeId, plantId, languageId, warehouseId, itemCode, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventory> getInventoryForIMFOrderManagementGroupByLevelIdV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                              String itemCode, Long stockTypeId, Long binClassId) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventory> inventory = inventoryV2Repository.findIMFInventoryGroupByLevelId(companyCodeId, plantId, languageId, warehouseId, itemCode, stockTypeId, binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param levelId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementGroupByLevelIdV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                                  String itemCode, Long stockTypeId, Long binClassId, Long levelId) {
+        if (companyCodeId == null || plantId == null || languageId == null || warehouseId == null ||
+                itemCode == null || stockTypeId == null || binClassId == null) {
+            throw new BadRequestException("Parameter cannot be null: C_ID, PlantId, Lang_Id, WhId, itm_code, stockTypeId, bin_cl_id---> "
+                    + companyCodeId + ", " + plantId + ", " + languageId + "," + warehouseId + "," + itemCode + "," + stockTypeId + "," + binClassId);
+        }
+
+        List<IInventoryImpl> inventory = inventoryV2Repository.findInventoryIMFOmlGroupByLevelId(companyCodeId, plantId, languageId, warehouseId, itemCode, stockTypeId, binClassId, levelId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @param levelId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementV2GroupByLevelId(String companyCodeId, String plantId, String languageId,
+                                                                                  String warehouseId, String itemCode,
+                                                                                  Long binClassId, Long levelId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryIMFOmlGroupByLevelId(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId,
+                        levelId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param binClassId
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementV2(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                    String itemCode, Long binClassId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryIMFOml(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId);
+        return inventory;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param storageBin
+     * @param stockTypeId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForIMFOrderManagementV2OrderByLevelId(String companyCodeId, String plantId, String languageId,
+                                                                                  String warehouseId, String itemCode,
+                                                                                  Long binClassId, String storageBin, Long stockTypeId) {
+        List<IInventoryImpl> inventory =
+                inventoryV2Repository.findInventoryIMFOmlOrderByLevelId(
+                        companyCodeId,
+                        languageId,
+                        plantId,
+                        warehouseId,
+                        itemCode,
+                        storageBin,
+                        stockTypeId,
+                        binClassId);
+        return inventory;
+    }
+
+
+    /**
+     * @param companyCode
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param packBarcodes
+     * @param itemCode
+     * @param storageBin
+     * @param storageSectionId
+     * @return
+     */
+    public InventoryV2 getIMFInventoryV2(String companyCode, String plantId, String languageId, String warehouseId,
+                                         String packBarcodes, String itemCode, String storageBin, String storageSectionId) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        Optional<InventoryV2> inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndStorageBinAndStorageSectionIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        storageBin,
+                        storageSectionId,
+                        0L);
+        if (inventory.isEmpty()) {
+            log.error("---------Inventory is null-----------");
+            return null;
+        }
+        log.info("getInventory record----------> : " + inventory.get());
+        return inventory.get();
+    }
+
+
+    // Create_Inventory_From_Staging_Line
+    public void createInventory(StagingLineEntityV2 staging) {
+        Inventory inventory = new Inventory();
+        BeanUtils.copyProperties(staging, inventory, CommonUtils.getNullPropertyNames(staging));
+        inventory.setCompanyCodeId(staging.getCompanyCode());
+        // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+        inventory.setVariantCode(1L);
+        inventory.setVariantSubCode("1");
+        inventory.setStorageMethod("1");
+        inventory.setBatchSerialNumber("1");
+        inventory.setBatchSerialNumber(staging.getBatchSerialNumber());
+        inventory.setBinClassId(3L);
+
+        // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+        AuthToken authTokenForMastersService = authTokenService.getMastersServiceAuthToken();
+        StorageBin storageBin = mastersService.getStorageBin(staging.getWarehouseId(), 3L, authTokenForMastersService.getAccess_token());
+        inventory.setStorageBin(storageBin.getStorageBin());
+
+        List<IImbasicData1> imbasicdata1 = imbasicdata1Repository.findByItemCode(inventory.getItemCode());
+        if (imbasicdata1 != null && !imbasicdata1.isEmpty()) {
+            inventory.setReferenceField8(imbasicdata1.get(0).getDescription());
+            inventory.setReferenceField9(imbasicdata1.get(0).getManufacturePart());
+        }
+        if (storageBin != null) {
+            inventory.setReferenceField10(storageBin.getStorageSectionId());
+            inventory.setReferenceField5(storageBin.getAisleNumber());
+            inventory.setReferenceField6(storageBin.getShelfId());
+            inventory.setReferenceField7(storageBin.getRowId());
+        }
+
+        // STCK_TYP_ID
+        inventory.setStockTypeId(1L);
+        // SP_ST_IND_ID
+        inventory.setSpecialStockIndicatorId(1L);
+        // INV_QTY
+        inventory.setInventoryQuantity(staging.getInventoryQuantity());
+        // INV_UOM
+        inventory.setInventoryUom(staging.getOrderUom());
+        inventory.setCreatedBy(staging.getCreatedBy());
+        inventory.setCreatedOn(staging.getCreatedOn());
+        Inventory createdinventory = inventoryRepository.save(inventory);
+        log.info(GREEN + "created inventory : " + createdinventory);
+    }
+
+    // Create_Inventory
+    public InventoryV2 createInventoryNonCBMV2(StagingLineEntityV2 stagingLine) {
+
+        try {
+            InventoryV2 dbInventory = null;
+            String packparcode = stagingLine.getBatchSerialNumber();
+            if (stagingLine.getBatchSerialNumber() != null) {
+                dbInventory = inventoryV2Repository.findTopByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndPackBarcodesAndBinClassIdAndBatchSerialNumberAndDeletionIndicatorOrderByInventoryIdDesc(
+                        stagingLine.getCompanyCode(),
+                        stagingLine.getPlantId(),
+                        stagingLine.getLanguageId(),
+                        stagingLine.getWarehouseId(),
+                        stagingLine.getItemCode(),
+                        stagingLine.getManufacturerName(),
+                        packparcode, 3L, stagingLine.getBatchSerialNumber(), 0L);
+            } else {
+                dbInventory = inventoryV2Repository.findTopByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndPackBarcodesAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                        stagingLine.getCompanyCode(),
+                        stagingLine.getPlantId(),
+                        stagingLine.getLanguageId(),
+                        stagingLine.getWarehouseId(),
+                        stagingLine.getItemCode(),
+                        stagingLine.getManufacturerName(),
+                        "99999", 3L, 0L);
+            }
+
+            InventoryV2 createdinventory = null;
+
+            if (dbInventory != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+                inventory.setInventoryQuantity(dbInventory.getInventoryQuantity() + stagingLine.getInventoryQuantity());
+                log.info("Inventory Qty = inv_qty + gr_qty: " + dbInventory.getInventoryQuantity() + ", " + stagingLine.getInventoryQuantity());
+                Double totalQty = 0D;
+                if (inventory.getReferenceField4() != null) {
+                    totalQty = inventory.getReferenceField4() + stagingLine.getInventoryQuantity();
+                }
+                if (inventory.getReferenceField4() == null) {
+                    totalQty = stagingLine.getInventoryQuantity();
+                }
+                inventory.setReferenceField4(totalQty);
+                log.info("Total Inventory Qty : " + totalQty);
+                if (stagingLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(stagingLine.getBarcodeId());
+                }
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(stagingLine.getCompanyCode(), stagingLine.getPlantId(), stagingLine.getLanguageId(), stagingLine.getWarehouseId(), stagingLine.getItemCode());
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setBatchSerialNumber(stagingLine.getBatchSerialNumber());
+//                inventory.setManufacturerDate(stagingLine.getManufacturerDate());
+//                inventory.setExpiryDate(stagingLine.getExpiryDate());
+                inventory.setBusinessPartnerCode(stagingLine.getBusinessPartnerCode());
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+//                inventory.setInventoryId(System.currentTimeMillis());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("created inventory[Existing] : " + createdinventory);
+            }
+
+            if (dbInventory == null) {
+
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(stagingLine, inventory, CommonUtils.getNullPropertyNames(stagingLine));
+
+                inventory.setCompanyCodeId(stagingLine.getCompanyCode());
+
+                // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+                inventory.setVariantCode(1L);
+                inventory.setVariantSubCode("1");
+                inventory.setStorageMethod("1");
+                inventory.setBatchSerialNumber("1");
+                inventory.setBatchSerialNumber(stagingLine.getBatchSerialNumber());
+                inventory.setBinClassId(3L);
+                inventory.setDeletionIndicator(0L);
+                inventory.setManufacturerCode(stagingLine.getManufacturerName());
+                inventory.setManufacturerName(stagingLine.getManufacturerName());
+                inventory.setBatchSerialNumber(stagingLine.getBatchSerialNumber());
+//                inventory.setManufacturerDate(stagingLine.getManufacturerDate());
+//                inventory.setExpiryDate(stagingLine.getExpiryDate());
+
+                if (stagingLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(stagingLine.getBarcodeId());
+                }
+
+                // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+                AuthToken authTokenForMastersService = authTokenService.getMastersServiceAuthToken();
+                StorageBinV2 storageBin = storageBinService.getStorageBinByBinClassIdV2(
+                        stagingLine.getWarehouseId(), 3L,
+                        stagingLine.getCompanyCode(),
+                        stagingLine.getPlantId(),
+                        stagingLine.getLanguageId());
+                log.info("storageBin: " + storageBin);
+                inventory.setStorageBin(storageBin.getStorageBin());
+
+                ImBasicData imBasicData = new ImBasicData();
+                imBasicData.setCompanyCodeId(stagingLine.getCompanyCode());
+                imBasicData.setPlantId(stagingLine.getPlantId());
+                imBasicData.setLanguageId(stagingLine.getLanguageId());
+                imBasicData.setWarehouseId(stagingLine.getWarehouseId());
+                imBasicData.setItemCode(stagingLine.getItemCode());
+                imBasicData.setManufacturerName(stagingLine.getManufacturerName());
+                ImBasicData1 itemCodeCapacityCheck = mastersService.getImBasicData1ByItemCodeV2(imBasicData, authTokenForMastersService.getAccess_token());
+                log.info("ImbasicData1 : " + itemCodeCapacityCheck);
+
+                if (itemCodeCapacityCheck != null) {
+                    inventory.setReferenceField8(itemCodeCapacityCheck.getDescription());
+                    inventory.setReferenceField9(itemCodeCapacityCheck.getManufacturerPartNo());
+                    inventory.setDescription(itemCodeCapacityCheck.getDescription());
+                }
+                if (storageBin != null) {
+                    inventory.setStorageSectionId(storageBin.getStorageSectionId());
+                    inventory.setReferenceField10(storageBin.getStorageSectionId());
+                    inventory.setReferenceField5(storageBin.getAisleNumber());
+                    inventory.setReferenceField6(storageBin.getShelfId());
+                    inventory.setReferenceField7(storageBin.getRowId());
+                    inventory.setLevelId(String.valueOf(storageBin.getFloorId()));
+                }
+
+                // STCK_TYP_ID
+                inventory.setStockTypeId(1L);
+                String stockTypeDesc = getStockTypeDesc(stagingLine.getCompanyCode(), stagingLine.getPlantId(), stagingLine.getLanguageId(), stagingLine.getWarehouseId(), 1L);
+                inventory.setStockTypeDescription(stockTypeDesc);
+
+                // SP_ST_IND_ID
+                inventory.setSpecialStockIndicatorId(1L);
+
+                // INV_QTY
+                if (dbInventory != null) {
+                    inventory.setInventoryQuantity(round(dbInventory.getInventoryQuantity() + stagingLine.getInventoryQuantity()));
+                    log.info("Inventory Qty = inv_qty + gr_qty: " + dbInventory.getInventoryQuantity() + ", " + stagingLine.getInventoryQuantity());
+                    inventory.setReferenceField4(round(inventory.getInventoryQuantity()));
+                    log.info("Inventory Total Qty: " + inventory.getInventoryQuantity());   //Allocated Qty is always 0 for BinClassId 3
+                }
+                if (dbInventory == null) {
+                    inventory.setInventoryQuantity(round(stagingLine.getInventoryQuantity()));
+                    log.info("Inventory Qty = gr_qty: " + stagingLine.getInventoryQuantity());
+                    inventory.setReferenceField4(round(inventory.getInventoryQuantity()));
+                    log.info("Inventory Total Qty: " + inventory.getInventoryQuantity());   //Allocated Qty is always 0 for BinClassId 3
+                }
+                //packbarcode
+                if (stagingLine.getBatchSerialNumber() != null) {
+                    inventory.setPackBarcodes(stagingLine.getBatchSerialNumber());
+                } else {
+                    inventory.setPackBarcodes("99999");
+                }
+
+                // INV_UOM
+                inventory.setInventoryUom(stagingLine.getOrderUom());
+                inventory.setCreatedBy(stagingLine.getCreatedBy());
+
+                //V2 Code (remaining all fields copied already using beanUtils.copyProperties)
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+                inventory.setBusinessPartnerCode(stagingLine.getBusinessPartnerCode());
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(stagingLine.getCompanyCode(), stagingLine.getPlantId(), stagingLine.getLanguageId(), stagingLine.getWarehouseId(), stagingLine.getItemCode());
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setCreatedOn(new Date());
+                inventory.setUpdatedOn(new Date());
+//                inventory.setInventoryId(System.currentTimeMillis());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("created inventory : " + createdinventory);
+            }
+
+            return createdinventory;
+        } catch (Exception e) {
+            // Exception Log
+//            createGrLineLog7(stagingLine, e.toString());
+
+            e.printStackTrace();
+            throw new BadRequestException("Exception : " + e);
+        }
+    }
+
+    // Update_Inventory_GrLine_Create
+    public void updateInventory(AddGrLineV2 grLineV2, String loginUserID) {
+
+        InventoryV2 dbInventory = inventoryV2Repository.findTopByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndPackBarcodesAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+<<<<<<< HEAD
+                grLineV2.getCompanyCode(),
+                grLineV2.getPlantId(),
+                grLineV2.getLanguageId(),
+                grLineV2.getWarehouseId(),
+                grLineV2.getItemCode(),
+                grLineV2.getManufacturerName(),
+                "99999", 3L, 0L);
+=======
+                    grLineV2.getCompanyCode(),
+                    grLineV2.getPlantId(),
+                    grLineV2.getLanguageId(),
+                    grLineV2.getWarehouseId(),
+                    grLineV2.getItemCode(),
+                    grLineV2.getManufacturerName(),
+                    "99999", 3L, 0L);
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+
+        InventoryV2 createdinventory = null;
+        if (dbInventory != null) {
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+            inventory.setInventoryQuantity(dbInventory.getInventoryQuantity() - grLineV2.getInventoryQuantity());
+            log.info("Inventory Qty = inv_qty - gr_qty: " + dbInventory.getInventoryQuantity() + ", " + grLineV2.getInventoryQuantity());
+            Double totalQty = 0D;
+            if (inventory.getReferenceField4() != null) {
+                totalQty = inventory.getReferenceField4() - grLineV2.getInventoryQuantity();
+            }
+            if (inventory.getReferenceField4() == null) {
+                totalQty = grLineV2.getInventoryQuantity();
+            }
+            inventory.setReferenceField4(totalQty);
+            log.info("Total Inventory Qty : " + totalQty);
+            if (grLineV2.getBarcodeId() != null) {
+                inventory.setBarcodeId(grLineV2.getBarcodeId());
+            }
+            if (inventory.getItemType() == null) {
+                IKeyValuePair itemType = getItemTypeAndDesc(grLineV2.getCompanyCode(), grLineV2.getPlantId(),
+                        grLineV2.getLanguageId(), grLineV2.getWarehouseId(), grLineV2.getItemCode());
+                if (itemType != null) {
+                    inventory.setItemType(itemType.getItemType());
+                    inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                }
+            }
+            inventory.setBusinessPartnerCode(grLineV2.getBusinessPartnerCode());
+            inventory.setReferenceDocumentNo(grLineV2.getRefDocNumber());
+            inventory.setReferenceOrderNo(grLineV2.getRefDocNumber());
+            inventory.setCreatedOn(dbInventory.getCreatedOn());
+            inventory.setUpdatedOn(new Date());
+//                inventory.setInventoryId(System.currentTimeMillis());
+            createdinventory = inventoryV2Repository.save(inventory);
+            log.info("created inventory[Existing] : " + createdinventory);
+        }
+        // Create_Inventory
+<<<<<<< HEAD
+//        if (dbInventory != null) {
+=======
+//        if(dbInventory != null) {
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+//            inventoryRepository.updateInventory(grLineV2.getCompanyCode(), grLineV2.getLanguageId(), grLineV2.getPlantId(),
+//                    grLineV2.getWarehouseId(), grLineV2.getItemCode());
+//            log.info("---------------------->Inventory Update Successfully -----------> ");
+//            InventoryV2 newInventory = new InventoryV2();
+//            BeanUtils.copyProperties(dbInventory, newInventory, CommonUtils.getNullPropertyNames(dbInventory));
+//            newInventory.setCreatedBy(loginUserID);
+//            newInventory.setCreatedOn(new Date());
+//            newInventory.setBinClassId(7L);
+////            newInventory.setInventoryId(System.currentTimeMillis());
+//            inventoryV2Repository.save(newInventory);
+//            log.info(" -------------------------> Inventory Created Successfully --------------------------->");
+//        }
+
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(grLineV2, inventory, CommonUtils.getNullPropertyNames(grLineV2));
+
+            inventory.setCompanyCodeId(grLineV2.getCompanyCode());
+
+            // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+            inventory.setVariantCode(1L);
+            inventory.setVariantSubCode("1");
+            inventory.setStorageMethod("1");
+            inventory.setBatchSerialNumber("1");
+            inventory.setBinClassId(7L);
+            inventory.setDeletionIndicator(0L);
+            inventory.setManufacturerCode(grLineV2.getManufacturerCode());
+            inventory.setManufacturerName(grLineV2.getManufacturerName());
+            inventory.setBatchSerialNumber(grLineV2.getBatchSerialNumber());
+//                inventory.setManufacturerDate(stagingLine.getManufacturerDate());
+//                inventory.setExpiryDate(stagingLine.getExpiryDate());
+
+            if (grLineV2.getBarcodeId() != null) {
+                inventory.setBarcodeId(grLineV2.getBarcodeId());
+            }
+
+            // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+            AuthToken authTokenForMastersService = authTokenService.getMastersServiceAuthToken();
+            StorageBinV2 storageBin = storageBinService.getStorageBinByBinClassIdV2(
+                    grLineV2.getWarehouseId(), 7L,
+                    grLineV2.getCompanyCode(),
+                    grLineV2.getPlantId(),
+                    grLineV2.getLanguageId());
+            log.info("storageBin: " + storageBin);
+            inventory.setStorageBin(storageBin.getStorageBin());
+
+            ImBasicData imBasicData = new ImBasicData();
+            imBasicData.setCompanyCodeId(grLineV2.getCompanyCode());
+            imBasicData.setPlantId(grLineV2.getPlantId());
+            imBasicData.setLanguageId(grLineV2.getLanguageId());
+            imBasicData.setWarehouseId(grLineV2.getWarehouseId());
+            imBasicData.setItemCode(grLineV2.getItemCode());
+            imBasicData.setManufacturerName(grLineV2.getManufacturerName());
+            ImBasicData1 itemCodeCapacityCheck = mastersService.getImBasicData1ByItemCodeV2(imBasicData, authTokenForMastersService.getAccess_token());
+            log.info("ImbasicData1 : " + itemCodeCapacityCheck);
+
+            if (itemCodeCapacityCheck != null) {
+                inventory.setReferenceField8(itemCodeCapacityCheck.getDescription());
+                inventory.setReferenceField9(itemCodeCapacityCheck.getManufacturerPartNo());
+                inventory.setDescription(itemCodeCapacityCheck.getDescription());
+            }
+            if (storageBin != null) {
+                inventory.setReferenceField10(storageBin.getStorageSectionId());
+                inventory.setReferenceField5(storageBin.getAisleNumber());
+                inventory.setReferenceField6(storageBin.getShelfId());
+                inventory.setReferenceField7(storageBin.getRowId());
+                inventory.setLevelId(String.valueOf(storageBin.getFloorId()));
+            }
+
+            // STCK_TYP_ID
+            inventory.setStockTypeId(1L);
+            String stockTypeDesc = getStockTypeDesc(grLineV2.getCompanyCode(), grLineV2.getPlantId(),
+                    grLineV2.getLanguageId(), grLineV2.getWarehouseId(), 1L);
+            inventory.setStockTypeDescription(stockTypeDesc);
+
+            // SP_ST_IND_ID
+            inventory.setSpecialStockIndicatorId(1L);
+
+//            // INV_QTY
+//            if (dbInventory != null) {
+//                inventory.setInventoryQuantity(round(dbInventory.getInventoryQuantity() + grLineV2.getInventoryQuantity()));
+//                log.info("Inventory Qty = inv_qty + gr_qty: " + dbInventory.getInventoryQuantity() + ", " + grLineV2.getInventoryQuantity());
+//                inventory.setReferenceField4(round(inventory.getInventoryQuantity()));
+//                log.info("Inventory Total Qty: " + inventory.getInventoryQuantity());   //Allocated Qty is always 0 for BinClassId 3
+//            }
+                inventory.setInventoryQuantity(round(grLineV2.getInventoryQuantity()));
+                log.info("Inventory Qty = gr_qty: " + grLineV2.getInventoryQuantity());
+                inventory.setReferenceField4(round(inventory.getInventoryQuantity()));
+                log.info("Inventory Total Qty: " + inventory.getInventoryQuantity());   //Allocated Qty is always 0 for BinClassId 3
+            //packbarcode
+            if (grLineV2.getBatchSerialNumber() != null) {
+                inventory.setPackBarcodes(grLineV2.getBatchSerialNumber());
+            } else {
+                inventory.setPackBarcodes("99999");
+            }
+
+            // INV_UOM
+            inventory.setInventoryUom(grLineV2.getOrderUom());
+            inventory.setCreatedBy(grLineV2.getCreatedBy());
+
+            //V2 Code (remaining all fields copied already using beanUtils.copyProperties)
+            inventory.setReferenceDocumentNo(grLineV2.getRefDocNumber());
+            inventory.setReferenceOrderNo(grLineV2.getRefDocNumber());
+            inventory.setBusinessPartnerCode(grLineV2.getBusinessPartnerCode());
+            if (inventory.getItemType() == null) {
+                IKeyValuePair itemType = getItemTypeAndDesc(grLineV2.getCompanyCode(), grLineV2.getPlantId(),
+                        grLineV2.getLanguageId(), grLineV2.getWarehouseId(), grLineV2.getItemCode());
+                if (itemType != null) {
+                    inventory.setItemType(itemType.getItemType());
+                    inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                }
+            }
+            inventory.setCreatedOn(new Date());
+            inventory.setUpdatedOn(new Date());
+//                inventory.setInventoryId(System.currentTimeMillis());
+            createdinventory = inventoryV2Repository.save(inventory);
+            log.info("created inventory : " + createdinventory);
+<<<<<<< HEAD
+    }
+
+=======
+        }
+    
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+    // Update_Inventory_For_Mobile_App
+    public void updateInventoryForMobileApp(StagingLineEntityV2 grLineV2, String loginUserID) {
+
+        InventoryV2 dbInventory = null;
+        String packparcode = grLineV2.getBatchSerialNumber();
+        if (grLineV2.getBatchSerialNumber() != null) {
+            dbInventory = inventoryV2Repository.findTopByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndPackBarcodesAndBinClassIdAndBatchSerialNumberAndDeletionIndicatorOrderByInventoryIdDesc(
+                    grLineV2.getCompanyCode(),
+                    grLineV2.getPlantId(),
+                    grLineV2.getLanguageId(),
+                    grLineV2.getWarehouseId(),
+                    grLineV2.getItemCode(),
+                    grLineV2.getManufacturerName(),
+                    packparcode, 3L, grLineV2.getBatchSerialNumber(), 0L);
+        } else {
+            dbInventory = inventoryV2Repository.findTopByCompanyCodeIdAndPlantIdAndLanguageIdAndWarehouseIdAndItemCodeAndManufacturerNameAndPackBarcodesAndBinClassIdAndDeletionIndicatorOrderByInventoryIdDesc(
+                    grLineV2.getCompanyCode(),
+                    grLineV2.getPlantId(),
+                    grLineV2.getLanguageId(),
+                    grLineV2.getWarehouseId(),
+                    grLineV2.getItemCode(),
+                    grLineV2.getManufacturerName(),
+                    "99999", 3L, 0L);
+        }
+
+//        // Update_Quantity
+//        if(dbInventory != null) {
+//            dbInventory.setInventoryQuantity(0.0);
+//            inventoryRepository.save(dbInventory);
+//        }
+        // Create_Inventory
+<<<<<<< HEAD
+        if (dbInventory != null) {
+=======
+        if(dbInventory != null) {
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+            inventoryRepository.updateInventory(grLineV2.getCompanyCode(), grLineV2.getLanguageId(), grLineV2.getPlantId(),
+                    grLineV2.getWarehouseId(), grLineV2.getItemCode());
+            log.info("---------------------->Inventory Update Successfully -----------> ");
+            InventoryV2 newInventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, newInventory, CommonUtils.getNullPropertyNames(dbInventory));
+            newInventory.setCreatedBy(loginUserID);
+            newInventory.setCreatedOn(new Date());
+            newInventory.setBinClassId(7L);
+            newInventory.setInventoryId(System.currentTimeMillis());
+            inventoryV2Repository.save(newInventory);
+            log.info(" -------------------------> Inventory Created Successfully --------------------------->");
+        }
+<<<<<<< HEAD
+        if (dbInventory == null) {
+=======
+        if(dbInventory == null) {
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+            log.info("--------------------------------Inventory Doesn't exist--------------------------------");
+        }
+    }
+
+    @Retryable(value = {SQLException.class, SQLServerException.class, CannotAcquireLockException.class, LockAcquisitionException.class, UnexpectedRollbackException.class}, maxAttempts = 2, backoff = @Backoff(delay = 2000))
+    public List<IInventoryImpl> getStockCountInventoryV4(String companyCode, String plantId, String languageId,
+                                                         String warehouseId, ExecuteStockCountInput executeStockCountInput) throws Exception {
+        try {
+            log.info("getInventory----------> : " + executeStockCountInput);
+<<<<<<< HEAD
+            if (executeStockCountInput.getBinClassId() == null || executeStockCountInput.getBinClassId().isEmpty()) {
+                List<Long> binClassIds = Arrays.asList(1L, 7L);
+                executeStockCountInput.setBinClassId(binClassIds);
+            }
+            if (executeStockCountInput.getItemCode() != null && executeStockCountInput.getItemCode().isEmpty()) {
+                executeStockCountInput.setItemCode(null);
+            }
+            if (executeStockCountInput.getManufacturerName() != null && executeStockCountInput.getManufacturerName().isEmpty()) {
+                executeStockCountInput.setManufacturerName(null);
+            }
+            if (executeStockCountInput.getStockTypeId() != null && executeStockCountInput.getStockTypeId().isEmpty()) {
+                executeStockCountInput.setStockTypeId(null);
+            }
+            if (executeStockCountInput.getStorageSectionId() != null && executeStockCountInput.getStorageSectionId().isEmpty()) {
+                executeStockCountInput.setStorageSectionId(null);
+            }
+            if (executeStockCountInput.getStorageBin() != null && executeStockCountInput.getStorageBin().isEmpty()) {
+                executeStockCountInput.setStorageBin(null);
+            }
+            if (executeStockCountInput.getBarcodeId() != null && executeStockCountInput.getBarcodeId().isEmpty()) {
+=======
+            if(executeStockCountInput.getBinClassId() == null || executeStockCountInput.getBinClassId().isEmpty()) {
+                List<Long> binClassIds = Arrays.asList(1L,7L);
+                executeStockCountInput.setBinClassId(binClassIds);
+            }
+            if(executeStockCountInput.getItemCode() != null && executeStockCountInput.getItemCode().isEmpty()) {
+                executeStockCountInput.setItemCode(null);
+            }
+            if(executeStockCountInput.getManufacturerName() != null && executeStockCountInput.getManufacturerName().isEmpty()) {
+                executeStockCountInput.setManufacturerName(null);
+            }
+            if(executeStockCountInput.getStockTypeId() != null && executeStockCountInput.getStockTypeId().isEmpty()) {
+                executeStockCountInput.setStockTypeId(null);
+            }
+            if(executeStockCountInput.getStorageSectionId() != null && executeStockCountInput.getStorageSectionId().isEmpty()) {
+                executeStockCountInput.setStorageSectionId(null);
+            }
+            if(executeStockCountInput.getStorageBin() != null && executeStockCountInput.getStorageBin().isEmpty()) {
+                executeStockCountInput.setStorageBin(null);
+            }
+            if(executeStockCountInput.getBarcodeId() != null && executeStockCountInput.getBarcodeId().isEmpty()) {
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+                executeStockCountInput.setBarcodeId(null);
+            }
+            List<IInventoryImpl> inventory =
+                    inventoryV2Repository.findStockCountInventory(
+                            companyCode, plantId, languageId, warehouseId,
+                            executeStockCountInput.getItemCode(),
+                            executeStockCountInput.getManufacturerName(),
+                            executeStockCountInput.getBinClassId(),
+                            executeStockCountInput.getStockTypeId(),
+                            executeStockCountInput.getStorageSectionId(),
+                            executeStockCountInput.getStorageBin(),
+                            executeStockCountInput.getBarcodeId());
+            log.info("getInventory record----------> : " + inventory.size());
+            return inventory;
+        } catch (Exception e) {
+            log.error("Exception while Inventory Get : " + e.toString());
+            throw e;
+        }
+    }
+<<<<<<< HEAD
+
+=======
+    
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+
+    //====================================================JainCord=========================================================
+    public List<IInventoryImpl> getInventoryForOrderManagementV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                 String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.findInventoryForOrderManagementV4(companyCodeId, plantId, languageId, warehouseId, itemCode, manufacturerName, binClassId, stockTypeId);
+    }
+
+    public List<IInventoryImpl> getInventoryForOrderManagementOrderByCreatedOnV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                                 String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        List<IInventoryImpl> inventoryList = inventoryV2Repository.getOMLInventoryV4OrderByCreatedOn(companyCodeId, plantId, languageId, warehouseId, null, null,
+                itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId);
+        if (inventoryList == null || inventoryList.isEmpty()) {
+            inventoryList = inventoryV2Repository.getOMLInventoryV4OrderByCreatedOn(companyCodeId, plantId, languageId, warehouseId, null, null,
+                    itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId);
+        }
+        return inventoryList;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementOrderByExpiryDateV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                                  String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.getOMLInventoryV4OrderByExpiryDate(companyCodeId, plantId, languageId, warehouseId, null, null,
+                itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementOrderByLevelIdV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                               String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.getOMLInventoryV4OrderByLevelId(companyCodeId, plantId, languageId, warehouseId, null, null,
+                itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementOrderByBatchV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                             String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.getOMLInventoryV4OrderByBatch(companyCodeId, plantId, languageId, warehouseId, null, null,
+                itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventory> getInventoryForOrderManagementByBatchV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                    String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.findInventoryByBatchV4(companyCodeId, plantId, languageId, warehouseId, binClassId,
+                stockTypeId, itemCode, manufacturerName);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param stockTypeId
+     * @param binClassId
+     * @param manufacturerName
+     * @return
+     */
+    public List<IInventory> getInventoryForOrderManagementGroupByLevelIdV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                           String itemCode, Long stockTypeId, Long binClassId, String manufacturerName) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.findInventoryGroupByLevelIdV4(companyCodeId, plantId, languageId, warehouseId, itemCode,
+                manufacturerName, stockTypeId, binClassId);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param stockTypeId
+     * @param binClassId
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryForOrderManagementLevelIdV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                                                        String itemCode, String manufacturerName, Long stockTypeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + binClassId);
+        return inventoryV2Repository.getOMLInventoryLevelIdV4(companyCodeId, plantId, languageId, warehouseId, null, null,
+                itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param barcodeId
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                      String itemCode, String manufacturerName, String barcodeId, String storageBin) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + barcodeId + "|" + storageBin);
+        IInventoryImpl dbInventory = inventoryV2Repository.getInventoryV4(companyCodeId, plantId, languageId, warehouseId, barcodeId, null,
+                itemCode, manufacturerName, PACK_BARCODE, storageBin);
+<<<<<<< HEAD
+        if (dbInventory != null) {
+=======
+        if(dbInventory != null) {
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+            return inventory;
+        }
+        return null;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param barcodeId
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryV4(String companyCodeId, String plantId, String languageId, String warehouseId, String itemCode, String manufacturerName,
+                                      String barcodeId, String storageBin, Long binClassId, Long stockTypeId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + barcodeId + "|" + storageBin + "|" + binClassId + "|" + stockTypeId);
+        IInventoryImpl dbInventory = inventoryV2Repository.getInventoryV4(companyCodeId, plantId, languageId, warehouseId, barcodeId, null,
+                itemCode, manufacturerName, PACK_BARCODE, binClassId, stockTypeId, storageBin);
+        if(dbInventory != null) {
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+            return inventory;
+        }
+        return null;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param barcodeId
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getInventoryV4(String companyCodeId, String plantId, String languageId, String warehouseId, String itemCode, String manufacturerName,
+                                      String barcodeId, String storageBin, Long stockTypeId) {
+        log.info("B1|" + companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + barcodeId + "|" + storageBin + "|" + stockTypeId);
+        IInventoryImpl dbInventory = inventoryV2Repository.getInventoryV4(companyCodeId, plantId, languageId, warehouseId, barcodeId, null,
+                itemCode, manufacturerName, PACK_BARCODE, stockTypeId, storageBin);
+        if(dbInventory != null) {
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+            return inventory;
+        }
+        return null;
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param storageBin
+     * @return
+     */
+    public List<IInventoryImpl> getInventoryV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                               String itemCode, String manufacturerName, String storageBin) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + storageBin);
+        return inventoryV2Repository.getInventoryV4(companyCodeId, plantId, languageId, warehouseId,
+                itemCode, manufacturerName, PACK_BARCODE, storageBin);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param barcodeId
+<<<<<<< HEAD
+     * @return
+     */
+    public InventoryV2 getOutboundInventoryV5(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                              String itemCode, String manufacturerName, String barcodeId, Long binClassId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + barcodeId   + "|" + binClassId );
+        IInventoryImpl dbInventory = inventoryV2Repository.getOutboundInventoryV4(companyCodeId, plantId, languageId, warehouseId, barcodeId, null,
+                itemCode, manufacturerName, PACK_BARCODE, null, binClassId);
+        log.info("OutboundInventory : " + dbInventory);
+        if (dbInventory != null) {
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+            return inventory;
+        }
+        return null;
+    }
+
+
+    /**
+     *
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param itemCode
+     * @param manufacturerName
+     * @param barcodeId
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+     * @param storageBin
+     * @return
+     */
+    public InventoryV2 getOutboundInventoryV4(String companyCodeId, String plantId, String languageId, String warehouseId,
+                                              String itemCode, String manufacturerName, String barcodeId, String storageBin) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + itemCode + "|" + manufacturerName + "|" + barcodeId + "|" + storageBin);
+        IInventoryImpl dbInventory = inventoryV2Repository.getOutboundInventoryV4(companyCodeId, plantId, languageId, warehouseId, barcodeId, null,
+<<<<<<< HEAD
+                itemCode, manufacturerName, PACK_BARCODE, storageBin, null);
+=======
+                itemCode, manufacturerName, PACK_BARCODE, storageBin);
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+        log.info("OutboundInventory : " + dbInventory);
+        if (dbInventory != null) {
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+            return inventory;
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param palletId
+     * @return
+     */
+    public List<IInventoryImpl> getOutboundInventoryV4(String companyCodeId, String plantId, String languageId,
+                                                       String warehouseId, String palletId) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + palletId);
+        return inventoryV2Repository.getOutboundInventoryV4(companyCodeId, plantId, languageId, warehouseId, PACK_BARCODE, palletId);
+    }
+
+    /**
+     * @param companyCodeId
+     * @param plantId
+     * @param languageId
+     * @param warehouseId
+     * @param storageBin
+     * @return
+     */
+    public Double getInventoryByStorageBinV4(String companyCodeId, String plantId, String languageId, String warehouseId, String storageBin) {
+        log.info(companyCodeId + "|" + plantId + "|" + languageId + "|" + warehouseId + "|" + storageBin);
+        return inventoryV2Repository.getInventoryBinStatusV4(companyCodeId, plantId, languageId, warehouseId, storageBin);
+    }
+    
+    //===========================================Inventory_ExceptionLog================================================
+    private void createInventoryLog9(String languageId, String companyCodeId, String plantId, String warehouseId,
+                                     String itemCode, String manufacturerName, Long binClassId, String error) {
+
+        ErrorLog errorLog = new ErrorLog();
+        errorLog.setOrderTypeId(itemCode);
+        errorLog.setOrderDate(new Date());
+        errorLog.setLanguageId(languageId);
+        errorLog.setCompanyCodeId(companyCodeId);
+        errorLog.setPlantId(plantId);
+        errorLog.setWarehouseId(warehouseId);
+        errorLog.setReferenceField1(itemCode);
+        errorLog.setReferenceField2(manufacturerName);
+        errorLog.setReferenceField3(String.valueOf(binClassId));
+        errorLog.setErrorMessage(error);
+        errorLog.setCreatedBy("MSD_API");
+        errorLog.setCreatedOn(new Date());
+        exceptionLogRepo.save(errorLog);
+    }
+
+
+    public InventoryV2 getInventoryForInboundConfirmV3(String companyCode, String plantId, String languageId, String warehouseId,
+                                                       String packBarcodes, String itemCode, String barcodeId, String manufacturerName,
+                                                       String storageBin, String batchSerialNumber) {
+        log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+        InventoryV2 inventory =
+                inventoryV2Repository.findTopByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndBarcodeIdAndManufacturerCodeAndStorageBinAndBatchSerialNumberAndDeletionIndicatorOrderByInventoryIdDesc(
+                        languageId,
+                        companyCode,
+                        plantId,
+                        warehouseId,
+                        packBarcodes,
+                        itemCode,
+                        barcodeId,
+                        manufacturerName,
+                        storageBin,
+                        batchSerialNumber,
+                        0L);
+        if (inventory != null) {
+            log.info("getInventory record----------> : " + inventory);
+            return inventory;
+        }
+        log.info("getInventory record----------> : " + inventory);
+        return null;
+    }
+
+    public InventoryV2 getInventoryV3(String companyCode, String plantId, String languageId, String warehouseId,
+                                      String packBarcodes, String itemCode, String barcodeId, String manufacturerName, String storageBin) {
+        try {
+            log.info("getInventory----------> : " + warehouseId + "," + packBarcodes + "," + itemCode + "," + storageBin);
+            List<InventoryV2> inventory =
+                    inventoryV2Repository.findByLanguageIdAndCompanyCodeIdAndPlantIdAndWarehouseIdAndPackBarcodesAndItemCodeAndBarcodeIdAndManufacturerNameAndStorageBinAndDeletionIndicatorOrderByInventoryIdDesc(
+                            languageId,
+                            companyCode,
+                            plantId,
+                            warehouseId,
+                            packBarcodes,
+                            itemCode,
+                            barcodeId,
+                            manufacturerName,
+                            storageBin,
+                            0L
+                    );
+            if (inventory.isEmpty()) {
+                log.error("---------Inventory is null-----------");
+                return null;
+            }
+            log.info("getInventory record----------> : " + inventory.get(0));
+            return inventory.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Error While Inventory Get : " + e);
+        }
+    }
+
+
+
+    //==================================================================================================================================
+
+    /**
+     *
+     * @param stagingLine
+     * @param loginUserId
+     */
+    @Transactional
+    public void createInventoryNonCBMStagingLineV2(StagingLineEntityV2 stagingLine, String loginUserId) throws Exception {
+
+        String companyCode = stagingLine.getCompanyCode();
+        String plantId = stagingLine.getPlantId();
+        String languageId = stagingLine.getLanguageId();
+        String warehouseId = stagingLine.getWarehouseId();
+        String barCodeId = stagingLine.getBarcodeId();
+        String itemCode = stagingLine.getItemCode();
+        String manufacturerName = stagingLine.getManufacturerName();
+        try {
+            InventoryV2 createdinventory = null;
+            InventoryV2 dbInventory = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, null, 3L, 1L);
+            if (dbInventory != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+
+                Double INV_QTY = getQuantity(dbInventory.getInventoryQuantity());
+                Double GR_QTY = getQuantity(stagingLine.getOrderQty());
+
+                log.info("Before - B3-Inventory - INV_QTY,TOT_QTY,OrderQty: {}, {}, {}, {}", INV_QTY, dbInventory.getReferenceField4(), GR_QTY);
+                INV_QTY = round(INV_QTY + GR_QTY);
+
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);
+
+                if (stagingLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(stagingLine.getBarcodeId());
+                }
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+                inventory.setUpdatedBy(loginUserId);
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("BinClassId 3 created inventory[Existing] : {}", createdinventory);
+            }
+
+            if (dbInventory == null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(stagingLine, inventory, CommonUtils.getNullPropertyNames(stagingLine));
+                inventory.setCompanyCodeId(companyCode);
+
+                // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+                inventory.setVariantCode(1L);
+                inventory.setVariantSubCode("1");
+                inventory.setStorageMethod("1");
+                if (stagingLine.getBatchSerialNumber() != null) {
+                    inventory.setBatchSerialNumber(stagingLine.getBatchSerialNumber());
+                    inventory.setPackBarcodes(stagingLine.getBatchSerialNumber());
+                } else {
+                    inventory.setBatchSerialNumber("1");
+                    inventory.setPackBarcodes(PACK_BARCODE);
+                }
+                inventory.setBinClassId(3L);
+                inventory.setDeletionIndicator(0L);
+                inventory.setReferenceField8(stagingLine.getItemDescription());
+                inventory.setReferenceField9(stagingLine.getManufacturerName());
+                inventory.setManufacturerCode(stagingLine.getManufacturerName());
+                inventory.setDescription(stagingLine.getItemDescription());
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+
+<<<<<<< HEAD
+                log.info("StorageBin get and set from Master -------------BinClassId ----> " + 3L);
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+                // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+                StorageBinV2 storageBin = storageBinService.getStorageBinByBinClassIdV2(warehouseId, 3L, companyCode, plantId, languageId);
+                log.info("storageBin: {}", storageBin);
+
+                if (storageBin != null) {
+                    inventory.setStorageBin(storageBin.getStorageBin());
+                    inventory.setReferenceField10(storageBin.getStorageSectionId());
+                    inventory.setStorageSectionId(storageBin.getStorageSectionId());
+                    inventory.setReferenceField5(storageBin.getAisleNumber());
+                    inventory.setReferenceField6(storageBin.getShelfId());
+                    inventory.setReferenceField7(storageBin.getRowId());
+                    inventory.setLevelId(String.valueOf(storageBin.getFloorId()));
+                }
+
+                // STCK_TYP_ID
+                inventory.setStockTypeId(1L);
+                String stockTypeDesc = getStockTypeDesc(companyCode, plantId, languageId, warehouseId, 1L);
+                inventory.setStockTypeDescription(stockTypeDesc);
+
+                // SP_ST_IND_ID
+                inventory.setSpecialStockIndicatorId(1L);
+<<<<<<< HEAD
+                inventory.setPalletId(stagingLine.getPalletId());
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+
+                // INV_QTY
+                double INV_QTY = round(stagingLine.getOrderQty());
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setReferenceField4(INV_QTY);      //Allocated Qty is zero for bin Class Id 3
+                log.info("New - Inventory - INV_QTY,TOT_QTY: {}", INV_QTY);
+
+                // INV_UOM
+                inventory.setInventoryUom(stagingLine.getOrderUom());
+                inventory.setCreatedBy(loginUserId);
+                inventory.setUpdatedBy(loginUserId);
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+
+                inventory.setCreatedOn(new Date());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("B3 created inventory : {}", createdinventory);
+            }
+        } catch (Exception e) {
+            // Exception Log
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * @param grLine
+     * @param loginUserId
+     */
+    public void createInventoryNonCBMGrLineV2(AddGrLineV2 grLine, String loginUserId) throws Exception {
+
+        String companyCode = grLine.getCompanyCode();
+        String plantId = grLine.getPlantId();
+        String languageId = grLine.getLanguageId();
+        String warehouseId = grLine.getWarehouseId();
+        String barCodeId = grLine.getBarcodeId();
+        String itemCode = grLine.getItemCode();
+        String manufacturerName = grLine.getManufacturerName();
+<<<<<<< HEAD
+        String palletId = grLine.getPalletId();
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+        try {
+            InventoryV2 createdinventory = null;
+            InventoryV2 dbInventory = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, null, 3L, 1L);
+            if (dbInventory != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+
+                Double INV_QTY = getQuantity(dbInventory.getInventoryQuantity());
+                Double GR_QTY = getQuantity(grLine.getGoodReceiptQty());
+
+                log.info("Before - B3-Inventory - INV_QTY,TOT_QTY,GrQty: {}, {}, {}", INV_QTY, dbInventory.getReferenceField4(), GR_QTY);
+                INV_QTY = INV_QTY - GR_QTY;
+                INV_QTY = INV_QTY < 0 ? 0 : round(INV_QTY);
+
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);
+<<<<<<< HEAD
+                inventory.setPalletId(palletId);
+=======
+>>>>>>> 81dc64bb940937a238631ec1ef8d3af347b8ec9e
+                log.info("After - B3-Inventory - INV_QTY,TOT_QTY: {}, {}", INV_QTY, inventory.getReferenceField4());
+
+                if (grLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(grLine.getBarcodeId());
+                }
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setReferenceDocumentNo(grLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(grLine.getRefDocNumber());
+                inventory.setUpdatedBy(loginUserId);
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("BinClassId 3 created inventory[Existing] - reduced : {}", createdinventory);
+            }
+
+            log.info("BinClassID 7 create/Update Initiated---->");
+            InventoryV2 dbInventoryBinClassId7 = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, null, 7L, 1L);
+            if (dbInventoryBinClassId7 != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventoryBinClassId7, inventory, CommonUtils.getNullPropertyNames(dbInventoryBinClassId7));
+
+                Double INV_QTY = getQuantity(dbInventoryBinClassId7.getInventoryQuantity());
+                Double ALLOC_QTY = getQuantity(dbInventoryBinClassId7.getAllocatedQuantity());
+                Double GR_QTY = getQuantity(grLine.getGoodReceiptQty());
+
+                log.info("Before - B7-Inventory - INV_QTY,ALLOC_QTY,TOT_QTY,GrQty: {}, {}, {}, {}", INV_QTY, ALLOC_QTY, dbInventory.getReferenceField4(), GR_QTY);
+                INV_QTY = round(INV_QTY + GR_QTY);
+                Double TOT_QTY = INV_QTY + round(ALLOC_QTY);
+
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(ALLOC_QTY);
+                inventory.setReferenceField4(TOT_QTY);
+                log.info("After - B7-Inventory - INV_QTY,ALLOC_QTY,TOT_QTY: {}, {}, {}", INV_QTY, ALLOC_QTY, TOT_QTY);
+
+                if (grLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(grLine.getBarcodeId());
+                }
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setReferenceDocumentNo(grLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(grLine.getRefDocNumber());
+                inventory.setUpdatedBy(loginUserId);
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("BinClassId 7 created inventory[Existing] - reduced : {}", createdinventory);
+            }
+            if (dbInventoryBinClassId7 == null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(grLine, inventory, CommonUtils.getNullPropertyNames(grLine));
+                inventory.setCompanyCodeId(companyCode);
+
+                // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+                inventory.setVariantCode(1L);
+                inventory.setVariantSubCode("1");
+                inventory.setStorageMethod("1");
+                if (grLine.getBatchSerialNumber() != null) {
+                    inventory.setBatchSerialNumber(grLine.getBatchSerialNumber());
+                    inventory.setPackBarcodes(grLine.getBatchSerialNumber());
+                } else {
+                    inventory.setBatchSerialNumber("1");
+                    inventory.setPackBarcodes(PACK_BARCODE);
+                }
+                inventory.setBinClassId(3L);
+                inventory.setDeletionIndicator(0L);
+                inventory.setReferenceField8(grLine.getItemDescription());
+                inventory.setReferenceField9(grLine.getManufacturerName());
+                inventory.setManufacturerCode(grLine.getManufacturerName());
+                inventory.setDescription(grLine.getItemDescription());
+                inventory.setReferenceDocumentNo(grLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(grLine.getRefDocNumber());
+
+                // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+                StorageBinV2 storageBin = storageBinService.getStorageBinByBinClassIdV2(warehouseId, 7L, companyCode, plantId, languageId);
+                log.info("storageBin: {}", storageBin);
+
+                if (storageBin != null) {
+                    inventory.setStorageBin(storageBin.getStorageBin());
+                    inventory.setReferenceField10(storageBin.getStorageSectionId());
+                    inventory.setStorageSectionId(storageBin.getStorageSectionId());
+                    inventory.setReferenceField5(storageBin.getAisleNumber());
+                    inventory.setReferenceField6(storageBin.getShelfId());
+                    inventory.setReferenceField7(storageBin.getRowId());
+                    inventory.setLevelId(String.valueOf(storageBin.getFloorId()));
+                }
+
+                // STCK_TYP_ID
+                inventory.setStockTypeId(1L);
+                String stockTypeDesc = getStockTypeDesc(companyCode, plantId, languageId, warehouseId, 1L);
+                inventory.setStockTypeDescription(stockTypeDesc);
+
+                // SP_ST_IND_ID
+                inventory.setSpecialStockIndicatorId(1L);
+
+                // INV_QTY
+                double INV_QTY = round(grLine.getGoodReceiptQty());
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);      //Allocated Qty is zero for bin Class Id 3
+                log.info("New - Inventory - INV_QTY,TOT_QTY: {}", INV_QTY);
+
+                // INV_UOM
+                inventory.setInventoryUom(grLine.getOrderUom());
+                inventory.setCreatedBy(loginUserId);
+                inventory.setUpdatedBy(loginUserId);
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+
+                inventory.setCreatedOn(new Date());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("B7-created inventory : {}", createdinventory);
+            }
+        } catch (Exception e) {
+            // Exception Log
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     *
+     * @param stagingLine
+     * @param loginUserId
+     * @throws Exception
+     */
+    public void createInventoryNonCBMGrLineV2(StagingLineEntityV2 stagingLine, String loginUserId) throws Exception {
+
+        String companyCode = stagingLine.getCompanyCode();
+        String plantId = stagingLine.getPlantId();
+        String languageId = stagingLine.getLanguageId();
+        String warehouseId = stagingLine.getWarehouseId();
+        String barCodeId = stagingLine.getBarcodeId();
+        String itemCode = stagingLine.getItemCode();
+        String manufacturerName = stagingLine.getManufacturerName();
+        try {
+            InventoryV2 createdinventory = null;
+            InventoryV2 dbInventory = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, null, 3L, 1L);
+            if (dbInventory != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+
+                Double INV_QTY = getQuantity(dbInventory.getInventoryQuantity());
+                Double GR_QTY = getQuantity(stagingLine.getOrderQty());
+
+                log.info("Before - B3-Inventory - INV_QTY,TOT_QTY,GrQty: {}, {}, {}", INV_QTY, dbInventory.getReferenceField4(), GR_QTY);
+                INV_QTY = INV_QTY - GR_QTY;
+                INV_QTY = INV_QTY < 0 ? 0 : round(INV_QTY);
+
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);
+                log.info("After - B3-Inventory - INV_QTY,TOT_QTY: {}, {}", INV_QTY, inventory.getReferenceField4());
+
+                if (stagingLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(stagingLine.getBarcodeId());
+                }
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+                inventory.setUpdatedBy(loginUserId);
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("BinClassId 3 created inventory[Existing] - reduced : {}", createdinventory);
+            }
+
+            log.info("BinClassID 7 create/Update Initiated---->");
+            InventoryV2 dbInventoryBinClassId7 = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, null, 7L, 1L);
+            if (dbInventoryBinClassId7 != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventoryBinClassId7, inventory, CommonUtils.getNullPropertyNames(dbInventoryBinClassId7));
+
+                Double INV_QTY = getQuantity(dbInventoryBinClassId7.getInventoryQuantity());
+                Double ALLOC_QTY = getQuantity(dbInventoryBinClassId7.getAllocatedQuantity());
+                Double GR_QTY = getQuantity(stagingLine.getOrderQty());
+
+                log.info("Before - B7-Inventory - INV_QTY,ALLOC_QTY,TOT_QTY,GrQty: {}, {}, {}, {}", INV_QTY, ALLOC_QTY, dbInventory.getReferenceField4(), GR_QTY);
+                INV_QTY = round(INV_QTY + GR_QTY);
+                Double TOT_QTY = INV_QTY + round(ALLOC_QTY);
+
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(ALLOC_QTY);
+                inventory.setReferenceField4(TOT_QTY);
+                log.info("After - B7-Inventory - INV_QTY,ALLOC_QTY,TOT_QTY: {}, {}, {}", INV_QTY, ALLOC_QTY, TOT_QTY);
+
+                if (stagingLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(stagingLine.getBarcodeId());
+                }
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+                inventory.setUpdatedBy(loginUserId);
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("BinClassId 7 created inventory[Existing] - reduced : {}", createdinventory);
+            }
+            if (dbInventoryBinClassId7 == null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(stagingLine, inventory, CommonUtils.getNullPropertyNames(stagingLine));
+                inventory.setCompanyCodeId(companyCode);
+
+                // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+                inventory.setVariantCode(1L);
+                inventory.setVariantSubCode("1");
+                inventory.setStorageMethod("1");
+                if (stagingLine.getBatchSerialNumber() != null) {
+                    inventory.setBatchSerialNumber(stagingLine.getBatchSerialNumber());
+                    inventory.setPackBarcodes(stagingLine.getBatchSerialNumber());
+                } else {
+                    inventory.setBatchSerialNumber("1");
+                    inventory.setPackBarcodes(PACK_BARCODE);
+                }
+                inventory.setBinClassId(3L);
+                inventory.setDeletionIndicator(0L);
+                inventory.setReferenceField8(stagingLine.getItemDescription());
+                inventory.setReferenceField9(stagingLine.getManufacturerName());
+                inventory.setManufacturerCode(stagingLine.getManufacturerName());
+                inventory.setDescription(stagingLine.getItemDescription());
+                inventory.setReferenceDocumentNo(stagingLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(stagingLine.getRefDocNumber());
+
+                // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+                StorageBinV2 storageBin = storageBinService.getStorageBinByBinClassIdV2(warehouseId, 7L, companyCode, plantId, languageId);
+                log.info("storageBin: {}", storageBin);
+
+                if (storageBin != null) {
+                    inventory.setStorageBin(storageBin.getStorageBin());
+                    inventory.setReferenceField10(storageBin.getStorageSectionId());
+                    inventory.setStorageSectionId(storageBin.getStorageSectionId());
+                    inventory.setReferenceField5(storageBin.getAisleNumber());
+                    inventory.setReferenceField6(storageBin.getShelfId());
+                    inventory.setReferenceField7(storageBin.getRowId());
+                    inventory.setLevelId(String.valueOf(storageBin.getFloorId()));
+                }
+
+                // STCK_TYP_ID
+                inventory.setStockTypeId(1L);
+                String stockTypeDesc = getStockTypeDesc(companyCode, plantId, languageId, warehouseId, 1L);
+                inventory.setStockTypeDescription(stockTypeDesc);
+
+                // SP_ST_IND_ID
+                inventory.setSpecialStockIndicatorId(1L);
+
+                // INV_QTY
+                double INV_QTY = round(stagingLine.getOrderQty());
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);      //Allocated Qty is zero for bin Class Id 3
+                log.info("New - Inventory - INV_QTY,TOT_QTY: {}", INV_QTY);
+
+                // INV_UOM
+                inventory.setInventoryUom(stagingLine.getOrderUom());
+                inventory.setCreatedBy(loginUserId);
+                inventory.setUpdatedBy(loginUserId);
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+
+                inventory.setCreatedOn(new Date());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("B7-created inventory : {}", createdinventory);
+            }
+        } catch (Exception e) {
+            // Exception Log
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * @param putAwayLine
+     * @param loginUserId
+     * @return
+     * @throws Exception
+     */
+    public InventoryV2 createInventoryNonCBMPutAwayLineV2(PutAwayLineV2 putAwayLine, String loginUserId) throws Exception {
+
+        String companyCode = putAwayLine.getCompanyCode();
+        String plantId = putAwayLine.getPlantId();
+        String languageId = putAwayLine.getLanguageId();
+        String warehouseId = putAwayLine.getWarehouseId();
+        String barCodeId = putAwayLine.getBarcodeId();
+        String itemCode = putAwayLine.getItemCode();
+        String manufacturerName = putAwayLine.getManufacturerName();
+        try {
+            InventoryV2 createdinventory = null;
+            InventoryV2 dbInventory = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, null, 3L, 1L);
+            if (dbInventory != null) {
+                InventoryV2 inventory = new InventoryV2();
+                BeanUtils.copyProperties(dbInventory, inventory, CommonUtils.getNullPropertyNames(dbInventory));
+
+                Double INV_QTY = getQuantity(dbInventory.getInventoryQuantity());
+                Double GR_QTY = getQuantity(putAwayLine.getPutawayConfirmedQty());
+
+                log.info("Before - B3-Inventory - INV_QTY,TOT_QTY,GrQty: {}, {}, {}", INV_QTY, dbInventory.getReferenceField4(), GR_QTY);
+                INV_QTY = INV_QTY - GR_QTY;
+                INV_QTY = INV_QTY < 0 ? 0 : round(INV_QTY);
+
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);
+                log.info("After - B3-Inventory - INV_QTY,TOT_QTY: {}, {}", INV_QTY, inventory.getReferenceField4());
+
+                if (putAwayLine.getBarcodeId() != null) {
+                    inventory.setBarcodeId(putAwayLine.getBarcodeId());
+                }
+
+                if (inventory.getItemType() == null) {
+                    IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                    if (itemType != null) {
+                        inventory.setItemType(itemType.getItemType());
+                        inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                    }
+                }
+                inventory.setReferenceDocumentNo(putAwayLine.getRefDocNumber());
+                inventory.setReferenceOrderNo(putAwayLine.getRefDocNumber());
+                inventory.setUpdatedBy(loginUserId);
+                inventory.setCreatedOn(dbInventory.getCreatedOn());
+                inventory.setUpdatedOn(new Date());
+                createdinventory = inventoryV2Repository.save(inventory);
+                log.info("BinClassId 3 created inventory[Existing] - reduced : {}", createdinventory);
+            }
+
+            log.info("BinClassID 1 create/Update Initiated---->");
+            InventoryV2 dbInventoryBinClassId1 = getInventoryV4(companyCode, plantId, languageId, warehouseId, itemCode, manufacturerName, barCodeId, putAwayLine.getConfirmedStorageBin(), 1L);
+            InventoryV2 inventory = new InventoryV2();
+            BeanUtils.copyProperties(putAwayLine, inventory, CommonUtils.getNullPropertyNames(putAwayLine));
+            inventory.setCompanyCodeId(companyCode);
+
+            // VAR_ID, VAR_SUB_ID, STR_MTD, STR_NO ---> Hard coded as '1'
+            inventory.setVariantCode(1L);
+            inventory.setVariantSubCode("1");
+            inventory.setStorageMethod("1");
+            inventory.setBatchSerialNumber("1");
+            inventory.setPackBarcodes(PACK_BARCODE);
+            inventory.setDeletionIndicator(0L);
+            inventory.setReferenceField8(putAwayLine.getDescription());
+            inventory.setReferenceField9(putAwayLine.getManufacturerName());
+            inventory.setManufacturerCode(putAwayLine.getManufacturerName());
+            inventory.setDescription(putAwayLine.getDescription());
+            inventory.setReferenceDocumentNo(putAwayLine.getRefDocNumber());
+            inventory.setReferenceOrderNo(putAwayLine.getRefDocNumber());
+
+            // ST_BIN ---Pass WH_ID/BIN_CL_ID=3 in STORAGEBIN table and fetch ST_BIN value and update
+            StorageBinV2 storageBin = storageBinService.getStorageBinV2(companyCode, plantId, languageId, warehouseId, putAwayLine.getConfirmedStorageBin());
+            log.info("storageBin: {}", storageBin);
+
+            if (storageBin != null) {
+                inventory.setStorageBin(storageBin.getStorageBin());
+                inventory.setBinClassId(storageBin.getBinClassId());
+                inventory.setReferenceField10(storageBin.getStorageSectionId());
+                inventory.setStorageSectionId(storageBin.getStorageSectionId());
+                inventory.setReferenceField5(storageBin.getAisleNumber());
+                inventory.setReferenceField6(storageBin.getShelfId());
+                inventory.setReferenceField7(storageBin.getRowId());
+                inventory.setLevelId(String.valueOf(storageBin.getFloorId()));
+            }
+
+            // STCK_TYP_ID
+            inventory.setStockTypeId(1L);
+            String stockTypeDesc = getStockTypeDesc(companyCode, plantId, languageId, warehouseId, 1L);
+            inventory.setStockTypeDescription(stockTypeDesc);
+
+            // SP_ST_IND_ID
+            inventory.setSpecialStockIndicatorId(1L);
+            double PA_QTY = getQuantity(putAwayLine.getPutawayConfirmedQty());
+            if(dbInventoryBinClassId1 == null) {
+                // INV_QTY
+                double INV_QTY = round(PA_QTY);
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(0D);
+                inventory.setReferenceField4(INV_QTY);      //Allocated Qty is zero for newInventory
+                log.info("B1 New - Inventory - INV_QTY,TOT_QTY: {}", INV_QTY);
+            } else {
+                double INV_QTY = getQuantity(dbInventoryBinClassId1.getInventoryQuantity());
+                double ALLOC_QTY = getQuantity(dbInventoryBinClassId1.getAllocatedQuantity());
+                INV_QTY = INV_QTY + PA_QTY;
+                double TOT_QTY = INV_QTY + ALLOC_QTY;
+                inventory.setInventoryQuantity(INV_QTY);
+                inventory.setAllocatedQuantity(ALLOC_QTY);
+                inventory.setReferenceField4(TOT_QTY);
+                log.info("B1 - Updated Inventory - INV_QTY,ALLOC_QTY,TOT_QTY: {},{},{}", INV_QTY, ALLOC_QTY, TOT_QTY);
+            }
+
+            // INV_UOM
+            inventory.setInventoryUom(putAwayLine.getPutAwayUom());
+            inventory.setCreatedBy(loginUserId);
+            inventory.setUpdatedBy(loginUserId);
+
+            if (inventory.getItemType() == null) {
+                IKeyValuePair itemType = getItemTypeAndDesc(companyCode, plantId, languageId, warehouseId, itemCode);
+                if (itemType != null) {
+                    inventory.setItemType(itemType.getItemType());
+                    inventory.setItemTypeDescription(itemType.getItemTypeDescription());
+                }
+            }
+
+            inventory.setCreatedOn(new Date());
+            inventory.setUpdatedOn(new Date());
+            createdinventory = inventoryV2Repository.save(inventory);
+            log.info("B1-created inventory : {}", createdinventory);
+            return createdinventory;
+        } catch (Exception e) {
+            // Exception Log
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+}

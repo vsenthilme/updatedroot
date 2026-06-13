@@ -1,0 +1,469 @@
+import { SelectionModel } from '@angular/cdk/collections';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { Subscription, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CommonService } from 'src/app/common-service/common-service.service';
+import { AuthService } from 'src/app/core/core';
+import { PickingService } from '../../Outbound/picking/picking.service';
+import { ReportsService } from '../reports.service';
+import { StocksampleService } from '../stocksamplereport/stocksample.service';
+import { Table } from 'primeng/table';
+import { LevelService } from '../../other-setup/level/level.service';
+import { FloorService } from '../../other-setup/floor/floor.service';
+
+@Component({
+  selector: 'app-picking-report-users',
+  templateUrl: './picking-report-users.component.html',
+  styleUrls: ['./picking-report-users.component.scss']
+})
+export class PickingReportUsersComponent implements OnInit {
+  screenid=3167;
+  inbound: any[] = [];
+  selectedinbound : any[] = [];
+  @ViewChild('inboundTag') inboundTag: Table | any;
+  isShowDiv = false;
+  table = false;
+  fullscreen = false;
+  search = true;
+  back = false;
+
+  searhform = this.fb.group({
+    companyCodeId:[[this.auth.companyId],],
+    plantId:[[this.auth.plantId],],
+    languageId:[[this.auth.languageId],],
+    warehouseId:[[this.auth.warehouseId],],
+    itemCode: [],
+    itemCodeFE:[],
+    refDocNumber: [],
+    outboundOrderTypeId: [],
+    pickedStorageBin:[],
+    storageSectionId:[],
+    toPickConfirmedOn:[],
+    fromPickConfirmedOn:[],
+    manufacturerName:[],
+    statusId:[],
+    levelId:[],
+  });
+
+  showFloatingButtons: any;
+  toggle = true;
+  public icon = 'expand_more';
+  showFiller = false;
+
+ // displayedColumns: string[] = [ 'statusId', 'refDocNumber','referenceField1', 'lineNumber', 'itemCode', 'description', 'pickedPackCode', 'proposedStorageBin','assignedPickerId','partnerCode', 'pickConfirmQty', 'pickupConfirmedOn', 'pickupCreatedOn', 'leadTime'];
+
+  //wms demo
+  displayedColumns: string[] = [ 'statusId', 'refDocNumber','referenceField1', 'lineNumber', 'itemCode', 'description', 'pickedPackCode', 'proposedStorageBin','assignedPickerId','partnerCode', 'pickConfirmQty', 'pickupConfirmedOn'];
+  sub = new Subscription();
+  ELEMENT_DATA: any[] = [];
+StatusList: any[] = [];
+
+
+  constructor(public dialog: MatDialog,
+    private service: StocksampleService,
+    private http: HttpClient,
+    // private cas: CommonApiService,
+    private fb: FormBuilder,
+    public toastr: ToastrService,
+    private router: Router,
+    private reportService: ReportsService,
+    private floor: FloorService,
+    private spin: NgxSpinnerService,
+    public cs: CommonService,
+    private pickingService: PickingService,
+    public auth: AuthService) { 
+
+      this.StatusList = [
+      //  {value: 48, label: '48 - Picking'},
+        {value: 50, label: '50 - Picked'},
+        {value: 51, label: '51 -Picker Denial'},
+       // {value: 59, label: '59 - Delivered'},
+    ];
+
+    }
+  routeto(url: any, id: any) {
+    sessionStorage.setItem('crrentmenu', id);
+    this.router.navigate([url]);
+  }
+  animal: string | undefined;
+  // applyFilter(event: Event) {
+  //   const filterValue = (event.target as HTMLInputElement).value;
+
+  //   this.dataSource.filter = filterValue.trim().toLowerCase();
+
+  //   if (this.dataSource.paginator) {
+  //     this.dataSource.paginator.firstPage();
+  //   }
+  // }
+  selectedCompany:any[]=[];
+  selectedplant:any[]=[];
+  selectedwarehouse:any[]=[];
+  multiSelectorderList:any[] = []
+
+cols: any[] = [
+  { header: 'Company', field: 'companyDescription', format: 'normal', showFooter: false  },
+  { header: 'Plant', field: 'plantDescription', format: 'normal', showFooter: false  },
+  { header: 'Warehouse', field: 'warehouseDescription', format: 'normal', showFooter: false  },
+  { header: 'Status', field: 'statusDescription', format: 'normal', showFooter: false  },
+  { header: 'Order No', field: 'refDocNumber', format: 'normal', showFooter: false  },
+  { header: 'Order Type', field: 'referenceDocumentType', format: 'normal', showFooter: false  },
+  { header: 'Pickup No', field: 'pickupNumber', format: 'normal', showFooter: false  },
+  { header: 'Line No', field: 'lineNumber', format: 'normal', showFooter: false },
+  { header: 'Mfr Name', field: 'manufacturerName', format: 'normal', showFooter: false },
+  { header: 'Part No', field: 'itemCode', format: 'normal', showFooter: false },
+  { header: 'Description', field: 'description', format: 'normal', showFooter: false  },
+  { header: 'Batch Serial Number', field: 'batchSerialNumber', format: 'normal', showFooter: false  },
+  { header: 'Barcode Id', field: 'partnerItemBarcode', format: 'normal', showFooter: false  },
+  { header: 'Bin Location', field: 'pickedStorageBin', format: 'normal', showFooter: false  },
+  { header: 'Level Id', field: 'levelId', format: 'normal', showFooter: false  },
+  { header: 'Picker', field: 'assignedPickerId', format: 'normal', showFooter: false  },
+  { header: 'Charge Value', field: 'pickCbm', format: 'normal', showFooter: false  },
+  { header: 'Store', field: 'partnerCode', format: 'normal', showFooter: false  },
+  { header: 'Order Qty', field: 'allocatedQty', format: 'normal', showFooter: true  },
+  { header: 'Pick To Qty', field: 'pickConfirmQty', format: 'normal', showFooter: true  },
+  { header: 'Variance', field: 'varianceQuantity', format: 'normal', showFooter: true  },
+  { header: 'Assigned On', field: 'pickupCreatedOn', format: 'date', showFooter: false  },
+  { header: 'Picked On', field: 'pickupUpdatedOn', format: 'date', showFooter: false  }
+];
+
+calculateFooterTotal(field: string): number {
+  let total = 0;
+  this.inbound.forEach(item => {
+    total += Number.parseFloat(item[field]) || 0;
+  });
+  return total;
+}
+  ngOnInit(): void {
+    // this.spin.show();
+    // this.pickingService.search({statusId : [50, 59]}).subscribe(res => {
+    //   res.forEach(x => this.multiSelectorderList.push({ value: x.refDocNumber, label: x.refDocNumber}));
+    //   this.spin.hide();
+    // }, err => {
+    //   this.cs.commonerrorNew(err);
+    //   this.spin.hide();
+    // })
+    this.getDropdown();
+    this.selectedCompany=this.auth.companyIdAndDescription;
+    this.selectedplant=this.auth.plantIdAndDescription;
+    this.selectedwarehouse=this.auth.warehouseIdAndDescription;
+  }
+ 
+  // ngAfterViewInit() {
+  //   this.dataSource.paginator = this.paginator;
+  // }
+  multiselectItemCodeList: any[] = [];
+  itemCodeList: any[] = [];
+
+  onItemType(searchKey) {
+    let searchVal = searchKey?.filter;
+    if (searchVal !== '' && searchVal !== null) {
+      forkJoin({
+        itemList: this.reportService.getItemCodeDropDown2(searchVal.trim(),this.auth.companyId,this.auth.plantId,this.auth.warehouseId,this.auth.languageId).pipe(catchError(err => of(err))),
+      })
+        .subscribe(({ itemList }) => {
+          if (itemList != null && itemList.length > 0) {
+            this.multiselectItemCodeList = [];
+            this.itemCodeList = itemList;
+            this.itemCodeList.forEach(x => this.multiselectItemCodeList.push({ value: x.itemCode + '/' + x.manufacturerName, label: x.itemCode + ' - ' + x.manufacturerName + ' - ' + x.description })); //+x.manufacturerName
+          }
+        });
+    }
+  }
+
+  multiselectStorageList: any[] = [];
+  storageBinList1: any[] = [];
+  selectedStorageBin: any[] = [];
+  onStorageType(searchKey) {
+    let searchVal = searchKey?.filter;
+    if (searchVal !== '' && searchVal !== null) {
+      forkJoin({
+        storageList: this.reportService.getStorageDropDown2(searchVal.trim(),this.auth.companyId,this.auth.plantId,this.auth.warehouseId,this.auth.languageId).pipe(catchError(err => of(err))),
+      })
+        .subscribe(({ storageList }) => {
+          if (storageList != null && storageList.length > 0) {
+            this.multiselectStorageList = [];
+            this.storageBinList1 = storageList;
+            this.storageBinList1.forEach(x => this.multiselectStorageList.push({ value: x.storageBin, label: x.storageBin}))
+          }
+        });
+    }
+  }
+  multiOrderNo: any[] = [];
+  levelIdOption: any[] = [];
+  getDropdown(){
+    this.sub.add(this.reportService.pickupSpark({warehouseId : [this.auth.warehouseId],companyCodeId:[this.auth.companyId],plantId:[this.auth.plantId],languageId:[this.auth.languageId]}).subscribe(res => {
+      res.forEach((x: any) => this.multiOrderNo.push({ value: x.refDocNumber, label: x.refDocNumber }));
+      this.multiOrderNo=this.cs.removeDuplicatesFromArrayNewstatus(this.multiOrderNo);
+    }))
+
+    this.sub.add(this.floor.search({warehouseId : [this.auth.warehouseId],companyCodeId:[this.auth.companyId],plantId:[this.auth.plantId],languageId:[this.auth.languageId]}).subscribe(res => {
+      res.forEach((x: any) => this.levelIdOption.push({ value: x.floorId, label: x.floorId + ' - ' + x.description }));
+      this.levelIdOption=this.cs.removeDuplicatesFromArrayNewstatus(this.levelIdOption);
+    }))
+    this.sub.add(this.reportService.pickupSpark({warehouseId : [this.auth.warehouseId],companyCodeId:[this.auth.companyId],plantId:[this.auth.plantId],languageId:[this.auth.languageId]}).subscribe(res => {
+      res.forEach((x: any) => this.orderTypDropdown.push({ value: x.outboundOrderTypeId, label: x.outboundOrderTypeId + ' - ' + x.referenceDocumentType }));
+      this.orderTypDropdown=this.cs.removeDuplicatesFromArrayNewstatus(this.orderTypDropdown);
+    }))
+
+  }
+  refDocNumber :'';
+  pickedPackCode = '';
+  itemCode = '';
+  pickedStorageBin: any;
+  toPickConfirmedOn = '';
+  fromPickConfirmedOn = '';
+  statusId: any[] = [50, 59]; 
+
+  reset(){
+    this.searhform.reset();
+    this.searhform.controls.warehouseId.patchValue([this.auth.warehouseId]);
+    this.searhform.controls.companyCodeId.patchValue([this.auth.companyId]);
+    this.searhform.controls.plantId.patchValue([this.auth.plantId]);
+    this.searhform.controls.languageId.patchValue([this.auth.languageId]);
+    this.searhform.controls.statusId.patchValue([50, 59]);
+  }
+  inboundnew: any[]=[];
+  filtersearch(){
+    
+  
+
+    this.spin.show();
+    let obj: any = {};
+
+    obj.itemCode = [];
+    if (this.itemCode != null && this.itemCode.trim() != "") {
+      obj.itemCode.push(this.itemCode)
+    }
+
+    obj.pickedPackCode = [];
+    if (this.pickedPackCode != null && this.pickedPackCode.trim() != "") {
+      obj.pickedPackCode.push(this.pickedPackCode)
+    }
+
+    obj.pickedStorageBin = [];
+    if (this.pickedStorageBin != null) {
+      obj.pickedStorageBin.push(this.pickedStorageBin);
+    }
+
+    obj.refDocNumber = this.refDocNumber;
+
+    //obj.toPickConfirmedOn = [];
+    // if (this.toPickConfirmedOn != null) {
+    //   obj.toPickConfirmedOn.push(this.cs.day_callapi(this.toPickConfirmedOn))
+    // }
+    this.searhform.controls.fromPickConfirmedOn.patchValue(this.cs.dateNewFormat1(this.searhform.controls.fromPickConfirmedOn.value));
+        this.searhform.controls.toPickConfirmedOn.patchValue(this.cs.dateNewFormat1(this.searhform.controls.toPickConfirmedOn.value));
+    obj.warehouseId = [this.auth.warehouseId]
+    obj.companyCode = [this.auth.companyId];
+      obj.languageId = [this.auth.languageId];
+      obj.plantId = [this.auth.plantId];
+    obj.statusId = this.statusId
+
+    this.sub.add(this.pickingService.pickuplineSpark(this.searhform.value).subscribe(res => {
+     
+ //     let result = res.filter((x: any) => x.statusId == 50);
+      this.inbound =res;
+      this.inboundnew=this.inbound;
+      this.calculateTotals(this.inbound);
+      this.table = true;
+      this.search = false;
+      this.fullscreen = false;
+      this.back = true;
+      this.spin.hide();
+      this.totalRecords = this.inbound.length
+    },
+      err => {
+        this.cs.commonerrorNew(err);
+        this.spin.hide();
+      }));
+  }
+  orderTypDropdown: any[] = [];
+  orderNoChange(e){
+    this.orderTypDropdown=[];
+    this.pickingService.pickuplineSpark({refDocNumber: e.value}).subscribe(res => {
+      res.forEach((x: any) => this.orderTypDropdown.push({ value: x.outboundOrderTypeId, label: x.outboundOrderTypeId + ' - ' + x.referenceDocumentType }));
+      this.orderTypDropdown=this.cs.removeDuplicatesFromArrayNewstatus(this.orderTypDropdown);
+    })
+  }
+
+  
+
+  toggleFloat() {
+    this.isShowDiv = !this.isShowDiv;
+    this.toggle = !this.toggle;
+    if (this.icon === 'expand_more') {
+      this.icon = 'chevron_left';
+    } else {
+      this.icon = 'expand_more'
+    }
+    this.showFloatingButtons = !this.showFloatingButtons;
+  }
+
+  ngOnDestroy() {
+    if (this.sub != null) {
+      this.sub.unsubscribe();
+    }
+    
+  }
+
+  @ViewChild(MatSort, { static: true })
+  sort!: MatSort;
+  @ViewChild(MatPaginator, { static: true })
+  paginator: MatPaginator; // Pagination
+  // Pagination
+
+
+
+
+  totalRecords = 0;
+  downloadexcel() {
+    const exportData = this.inbound.map(item => {
+      const exportItem: any = {};
+      this.cols.forEach(col => {
+        if (col.format == 'date') {
+          exportItem[col.header] = this.cs.excelDate(item[col.field]);
+        } else {
+          exportItem[col.header] = item[col.field];
+        }
+      });
+      return exportItem;
+    });
+    this.cs.exportAsExcel(exportData, 'Picking Report');
+  }
+
+  togglesearch() {
+    this.search = false;
+    this.table = true;
+    this.fullscreen = false;
+    this.back = true;
+  }
+  backsearch() {
+    this.table = true;
+    this.search = true;
+    this.fullscreen = true;
+    this.back = false;
+  }
+
+
+  onItemSelect(item: any) {
+  }
+
+  onSelectAll(items: any) {
+  }
+
+  // /** Whether the number of selected elements matches the total number of rows. */
+  // isAllSelected() {
+  //   const numSelected = this.selection.selected.length;
+  //   const numRows = this.dataSource.data.length;
+  //   return numSelected === numRows;
+  // }
+
+  // /** Selects all rows if they are not all selected; otherwise clear selection. */
+  // masterToggle() {
+  //   if (this.isAllSelected()) {
+  //     this.selection.clear();
+  //     return;
+  //   }
+
+  //   this.selection.select(...this.dataSource.data);
+  // }
+
+  // /** The label for the checkbox on the passed row */
+  // checkboxLabel(row?: any): string {
+  //   if (!row) {
+  //     return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+  //   }
+  //   return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.warehouseId + 1}`;
+  // }
+
+
+
+  // clearselection(row: any) {
+
+  //   this.selection.clear();
+  //   this.selection.toggle(row);
+  // }
+  // getBillableAmount() {
+  //   let total = 0;
+  //   this.dataSource.data.forEach(element => {
+  //     total = total + (element.s != null ? element.s : 0);
+  //   })
+  //   return (Math.round(total * 100) / 100);
+  // }
+  itemCodeChanged(e){
+    console.log(e);
+    let selectedArray: any ;
+    let SelectedArray2:any;
+      let splittedValue = e.value.split('/')
+      selectedArray=(splittedValue[0])
+      SelectedArray2=(splittedValue[1])
+      console.log(selectedArray);
+      console.log(SelectedArray2);
+      this.searhform.controls.itemCode.patchValue([selectedArray]);
+      this.searhform.controls.manufacturerName.patchValue(SelectedArray2);
+  }
+  getOrderQty(){
+    let total = 0;
+    this.inbound.forEach(x =>{
+      total = total + (x.allocatedQty != null ? x.allocatedQty : 0)
+    })
+    return Math.round(total *100 / 100)
+  }
+  getPickingQty(){
+    let total = 0;
+    this.inbound.forEach(x =>{
+      total = total + (x.pickConfirmQty != null ? x.pickConfirmQty : 0)
+    })
+    return Math.round(total *100 / 100)
+  }
+  getvarianceQty(){
+    let total = 0;
+    this.inbound.forEach(x =>{
+      total = total + (x.varianceQuantity != null ? x.varianceQuantity : 0)
+    })
+    return Math.round(total *100 / 100)
+  }
+  handleSearch1(filterInput){
+    if (filterInput) {
+      this.calculateTotals(this.inboundTag.filteredValue);
+    }
+    else {
+      this.calculateTotals(this.inbound);
+  
+    }
+  }
+
+  filteredInventory: any[] = []; // Filtered inventory data array, if applicable
+  totalInventoryQuantity: number = 0; // Total inventory quantity
+  totalAllocatedQuantity: number = 0; // Total allocated quantity
+totalQty1:number =0;
+  calculateTotals(data?: any[]): void {
+   this.totalInventoryQuantity = 0;
+   this.totalAllocatedQuantity = 0;
+   this.totalQty1=0;
+    if (data && data.length > 0) {
+      this.totalInventoryQuantity = data.reduce((total, item) => total + (item.allocatedQty != null ? item.allocatedQty : 0), 0);
+      this.totalAllocatedQuantity = data.reduce((total, item) => total + (item.pickConfirmQty != null ? item.pickConfirmQty : 0), 0);
+      this.totalQty1=data.reduce((total, item) => total + (item.varianceQuantity != null ? item.varianceQuantity : 0), 0);
+    } else {
+      this.inbound.forEach(x => {
+        this.totalInventoryQuantity = 0;
+        this.totalAllocatedQuantity = 0;
+        this.totalQty1=0;
+      })
+
+    // }
+  
+  }
+}
+}
+

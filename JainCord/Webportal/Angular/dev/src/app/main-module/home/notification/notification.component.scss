@@ -1,0 +1,31 @@
+.card {
+    border-radius: 0px !important;
+}
+
+.card-body:hover{
+    background-color: #f3f3f3 !important;
+}
+
+.notifysize{
+    font-size: 12px !important;
+}
+
+.scrollNotify{
+    max-height: calc(100vh - 30rem) !important;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.notification-box{
+    background-color: white;
+}
+.notification-box:hover{
+    background-color: #fff0e0;
+}
+.active{
+    background-color: #ffead3 !important;
+}
+
+::ng-deep .p-overlaypanel .p-overlaypanel-content {
+    padding: 0rem !important; 
+    width: 21rem !important;
+}

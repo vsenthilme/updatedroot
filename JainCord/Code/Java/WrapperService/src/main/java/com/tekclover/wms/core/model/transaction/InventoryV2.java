@@ -1,0 +1,56 @@
+package com.tekclover.wms.core.model.transaction;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.Date;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class InventoryV2 extends Inventory {
+
+	private Long inventoryId;
+	private String barcodeId;
+	private String cbm;
+	private String cbmUnit;
+	private String cbmPerQuantity;
+	private String manufacturerCode;
+	private String manufacturerName;
+	private String origin;
+	private String brand;
+	private String referenceDocumentNo;
+	private String companyDescription;
+	private String plantDescription;
+	private String warehouseDescription;
+//	private String statusDescription;
+	private String levelId;
+	private String partnerCode;
+	private Long itemType;
+	private String itemTypeDescription;
+
+	private String sCreatedOn;
+
+    private String stockTypeDescription;
+
+	//threePl
+	private Double threePLCbm;
+	private String threePLUom;
+	private String threePLBillStatus;
+	private Double threePLLength;
+	private Double threePLHeight;
+	private Double threePLWidth;
+	private Date batchDate;
+
+	//================================JainCord=============================
+	private String sortNo;
+	private String meter;
+	private String lotNo;
+	private String pieceId;
+	private String gsm;
+	private String grade;
+	private String color;
+	private String palletId;
+
+}
