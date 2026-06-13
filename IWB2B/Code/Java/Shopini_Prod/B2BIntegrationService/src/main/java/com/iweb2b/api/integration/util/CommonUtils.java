@@ -1,0 +1,257 @@
+package com.iweb2b.api.integration.util;
+
+import java.beans.PropertyDescriptor;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class CommonUtils {
+
+	/**
+	 * 
+	 * @author Murugavel
+	 *
+	 */
+	public static enum DashboardTypes {
+		AGREEMENT, AGREEMENT_TOTAL, AGREEMENT_SENT, AGREEMENT_RECEIVED, AGREEMENT_RESENT
+	}
+
+	/**
+	 * getNullPropertyNames
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public static String[] getNullPropertyNames(Object source) {
+		final BeanWrapper src = new BeanWrapperImpl(source);
+		PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+		Set<String> emptyNames = new HashSet<String>();
+		for (PropertyDescriptor pd : pds) {
+			Object srcValue = src.getPropertyValue(pd.getName());
+			if (srcValue == null)
+				emptyNames.add(pd.getName());
+		}
+		String[] result = new String[emptyNames.size()];
+		return emptyNames.toArray(result);
+	}
+
+	/**
+	 * copy
+	 * 
+	 * @param fromBean
+	 * @return
+	 */
+	public static Object copy(Object fromBean) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		XMLEncoder out = new XMLEncoder(bos);
+		out.writeObject(fromBean);
+		out.close();
+		ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+		XMLDecoder in = new XMLDecoder(bis);
+		Object toBean = in.readObject();
+		in.close();
+		return toBean;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static String getStatusMapping(String mapString) {
+		/*
+		 * Pickup scan - Pickup completed
+		 * Station sending/DC sending - Intransit to HUB
+		 * Station arrival - Intransit to Hub
+		 * DC arrival - Inscan at Hub
+		 * Delivery Scan - Attempted
+		 * Sign Scan - Delivered
+		 * Abnormal Parcel Scan - Cancel
+		 * Returned Parcel Scan - RTO
+		 * Returned Signed - RTO
+		 */
+		Map<String, String> mapStatus = new HashMap<>();
+		mapStatus.put("PICKUP SCAN", "shipment_clear_successfully");
+		mapStatus.put("STATION SENDING/DC SENDING", "intransit_to_hub");
+		mapStatus.put("STATION ARRIVAL", "inscan_at_hub");	
+		mapStatus.put("DC ARRIVAL", "reached_at_hub");
+		mapStatus.put("DELIVERY SCAN", "accept");
+		mapStatus.put("SIGN SCAN", "delivered");
+		mapStatus.put("ABNORMAL PARCEL SCAN", "attempted");
+		mapStatus.put("RETURNED PARCEL SCAN", "rto");
+		mapStatus.put("RETURNED SIGNED", "delivered");
+		return mapStatus.get(mapString);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static String getStatusMapping_QP(String mapString) {
+		/*
+		 * Pickup scan - Pickup completed
+		 * Station sending/DC sending - Intransit to HUB
+		 * Station arrival - Intransit to Hub
+		 * DC arrival - Inscan at Hub
+		 * Delivery Scan - Attempted
+		 * Sign Scan - Delivered
+		 * Abnormal Parcel Scan - Cancel
+		 * Returned Parcel Scan - RTO
+		 * Returned Signed - RTO
+		 */
+		Map<String, String> mapStatus = new HashMap<>();
+//		mapStatus.put("CREATED", "No Mapping");
+		mapStatus.put("PICKUP", "pickup_completed");
+		mapStatus.put("RECIEVED", "reached_at_hub");	
+		mapStatus.put("ASSIGNEDTODRIVER", "accept");
+		mapStatus.put("OUTFORDELV", "accept");
+		mapStatus.put("DELIVERED", "delivered");
+		mapStatus.put("CANCELLED", "cancel");
+		mapStatus.put("FAILED", "attempted");
+		mapStatus.put("PICKUPSUCCESS", "pickup_completed");
+		mapStatus.put("PICKUPFAILED", "attempted");
+		mapStatus.put("DELIVERY  FAILED", "attempted");
+		mapStatus.put("ITEMDISPATCHEDTOSENDER", "rto");
+		mapStatus.put("ITEMSTORED", "inscan_at_hub");
+		mapStatus.put("COUNTERDELIVERYSUCCESS", "delivered");
+		mapStatus.put("ITEMRECEIVEDATGPO", "reached_at_hub");
+		mapStatus.put("RTS", "rto");
+		mapStatus.put("DISPATCHEDTOBRANCH", "intransit_to_hub");
+		mapStatus.put("RETURNFROMCUSTOMS", "shipment_clear_successfully");
+		log.info("%%%%%%%%%%%%%%%%%%%%%----1----> : " + mapString + ":" + mapStatus.get(mapString.trim().toUpperCase()));
+		return mapStatus.get(mapString.trim().toUpperCase());
+	}
+
+	/**
+	 *
+	 * @param mapString
+	 * @return
+	 */
+	public static String getStatusMapping_Shopini(String mapString) {
+		/*
+		 *	Pending - Unmapped
+		 *	Equipped - Reached at Hub
+		 *	Shipped	- Out for Delivery (accept)
+		 *	Received - Delivered
+		 *	Not received - Undelivered
+		 */
+		mapString.toUpperCase();
+		Map<String, String> mapStatus = new HashMap<>();
+//		mapStatus.put("PENDING", "Unmapped");
+		mapStatus.put("EQUIPPED", "reached_at_hub");
+		mapStatus.put("SHIPPED", "accept");
+		mapStatus.put("RECEIVED", "delivered");
+		mapStatus.put("NOT RECEIVED", "undelivered");
+		return mapStatus.get(mapString.trim().toUpperCase());
+	}
+
+	/**
+	 *
+	 * @param mapString
+	 * @return
+	 */
+	public static String getAllStatusShopiniMapping(String mapString) {
+		/*
+		 *	date_Added - Unmapped
+		 *	date_Equiped - Reached at Hub
+		 *	date_Shipped	- Out for Delivery (accept)
+		 *	date_Received - Delivered
+		 *	date_Not_Received - Undelivered
+		 */
+		Map<String, String> mapStatus = new HashMap<>();
+//		mapStatus.put("date_Added", "created");
+		mapStatus.put("DATE_EQUIPED", "EQUIPPED");
+		mapStatus.put("DATE_SHIPPED", "SHIPPED");
+		mapStatus.put("DATE_RECEIVED", "RECEIVED");
+		mapStatus.put("DATE_NOT_RECEIVED", "NOT RECEIVED");
+		return mapStatus.get(mapString.trim().toUpperCase());
+	}
+
+	/**
+	 * 
+	 * @param date
+	 * @param tz
+	 * @return
+	 */
+	public static String toISOString(Date date, TimeZone tz) {
+        try {
+        	String FORMAT_DATE_ISO = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+			if (tz == null) {
+			    tz = TimeZone.getDefault();
+			}
+			DateFormat f = new SimpleDateFormat(FORMAT_DATE_ISO);
+			f.setTimeZone(tz);
+			return f.format(date);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+    }
+
+	/**
+	 * 
+	 * @param date
+	 * @return
+	 */
+    public static String toISOString (Date date) {
+        return toISOString(date, TimeZone.getDefault());
+    }
+
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+//		LocalDate localDate = LocalDate.now();
+//		System.out.println(localDate);
+//		
+//		DateTimeFormatter newPattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//		LocalDateTime datetime = LocalDateTime.now();
+//		String currentDatetime = datetime.format(newPattern);
+//		System.out.println(currentDatetime);
+//		
+//		String date = toISOString(new Date());
+//		log.info("date : " + date);
+		
+		Map<String, String> mapStatus = new HashMap<>();
+		mapStatus.put("PICKUP", "pickup_completed");
+		mapStatus.put("RECIEVED", "reached_at_hub");	
+		mapStatus.put("ASSIGNEDTODRIVER", "accept");
+		mapStatus.put("OUTFORDELV", "accept");
+		mapStatus.put("DELIVERED", "delivered");
+		mapStatus.put("CANCELLED", "cancel");
+		mapStatus.put("FAILED", "attempted");
+		mapStatus.put("PICKUPSUCCESS", "pickup_completed");
+		mapStatus.put("PICKUPFAILED", "attempted");
+		mapStatus.put("DELIVERYFAILED", "attempted");
+		mapStatus.put("ITEMDISPATCHEDTOSENDER", "rto");
+		mapStatus.put("ITEMSTORED", "inscan_at_hub");
+		mapStatus.put("COUNTERDELIVERYSUCCESS", "delivered");
+		mapStatus.put("ITEMRECEIVEDATGPO", "reached_at_hub");
+		mapStatus.put("RTS", "rto");
+		mapStatus.put("DISPATCHEDTOBRANCH", "intransit_to_hub");
+		mapStatus.put("RETURNFROMCUSTOMS", "shipment_clear_successfully");
+		
+		String s = "RECIEVED";
+		s = s.replaceAll("\\s" , "");
+		System.out.println(s);
+		System.out.println(mapStatus.get(s.toUpperCase()));
+		
+		getStatusMapping_QP(s);
+	}
+}
