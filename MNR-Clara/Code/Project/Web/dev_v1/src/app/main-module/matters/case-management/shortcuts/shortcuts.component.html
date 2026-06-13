@@ -1,0 +1,108 @@
+<div class="d-flex  align-items-center justify-content-between mx-1 my-2 mb-2">
+    <div class="ps-3">
+        <nav aria-label="breadcrumb mb-0">
+            <ol class="breadcrumb mb-0 d-flex align-items-center">
+                <li class="breadcrumb-item mb-0 ms-3">
+                    <a>
+                        <mat-icon class="text-secondary align-middle">home</mat-icon>
+                    </a>
+                </li>
+                <div class="divider mx-3 border-end"></div>
+                <li class="breadcrumb-item mb-0 active" aria-current="page"><a
+                        routerLink="/main/matters/case-management/general">
+                        Matter
+                    </a></li>
+                <li class="breadcrumb-item mb-0 active " aria-current="page">Recent Matters</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="pe-2 me-1 d-flex justify-content-between align-items-end">
+        <!-- <div [hidden]="isShowDiv"> <input matInput (keyup)="applyFilter($event)"
+                class="form-control filter_button mx-2 border-bottom" placeholder="Filter" style="width:90%"></div> -->
+        <div [ngClass]="showFloatingButtons == true ? 'floating-pane-active' : 'floating-pane-deactive'"
+            class="button-row">
+            <button mat-mini-fab *ngIf="showFloatingButtons == true" class="floating-buttons bg-pink text-white mx-2"
+                matTooltip="Download Excel">
+                <mat-icon class="">download</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true" class="floating-buttons bg-yellow1 text-white mx-2"
+                matTooltip="Delete" [disabled]="!RA.delete || this.code.pageflow == 'Display'">
+                <mat-icon class="">delete</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class=" floating-buttons text-white mx-2 bg-lightblue" matTooltip="Display" [disabled]="!RA.view">
+                <mat-icon class="">search</mat-icon>
+            </button>
+
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class="floating-buttons text-white mx-2 bg-success1" matTooltip="Copy">
+                <mat-icon class="">content_copy</mat-icon>
+            </button>
+            <button mat-mini-fab *ngIf="showFloatingButtons == true"
+                class="floating-buttons primary1 text-white mx-2 me-3" matTooltip="Edit"
+                [disabled]="!RA.createUpdate || this.code.pageflow == 'Display'">
+                <mat-icon class="">edit</mat-icon>
+            </button>
+            <button disabled  mat-mini-fab (click)="toggleFloat()" class=" disabled mx-2 text-white action-button"
+                [ngClass]="{'bg-yellow' : toggle, 'purple': !toggle}">
+                <mat-icon>{{icon}}</mat-icon>Options
+            </button>
+            <button disabled mat-mini-fab [disabled]="!RA.createUpdate || this.code.pageflow == 'Display'"
+                class=" disabled bg-darkblue text-white mx-2 action-button">
+                <mat-icon class="">add</mat-icon> New
+            </button>
+
+
+            <button disabled  disabled="disabled" mat-mini-fab class=" disabled disabled text-white mx-2 action-button bg-red" type="button"
+                mat-button>
+                <mat-icon class="">search</mat-icon> Search
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="example-sidenav-content" >
+
+    <div class=" my-0 py-0">
+        <h2 class="mx-4 mb-1 text-blue">Recent Matters</h2>
+        <div class="ms-3 me-3 px-1 mt-1 scroll1">
+            
+            <div class="card shadowBox my-2 " *ngFor="let element of shortcutsList; let j = index">
+                <div class="card-body card-body1 row">
+                    <div class="my-auto col-05">
+                        <img class="img-fluid pl-2" style="width: 80%;" src="./assets/img/icons1/Matter.png" alt="">
+                    </div>
+                    <div class="my-auto col-3 pl-0">
+                        <p class="mb-0">Matter No: {{element.matterNumber}}<br><strong class="text-secondary">{{element.matterDescription}}</strong></p>
+                    </div>
+                    <div class="my-auto col-3">
+                        <p class="mb-0 d-inline">Client ID: {{element.clientId}}<br><strong class="text-secondary">{{element.clientName}}</strong></p>
+                    </div>
+                    <div class="my-auto col-1 ">
+                        <p *ngIf="element.statusDesc == 'CASE OPEN'" [ngClass]="element.statusDesc == 'CASE OPEN' ? 'text-primary' : ''" class="mb-0">{{element.statusDesc}}</p>
+                        <p *ngIf="element.statusDesc == 'CASE CLOSED'" [ngClass]="element.statusDesc == 'CASE CLOSED' ? 'text-danger' : ''" class="mb-0">{{element.statusDesc}}</p>
+                        <p *ngIf="element.statusDesc == 'CASE FILED'" [ngClass]="element.statusDesc == 'CASE FILED' ? 'text-warning' : ''" class="mb-0">{{element.statusDesc}}</p>
+                        <p *ngIf="element.statusDesc == 'APPROVED'" [ngClass]="element.statusDesc == 'APPROVED' ? 'text-success' : ''" class="mb-0">{{element.statusDesc}}</p>
+                        <p *ngIf="element.statusDesc == 'RFE'" [ngClass]="element.statusDesc == 'RFE' ? 'text-info' : ''" class="mb-0">{{element.statusDesc}}</p>
+                    </div>
+                    <div class="my-auto col-2 ">
+                        <h5 class="mb-0">Last Opened on {{element.viewedDate | date :'MM-dd-yyyy'}}</h5>
+                    </div>
+                    <div class="my-auto col-1">
+                        <button mat-stroked-button  (click)="createTimeTicket(element)"
+                        class="hoverbutton2 mt-2"> Time Ticket </button>                      
+                    </div>
+                    
+                    <div class="my-auto col-1">                       
+                        <button mat-stroked-button  (click)="openDialog(element)"
+                        class="hoverbutton1 mt-2"> View </button>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+</div>
+
+
+
