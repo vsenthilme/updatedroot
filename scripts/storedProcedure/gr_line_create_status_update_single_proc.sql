@@ -1,0 +1,103 @@
+CREATE OR ALTER PROCEDURE grline_create_status_update_proc
+	@companyCodeId nvarchar(5), 
+	@plantId nvarchar(5), 
+	@languageId nvarchar(5),
+	@warehouseId nvarchar(5), 
+	@refDocNumber nvarchar(25),
+	@preInboundNo nvarchar(25), 
+	@goodsReceiptNo nvarchar(25),
+	@statusId bigint,
+	@statusDescription nvarchar(50),
+	@updatedOn DATETIME
+		
+AS
+BEGIN
+
+	--update GrHeader
+	DECLARE @ROW_COUNT int, @ROW_COUNT_STATUS_ID_17 int, @IS_STATUS_ID_17 int = 0
+
+	SELECT @ROW_COUNT = COUNT(REF_DOC_NO) FROM tblstagingline 
+	WHERE C_ID = @companyCodeId AND 
+	PLANT_ID = @plantId AND 
+	LANG_ID = @languageId AND 
+	WH_ID = @warehouseId AND 
+	REF_DOC_NO = @refDocNumber AND
+	PRE_IB_NO = @preInboundNo AND
+	IS_DELETED = 0 
+	GROUP BY REF_DOC_NO
+		
+	SELECT @ROW_COUNT_STATUS_ID_17 = COUNT(REF_DOC_NO) FROM (
+	SELECT SUM(GR_QTY) GRQTY,ORD_QTY,REF_DOC_NO,IB_LINE_NO,ITM_CODE,MFR_NAME FROM TBLGRLINE 
+	WHERE C_ID = @companyCodeId AND 
+	PLANT_ID = @plantId AND 
+	LANG_ID = @languageId AND 
+	WH_ID = @warehouseId AND 
+	REF_DOC_NO = @refDocNumber AND
+	PRE_IB_NO = @preInboundNo AND
+	IS_DELETED = 0 
+	GROUP BY IB_LINE_NO,ITM_CODE,MFR_NAME,REF_DOC_NO,ORD_QTY 
+	HAVING SUM(GR_QTY) = ORD_QTY
+	) X GROUP BY REF_DOC_NO
+
+	IF @ROW_COUNT = @ROW_COUNT_STATUS_ID_17
+	BEGIN
+		SET @IS_STATUS_ID_17 = 1
+	END	
+
+	IF @IS_STATUS_ID_17 = 1
+	BEGIN
+		UPDATE tblgrheader
+			SET STATUS_ID = @statusId,
+			STATUS_TEXT = @statusDescription,
+			GR_UTD_ON = @updatedOn,
+			GR_CNF_ON = @updatedOn
+			WHERE C_ID = @companyCodeId AND 
+				PLANT_ID = @plantId AND 
+				LANG_ID = @languageId AND 
+				WH_ID = @warehouseId AND 
+				REF_DOC_NO = @refDocNumber AND
+				PRE_IB_NO = @preInboundNo AND
+				IS_DELETED = 0
+	END
+
+	--update stagingline
+	UPDATE IBL SET IBL.REC_ACCEPT_QTY = X.ACCEPTQTY, 
+				   IBL.REC_DAMAGE_QTY = X.DAMAGEQTY, 
+				   IBL.ST_UTD_ON = @updatedOn, IBL.ST_CNF_ON = @updatedOn				   
+	FROM tblstagingline IBL INNER JOIN
+	(SELECT C_ID,PLANT_ID,LANG_ID,WH_ID,REF_DOC_NO,PRE_IB_NO,IB_LINE_NO,ITM_CODE,MFR_NAME,
+	SUM(ACCEPT_QTY) ACCEPTQTY,SUM(DAMAGE_QTY) DAMAGEQTY
+	FROM tblgrline
+	WHERE IS_DELETED = 0 AND C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND 
+		  WH_ID = @warehouseId AND REF_DOC_NO = @refDocNumber AND PRE_IB_NO = @preInboundNo
+		  GROUP BY ITM_CODE,MFR_NAME,IB_LINE_NO,REF_DOC_NO,PRE_IB_NO,WH_ID,PLANT_ID,C_ID,LANG_ID
+	) X ON
+	IBL.C_ID = X.C_ID AND IBL.PLANT_ID = X.PLANT_ID AND IBL.LANG_ID = X.LANG_ID AND IBL.WH_ID = X.WH_ID AND 
+	IBL.REF_DOC_NO = X.REF_DOC_NO AND IBL.PRE_IB_NO = X.PRE_IB_NO AND IBL.ITM_CODE = X.ITM_CODE AND 
+	IBL.MFR_NAME = X.MFR_NAME AND IBL.IB_LINE_NO = X.IB_LINE_NO AND IBL.IS_DELETED = 0
+
+	UPDATE IBL SET IBL.STATUS_ID = X.STATUS_ID, IBL.STATUS_TEXT = X.STATUS_TEXT
+	FROM tblstagingline IBL INNER JOIN
+	(SELECT C_ID,PLANT_ID,LANG_ID,WH_ID,REF_DOC_NO,PRE_IB_NO,IB_LINE_NO,ITM_CODE,MFR_NAME,
+	STATUS_ID,STATUS_TEXT
+	FROM tblgrline
+	WHERE IS_DELETED = 0 AND C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND 
+		  WH_ID = @warehouseId AND REF_DOC_NO = @refDocNumber AND PRE_IB_NO = @preInboundNo AND STATUS_ID <> 24 AND
+		  GR_CTD_ON IN (SELECT MAX(GR_CTD_ON) FROM TBLGRLINE GROUP BY ITM_CODE,MFR_NAME,IB_LINE_NO,REF_DOC_NO,PRE_IB_NO)
+	) X ON
+	IBL.C_ID = X.C_ID AND IBL.PLANT_ID = X.PLANT_ID AND IBL.LANG_ID = X.LANG_ID AND IBL.WH_ID = X.WH_ID AND 
+	IBL.REF_DOC_NO = X.REF_DOC_NO AND IBL.PRE_IB_NO = X.PRE_IB_NO AND IBL.ITM_CODE = X.ITM_CODE AND 
+	IBL.MFR_NAME = X.MFR_NAME AND IBL.IB_LINE_NO = X.IB_LINE_NO AND IBL.IS_DELETED = 0
+
+	--Update InboundLine status
+	UPDATE IBL SET IBL.STATUS_ID = @statusId, IBL.STATUS_TEXT = @statusDescription, IBL.UTD_ON = @updatedOn, IBL.IB_CNF_ON = @updatedOn 
+	FROM tblinboundline IBL INNER JOIN
+	(SELECT C_ID,PLANT_ID,LANG_ID,WH_ID,REF_DOC_NO,PRE_IB_NO,IB_LINE_NO,ITM_CODE,MFR_NAME FROM tblgrline
+	WHERE IS_DELETED = 0 AND status_id = @statusId AND C_ID = @companyCodeId AND PLANT_ID = @plantId AND 
+			LANG_ID = @languageId AND WH_ID = @warehouseId AND REF_DOC_NO = @refDocNumber AND PRE_IB_NO = @preInboundNo
+	) X ON
+	IBL.C_ID = X.C_ID AND IBL.PLANT_ID = X.PLANT_ID AND IBL.LANG_ID = X.LANG_ID AND IBL.WH_ID = X.WH_ID AND 
+	IBL.REF_DOC_NO = X.REF_DOC_NO AND IBL.PRE_IB_NO = X.PRE_IB_NO AND IBL.ITM_CODE = X.ITM_CODE AND 
+	IBL.MFR_NAME = X.MFR_NAME AND IBL.IB_LINE_NO = X.IB_LINE_NO AND IBL.IS_DELETED = 0 AND IBL.STATUS_ID <> 20
+
+END

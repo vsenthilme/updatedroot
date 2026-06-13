@@ -1,0 +1,54 @@
+USE WMS_ALMDEV
+GO
+
+-- String companyCodeId, String plantId, String languageId, String warehouseId
+-- String refDocNumber, String preOutboundNo
+CREATE OR ALTER PROCEDURE pick_list_cnf_update_proc 
+	@companyCodeId nvarchar(5), 
+	@plantId nvarchar(5), 
+	@languageId nvarchar(5),
+	@warehouseId nvarchar(5), 
+	@oldRefDocNumber nvarchar(25),
+	@oldPreOutboundNo nvarchar(25), 	
+	@newRefDocNumber nvarchar(25),
+	@newPreOutboundNo nvarchar(25),
+	@salesOrderNo nvarchar(25)
+		
+AS
+BEGIN
+
+	UPDATE PL SET PL.PICK_UTD_BY = X.PICK_UTD_BY, PL.PICK_CNF_BY = X.PICK_CNF_BY 
+	FROM tblpickupline PL INNER JOIN
+	(SELECT C_ID,PLANT_ID,LANG_ID,WH_ID,REF_DOC_NO,PRE_OB_NO,ITM_CODE,MFR_NAME,OB_ORD_TYP_ID,SALES_ORDER_NUMBER,PICK_UTD_BY,PICK_CNF_BY FROM tblpickupline
+	WHERE C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId 
+	AND REF_DOC_NO = @oldRefDocNumber AND PRE_OB_NO = @oldPreOutboundNo AND SALES_ORDER_NUMBER = @salesOrderNo
+	) X ON
+	PL.C_ID = X.C_ID AND PL.PLANT_ID = X.PLANT_ID AND PL.LANG_ID = X.LANG_ID AND PL.WH_ID = X.WH_ID AND 
+	PL.SALES_ORDER_NUMBER = X.SALES_ORDER_NUMBER AND PL.ITM_CODE = X.ITM_CODE AND 
+	PL.MFR_NAME = X.MFR_NAME AND PL.OB_ORD_TYP_ID = X.OB_ORD_TYP_ID AND PL.IS_DELETED = 0 AND 
+	PL.REF_DOC_NO = @newRefDocNumber AND PL.PRE_OB_NO = @newPreOutboundNo
+
+	UPDATE PL SET PL.QC_CTD_BY = X.QC_CTD_BY, PL.QC_CNF_BY = X.QC_CNF_BY, PL.QC_UTD_BY = X.QC_UTD_BY
+	FROM tblqualityheader PL INNER JOIN
+	(SELECT C_ID,PLANT_ID,LANG_ID,WH_ID,REF_DOC_NO,PRE_OB_NO,REF_FIELD_4,MFR_NAME,OB_ORD_TYP_ID,SALES_ORDER_NUMBER,QC_CTD_BY,QC_CNF_BY,QC_UTD_BY FROM tblqualityheader
+	WHERE C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId 
+	AND REF_DOC_NO = @oldRefDocNumber AND PRE_OB_NO = @oldPreOutboundNo AND SALES_ORDER_NUMBER = @salesOrderNo
+	) X ON
+	PL.C_ID = X.C_ID AND PL.PLANT_ID = X.PLANT_ID AND PL.LANG_ID = X.LANG_ID AND PL.WH_ID = X.WH_ID AND 
+	PL.SALES_ORDER_NUMBER = X.SALES_ORDER_NUMBER AND PL.REF_FIELD_4 = X.REF_FIELD_4 AND 
+	PL.MFR_NAME = X.MFR_NAME AND PL.OB_ORD_TYP_ID = X.OB_ORD_TYP_ID AND PL.IS_DELETED = 0 AND 
+	PL.REF_DOC_NO = @newRefDocNumber AND PL.PRE_OB_NO = @newPreOutboundNo
+
+	UPDATE PL SET PL.QC_CTD_BY = X.QC_CTD_BY, PL.QC_CNF_BY = X.QC_CNF_BY, PL.QC_UTD_BY = X.QC_UTD_BY
+	FROM tblqualityline PL INNER JOIN
+	(SELECT C_ID,PLANT_ID,LANG_ID,WH_ID,REF_DOC_NO,PRE_OB_NO,ITM_CODE,MANUFACTURER_NAME,OB_ORD_TYP_ID,SALES_ORDER_NUMBER,QC_CTD_BY,QC_CNF_BY,QC_UTD_BY FROM tblqualityline
+	WHERE C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId 
+	AND REF_DOC_NO = @oldRefDocNumber AND PRE_OB_NO = @oldPreOutboundNo AND SALES_ORDER_NUMBER = @salesOrderNo
+	) X ON
+	PL.C_ID = X.C_ID AND PL.PLANT_ID = X.PLANT_ID AND PL.LANG_ID = X.LANG_ID AND PL.WH_ID = X.WH_ID AND 
+	PL.SALES_ORDER_NUMBER = X.SALES_ORDER_NUMBER AND PL.ITM_CODE = X.ITM_CODE AND 
+	PL.MANUFACTURER_NAME = X.MANUFACTURER_NAME AND PL.OB_ORD_TYP_ID = X.OB_ORD_TYP_ID AND PL.IS_DELETED = 0 AND 
+	PL.REF_DOC_NO = @newRefDocNumber AND PL.PRE_OB_NO = @newPreOutboundNo
+
+END			
+GO

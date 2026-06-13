@@ -1,0 +1,59 @@
+-- String companyCodeId, String plantId, String languageId, String warehouseId
+-- String refDocNumber, String preOutboundNo, Long statusId, String statusDescription,
+CREATE OR ALTER PROCEDURE all_status_update_ob_cnf_proc
+	@companyCodeId nvarchar(5), 
+	@plantId nvarchar(5), 
+	@languageId nvarchar(5),
+	@warehouseId nvarchar(5), 
+	@refDocNumber nvarchar(25),
+	@preOutboundNo nvarchar(25), 	
+	@statusId bigint,
+	@statusDescription nvarchar(50),
+	@updatedBy nvarchar(50),
+	@updatedOn DATETIME
+		
+AS
+BEGIN
+
+	UPDATE tblpreoutboundheader
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription, 
+	PRE_OB_UTD_BY = @updatedBy, PRE_OB_UTD_ON = @updatedOn
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_OB_NO = @preOutboundNo AND STATUS_ID <> 59
+
+	UPDATE tbloutboundheader
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription, 
+	DLV_CNF_BY = @updatedBy, DLV_CNF_ON = @updatedOn
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_OB_NO = @preOutboundNo AND STATUS_ID <> 59	
+	
+	UPDATE tbloutboundline
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription, 
+	DLV_CNF_BY = @updatedBy, DLV_CNF_ON = @updatedOn
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_OB_NO = @preOutboundNo AND STATUS_ID <> 59
+			
+	UPDATE tblpreoutboundline
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription, 
+	PRE_OB_UTD_BY = @updatedBy, PRE_OB_UTD_ON = @updatedOn
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_OB_NO = @preOutboundNo AND STATUS_ID <> 59
+	
+	UPDATE tblordermangementline
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription, 
+	PICK_UP_UTD_BY = @updatedBy, PICK_UP_UTD_ON = @updatedOn
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_OB_NO = @preOutboundNo AND STATUS_ID <> 59
+			
+	UPDATE tblpickupline
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_OB_NO = @preOutboundNo AND STATUS_ID <> 59		
+
+END

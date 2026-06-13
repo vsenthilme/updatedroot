@@ -1,0 +1,180 @@
+--select query
+
+select * from tbliborder2 order by order_received_on desc
+select * from tbliborderlines2 order by id desc
+
+select * from tblpreinboundheader order by ctd_on desc
+select * from tblpreinboundline order by ctd_on desc
+select * from tblinboundheader order by ctd_on desc
+select * from tblinboundline order by ctd_on desc
+select * from tblinboundlinedup order by ctd_on desc
+select * from tblstagingheader order by st_ctd_on desc
+select * from tblstagingline order by st_ctd_on desc
+select * from tblgrheader order by gr_ctd_on desc
+select * from tblgrline order by gr_ctd_on desc
+select * from tblputawayheader order by pa_ctd_on desc
+select * from tblputawayline order by pa_cnf_on desc
+select * from tblinventory order by iu_ctd_on desc
+select * from tblinventorymovement order by im_ctd_on desc
+
+select * from tbloborder2 order by order_received_on desc
+select * from tbloborderlines2 order by id desc
+
+select * from tblpreoutboundheader order by pre_ob_ctd_on desc
+select * from tblpreoutboundline order by pre_ob_ctd_on desc
+select * from tblordermangementheader order by pick_up_ctd_on desc
+select * from tblordermangementline order by pick_up_ctd_on desc
+select * from tbloutboundheader order by dlv_ctd_on desc
+select * from tbloutboundline order by dlv_ctd_on desc
+select * from tbloutboundlinedup order by dlv_ctd_on desc
+select * from tblpickupheader order by pick_ctd_on desc
+select * from tblpickupline order by pick_cnf_on desc
+select * from tblqualityheader order by qc_ctd_on desc
+select * from tblqualityline order by qc_ctd_on desc
+
+select * from tblcyclecountheader order by cycle_count_creation_date desc
+select * from tblcyclecountline order by id desc
+
+select * from tblperiodicheader order by cc_ctd_on desc
+select * from tblperiodicline order by cc_ctd_on desc
+
+select * from tblperpetualheader order by cc_ctd_on desc
+select * from tblperpetualline order by cc_ctd_on desc
+
+select * from tblorderitemmaster order by item_id desc
+select * from tblordercustomermaster order by customer_id desc
+
+select * from tblimbasicdata1 order by ctd_on desc
+select * from tblbusinesspartner order by ctd_on desc
+
+select * from tblmiddlewarestockadjustment order by stock_adjustment_id desc
+select * from tblstockadjustment order by stock_adjustment_id desc
+
+select * from tblinhousetransferheader order by it_ctd_on desc
+select * from tblinhousetransferline order by it_ctd_on desc
+
+--delete query
+delete tblpreinboundline 
+delete tblpreinboundheader 
+delete tblinboundline 
+delete tblinboundheader 
+delete tblstagingline 
+delete tblstagingheader 
+delete tblgrline 
+delete tblgrheader 
+delete tblputawayline 
+delete tblputawayheader 
+
+delete tblinventory
+truncate table tblinventory 
+delete tblinventorymovement
+
+delete tblpreoutboundline 
+delete tblpreoutboundheader 
+delete tblordermangementline 
+delete tblordermangementheader 
+delete tbloutboundline 
+delete tbloutboundlinedup 
+delete tbloutboundheader 
+delete tblpickupline 
+delete tblpickupheader 
+delete tblqualityline 
+delete tblqualityheader 
+
+delete tblimbasicdata1
+delete tblbusinesspartner
+delete tblimpartner
+
+truncate table tbloborderlines2
+delete tbloborder2
+truncate table tbliborderlines2
+delete tbliborder2
+
+truncate table tblmiddlewarestockadjustment
+truncate table tblstockadjustment
+
+delete tblinhousetransferline
+delete tblinhousetransferheader
+
+delete tblcyclecountheader
+truncate table tblcyclecountline
+delete tblperiodicline
+delete tblperiodicheader
+delete tblperpetualline
+delete tblperpetualheader
+
+truncate table tblorderitemmaster
+truncate table tblordercustomermaster
+
+delete tblimbasicdata1
+delete tblbusinesspartner
+delete tblimpartner
+delete tblstoragebin
+
+update tblstoragebin set status_id = 0
+
+truncate table tbldeliveryconfirmation
+
+
+--delete specific record
+delete tblpreoutboundline where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblpreoutboundheader where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblordermangementline where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblordermangementheader where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tbloutboundline where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tbloutboundheader where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblpickupline where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblpickupheader where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblqualityline where ref_doc_no = 'TO000015196' and wh_id = '110'
+delete tblqualityheader where ref_doc_no = 'TO000015196' and wh_id = '110'
+
+delete tblpreinboundline  where ref_doc_no = 'MLN-007'
+delete tblpreinboundheader  where ref_doc_no = 'MLN-007'
+delete tblinboundline  where ref_doc_no = 'MLN-007'
+delete tblinboundheader  where ref_doc_no = 'MLN-007'
+delete tblstagingline  where ref_doc_no = 'MLN-007'
+delete tblstagingheader  where ref_doc_no = 'MLN-007'
+delete tblgrheader  where ref_doc_no = 'MLN-007'
+delete tblgrline  where ref_doc_no = 'MLN-007'
+delete tblputawayline  where ref_doc_no = 'MLN-007'
+delete tblputawayheader  where ref_doc_no = 'MLN-007'
+
+delete tblinventory  where ref_doc_no = 'MLN-007'
+delete tblinventorymovement where ref_doc_no = 'MLN-007'
+
+delete tblpreoutboundline where ref_doc_no='TO-100143'
+delete tblpreoutboundheader where ref_doc_no='TO-100143'
+delete tblordermangementline where ref_doc_no='TO-100143'
+delete tblordermangementheader where ref_doc_no='TO-100143'
+delete tbloutboundline where ref_doc_no='TO-100143'
+delete tbloutboundheader where ref_doc_no='TO-100143'
+delete tblpickupline where ref_doc_no='TO-100143'
+delete tblpickupheader where ref_doc_no='TO-100143'
+delete tblqualityline where ref_doc_no='TO-100143'
+delete tblqualityheader where ref_doc_no='TO-100143'
+
+--delete multiple records
+delete tblpreinboundline where ref_doc_no in ('III-075','III-081')
+delete tblpreinboundheader where ref_doc_no in ('III-075','III-081')
+delete tblinboundline where ref_doc_no in ('III-075','III-081')
+delete tblinboundheader where ref_doc_no in ('III-075','III-081')
+delete tblstagingline where ref_doc_no in ('III-075','III-081')
+delete tblstagingheader where ref_doc_no in ('III-075','III-081')
+delete tblgrheader where ref_doc_no in ('III-075','III-081')
+delete tblgrline where ref_doc_no in ('III-075','III-081')
+delete tblputawayline where ref_doc_no in ('III-075','III-081')
+delete tblputawayheader where ref_doc_no in ('III-075','III-081')
+
+delete tblinventory where ref_doc_no in ('III-075','III-081')
+delete tblinventorymovement where ref_doc_no in ('III-075','III-081')
+
+delete tblpreoutboundline where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblpreoutboundheader where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblordermangementline where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblordermangementheader where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tbloutboundline where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tbloutboundheader where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblpickupline where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblpickupheader where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblqualityline where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')
+delete tblqualityheader where ref_doc_no in ('PI-70071','PI-70069','PI-70067','PI-70062')

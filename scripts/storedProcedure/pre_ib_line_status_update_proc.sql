@@ -1,0 +1,22 @@
+-- String companyCodeId, String plantId, String languageId, String warehouseId
+-- String refDocNumber, String preInboundNo, Long statusId, String statusDescription,
+CREATE OR ALTER PROCEDURE pre_ib_line_status_update_proc 
+	@companyCodeId nvarchar(5), 
+	@plantId nvarchar(5), 
+	@languageId nvarchar(5),
+	@warehouseId nvarchar(5), 
+	@refDocNumber nvarchar(25),
+	@preInboundNo nvarchar(25), 	
+	@statusId bigint,
+	@statusDescription nvarchar(50)
+		
+AS
+BEGIN
+
+	UPDATE tblpreinboundline
+	SET STATUS_ID = @statusId, STATUS_TEXT = @statusDescription
+	WHERE IS_DELETED = 0 AND 
+			C_ID = @companyCodeId AND PLANT_ID = @plantId AND LANG_ID = @languageId AND WH_ID = @warehouseId AND 
+			REF_DOC_NO = @refDocNumber AND PRE_IB_NO = @preInboundNo
+
+END

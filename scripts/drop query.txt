@@ -1,0 +1,83 @@
+--drop query
+
+drop table tblpreinboundline 
+drop table tblpreinboundheader 
+drop table tblinboundline 
+drop table tblinboundheader 
+drop table tblstagingline 
+drop table tblstagingheader 
+drop table tblgrline 
+drop table tblgrheader 
+drop table tblputawayline 
+drop table tblputawayheader 
+
+drop table tblinventory 
+drop table tblinventorymovement
+
+drop table tblpreoutboundline 
+drop table tblpreoutboundheader 
+drop table tblordermangementline 
+drop table tblordermangementheader 
+drop table tbloutboundline 
+drop table tbloutboundlinedup 
+drop table tbloutboundheader 
+drop table tblpickupline 
+drop table tblpickupheader 
+drop table tblqualityline 
+drop table tblqualityheader 
+
+drop table tblimbasicdata1
+drop table tblbusinesspartner
+drop table tblimpartner
+
+drop table tbloborderlines2
+drop table tbloborder2
+drop table tbliborderlines2
+drop table tbliborder2
+
+drop table tblmiddlewarestockadjustment
+drop table tblstockadjustment
+
+drop table tblinhousetransferline
+drop table tblinhousetransferheader
+
+drop table tblcyclecountheader
+drop table tblcyclecountline
+drop table tblperiodicline
+drop table tblperiodicheader
+drop table tblperpetualline
+drop table tblperpetualheader
+
+drop table tblorderitemmaster
+drop table tblordercustomermaster
+
+drop table tblimbasicdata1
+drop table tblbusinesspartner
+drop table tblimpartner
+drop table tblstoragebin
+
+
+--middleware
+drop table CUSTOMERMASTER
+drop table ITEMMASTER
+drop table PERIODICLINE
+drop table PERIODICHEADER
+drop table PERPETUALLINE
+drop table PERPETUALHEADER
+drop table PICKLISTLINE
+drop table PICKLISTHEADER
+drop table PURCHASERETURNLINE
+drop table PURCHASERETURNHEADER
+drop table DELIVERY
+drop table SALESINVOICE
+drop table SALESRETURNLINE
+drop table SALESRETURNHEADER
+drop table STOCKADJUSTMENT
+drop table STOCKRECEIPTLINE
+drop table STOCKRECEIPTHEADER
+drop table SUPPLIERINVOICELINE
+drop table SUPPLIERINVOICEHEADER
+drop table TRANSFERINLINE
+drop table TRANSFERINHEADER
+drop table TRANSFEROUTLINE
+drop table TRANSFEROUTHEADER
