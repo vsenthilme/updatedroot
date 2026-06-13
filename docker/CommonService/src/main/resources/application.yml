@@ -1,0 +1,8 @@
+spring:
+  data:
+    cassandra:
+      port: 9042
+      contact-points: cassandra
+      keyspace-name: overc
+      entity-base-package: com.courier.overc360.api.common.model
+      schema-action: CREATE_IF_NOT_EXISTS
